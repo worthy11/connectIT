@@ -3,6 +3,7 @@
 connectIT is a domain-specific language designed for describing and visualizing 3D modular origami structures. With an intuitive syntax, it enables creators to define units, layers, and complex folded shapes programmatically. <br />
 
 ## 🔺Features
+
 - Declarative Syntax – Define origami models using intuitive language constructs.
 - Arithmetic & Logic Operations – Perform calculations and comparisons.
 - Loops & Conditionals – Control structures for procedural generation.
@@ -10,6 +11,7 @@ connectIT is a domain-specific language designed for describing and visualizing 
 - Real-time Visualization – Render 3D models using Plotly. <br />
 
 ## 🔺Example Code
+
 ```
 LAYER first = UNIT(red) * 3;
 LAYER second = UNIT(green) * 2;
@@ -24,6 +26,7 @@ CONNECT third EXTENDS pyramid;
 ```
 
 ## 🔺Setup
+
 ### Installing Dependencies
 
 Ensure you have Python and ANTLR4 installed:
@@ -42,11 +45,16 @@ antlr4 -Dlanguage=Python3 connectIT.g4
 
 ### Running the Interpreter
 
+Check out the `examples/` directory. After generating all necessary components, run one of the example interpreters:
+
 ```
-python main.py examples/pyramid.fold
+py examples/antlr_demo/ExprInterpreter.py
 ```
 
+See `examples/antlr_demo/README.md` for more instructions.
+
 ### Visualization
+
 ```py
 # TODO
 ```
