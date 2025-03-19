@@ -39,8 +39,6 @@ pip install antlr4-python3-runtime anltr4-tools plotly
 
 ```
 git clone https://github.com/worthy11/connectIT.git
-cd connectIT
-antlr4 -Dlanguage=Python3 connectIT.g4
 ```
 
 ### Running the Interpreter
