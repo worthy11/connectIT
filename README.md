@@ -29,7 +29,7 @@ CONNECT third EXTENDS pyramid;
 Ensure you have Python and ANTLR4 installed:
 
 ```
-pip install antlr4-python3-runtime plotly
+pip install antlr4-python3-runtime anltr4-tools plotly
 ```
 
 ### Cloning the Repository
