@@ -1,3 +1,12 @@
+examples/*/*.interp
+examples/*/*.tokens
+examples/*/*Lexer.interp
+examples/*/*Lexer.py
+examples/*/*Lexer.tokens
+examples/*/*Listener.py
+examples/*/*Parser.py
+examples/*/*Visitor.py
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
