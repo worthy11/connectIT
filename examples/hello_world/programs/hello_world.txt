@@ -1,0 +1,15 @@
+UNIT r = *red*
+UNIT g = *green*
+UNIT b = *blue*
+
+LAYER first = r * 3
+LAYER second = g * 2
+LAYER third = r * 1 + g * 4
+
+SHOW r
+SHOW g
+SHOW b
+
+SHOW first
+SHOW second
+SHOW third

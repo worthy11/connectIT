@@ -1,0 +1,6 @@
+UNIT a = *blue*
+
+
+SHOW a
+
+

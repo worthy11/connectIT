@@ -1,0 +1,2 @@
+UNIT r = *red*
+SHOW r
