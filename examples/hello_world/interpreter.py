@@ -5,7 +5,6 @@ from ConnectITVisitor import ConnectITVisitor
 
 from data_types import *
 from utils import *
-import plotly.graph_objects as go
 
 class EvalVisitor(ConnectITVisitor):
     def __init__(self):
