@@ -20,25 +20,26 @@ class Unit(Structure):
             'white': '\033[97m',
             'black': '\033[90m'
         }
+        self.x = self.y = self.z = 0
 
     def __str__(self) -> str:
         color_code = self.color_codes.get(self.color[1:-1], '')
         reset_code = '\033[0m'
         return f"{color_code}▲{reset_code}"
+    
+    def set_position(self, x: int, y: int, z: int):
+        self.x, self.y, self.z = x, y, z
 
 class Layer(Structure):
     def __init__(self, name: str, units: list[Unit]):
         super().__init__(name)
         self.units = units
-        self.length = len(units)
 
     def add_unit(self, unit: Unit):
         self.units.append(unit)
-        self.length += 1
 
     def remove_unit(self, index: int):
         self.units.pop(index)
-        self.length -= 1
 
     def __str__(self):
         # Join the string representation of each unit (colored triangle) with a space

@@ -4,10 +4,13 @@ from ConnectITParser import ConnectITParser
 from ConnectITVisitor import ConnectITVisitor
 
 from data_types import *
+from utils import *
+import plotly.graph_objects as go
 
 class EvalVisitor(ConnectITVisitor):
     def __init__(self):
         self.variables = {}
+        self.fig = go.Figure()
 
     def visitProgram(self, ctx):
         output = []
@@ -85,10 +88,22 @@ class EvalVisitor(ConnectITVisitor):
         if ctx.getChildCount() == 2:
             name: str = ctx.ID().getText()
             var: Structure = self.variables[name]
-            return(str(var))
+            # return(str(var))
+            shape_name = ctx.ID().getText()
+
+            if shape_name not in self.variables:
+                print(f"Error: '{shape_name}' is not defined.")
+                return
+
+            structure = self.variables[shape_name]
+            if isinstance(structure, Structure):
+                show_figure(self.fig, structure)
+            else:
+                print(f"SHOW only supports STRUCTUREs, not {type(structure)}.")
 
         else:
             raise Exception("Invalid instruction")
+
 
 def evaluate_expression(expression):
     input_stream = InputStream(expression)
@@ -101,7 +116,7 @@ def evaluate_expression(expression):
     return visitor.visit(tree)
 
 if __name__ == "__main__":
-    with open('programs/hello_world.txt', 'r') as f:
+    with open('examples/hello_world/programs/hello_world.txt', 'r') as f:
         program = f.read()
     try:
         result = evaluate_expression(program)

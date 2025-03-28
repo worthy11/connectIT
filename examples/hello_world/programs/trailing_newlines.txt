@@ -1,6 +1,10 @@
 UNIT a = *blue*
+UNIT b = *blue*
+UNIT c = *blue*
 
 
 SHOW a
+SHOW b
+SHOW c
 
 
