@@ -50,16 +50,16 @@ class Shape(Structure):
     def __init__(self, name: str, layers: list[Layer]):
         super().__init__(name)
         self.layers = layers
-        self.connections = {}
+        self.connections = []
 
     def add_layer(self, layer : Layer, connection_type: str = "between", offset: int = 0):
         self.layers.append(layer)
-        self.connections[layer] = {"type": connection_type, "offset": offset}
+        self.connections.append({"type": connection_type, "offset": offset})
     
     def remove_layer(self):
         if self.layers:
-            layer = self.layers.pop()  
-            del self.connections[layer]
+            self.layers.pop()  
+            self.connections.pop()
 
     def __str__(self):
         return "\n".join(str(layer) for layer in self.layers)
