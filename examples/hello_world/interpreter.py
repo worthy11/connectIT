@@ -58,7 +58,7 @@ class EvalVisitor(ConnectITVisitor):
         name: str = ctx.ID().getText()
         units: list = self.visit(ctx.layerExpr())
         layer: Layer = Layer(name, units)
-
+        
         self.variables[name] = layer
         return None
 
@@ -81,7 +81,47 @@ class EvalVisitor(ConnectITVisitor):
 
         else:
             raise Exception("Invalid layerExpr")
-        
+
+    def visitShapeDeclaration(self, ctx):
+        # print(f"ShapeDeclaration: {ctx.getText()}")
+        name: str = ctx.ID().getText()
+        layers: list = self.visit(ctx.shapeExpr())
+        shape: Shape = Shape(name, layers)
+
+        self.variables[name] = shape
+        return None
+
+    def visitShapeExpr(self, ctx):
+        # print(f"ShapeExpr: {ctx.getText()}")
+
+        if ctx.getChildCount() == 3:
+            left = self.visit(ctx.getChild(0))
+            op = ctx.getChild(1).getText()
+            right = self.visit(ctx.getChild(2))
+
+            if op == "*":
+                if isinstance(left, Layer) and ctx.getChild(2).NUMBER():
+                    return [left] * int(ctx.getChild(2).NUMBER().getText())
+                else:
+                    raise Exception("Invalid multiplication in shape expression")
+
+            elif op == "+":
+                if isinstance(left, list) and isinstance(right, list):
+                    return left + right
+                else:
+                    raise Exception("Invalid addition in shape expression")
+
+        elif ctx.ID():
+            name = ctx.ID().getText()
+            if name in self.variables and isinstance(self.variables[name], Layer):
+                return [self.variables[name]]
+            else:
+                raise Exception(f"Shape expression refers to an undefined layer: {name}")
+
+        else:
+            raise Exception("Invalid shape expression")
+
+
     def visitShowStatement(self, ctx):
         # print(f"ShowStatement: {ctx.getText()}")
         if ctx.getChildCount() == 2:
