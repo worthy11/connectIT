@@ -1,19 +1,34 @@
 grammar ConnectIT;
 
-program     : NEWLINE* (statement (NEWLINE+ statement)*)* NEWLINE* EOF ;
+program     : NEWLINE* ( statement ( NEWLINE+ statement )* )* NEWLINE* EOF ;
+
 statement   : declaration 
             | assignment 
             | shapeDef 
             | modelDef 
             | showStatement
+            | whileStmt
+            | forStmt
+            | ifStmt
+            | functionDeclaration
             | returnExpr
             ;
 
-declaration : 'UNIT' ID ( '=' unitExpr )?           # unitDeclaration
-            | 'LAYER' ID ( '=' layerExpr )?         # layerDeclaration
-            | 'SHAPE' ID                            # shapeDeclaration
-            | 'MODEL' ID                            # modelDeclaration
+declaration : 'UNIT' unitAssigmentList        # unitDeclaration
+            | 'LAYER' layerAssigmentList      # layerDeclaration
+            | 'SHAPE' idList                  # shapeDeclaration
+            | 'MODEL' idList                  # modelDeclaration
             ;
+
+unitAssigmentList   : unitAssignment (',' unitAssignment)* ;
+
+unitAssignment  : ID ( '=' unitExpr )? ;
+
+layerAssigmentList  : layerAssignment ( ',' layerAssignment )* ;
+
+layerAssignment : ID ( '=' layerExpr )? ;
+
+idList  : ID ( ',' ID )* ;
 
 assignment  : ID '=' expression
             | layerChain '-->' ID
@@ -35,49 +50,48 @@ layerExpr   : ID '*' NUMBER
             |
             ;
 
-shapeDef    : layerChain '-->' ( SHAPE )? ID ;
-layerChain  : ( layerExpr | ID ) ('<-' layerChain)?
-            | ( layerExpr | ID ) ('<<-' layerChain)?
-            | ( layerExpr | ID ) ('<' NUMBER '-' layerChain)?
-            | ID '<-' (layerChain)?
+shapeDef    : layerChain '-->' ( 'SHAPE' )? ID ;
+
+layerChain  : ( layerExpr | ID ) ( '<-' layerChain )?
+            | ( layerExpr | ID ) ( '<<-' layerChain )?
+            | ( layerExpr | ID ) ( '<-' NUMBER '-' layerChain )?
             ; 
 
-modelDef    : shapeChain '-->' ID ;
+modelDef    : shapeChain '-->' ( 'MODEL' )? ID ;
+
 shapeChain  : ID ('<-' shapeChain)? ; // Only SHAPE IDs allowed
 
-showStatement : 'SHOW' ID ; 
+showStatement   : 'SHOW' ID ; 
 
-whileStmt -> 'REPEAT WHILE' condition NEWLINE? '[' statementBlock NEWLINE? ']'  
-condition -> expr  
-statementBlock -> statement (NEWLINE statement)*
+ifStmt  : 'IF' condition NEWLINE? '[' statementBlock NEWLINE? ']'
+        ( NEWLINE? 'ELSE IF' condition NEWLINE? '[' statementBlock NEWLINE? ']' )*
+        ( NEWLINE? 'ELSE' NEWLINE? '[' statementBlock NEWLINE? ']' )? ;
 
-forStmt -> 'REPEAT' NUMBER 'TIMES' NEWLINE? statementBlock
+whileStmt   : 'REPEAT WHILE' condition NEWLINE? '[' statementBlock NEWLINE? ']' ;
 
-functionDeclaration -> 'METHOD' ID '(' ( 'NUMBER'
-                                        | 'COLOR'
-                                        | 'PATTERN'
-                                        | 'UNIT'
-                                        | 'LAYER'
-                                        | 'SHAPE'
-                                        | 'MODEL'
-                                        )*
-                        ')' RETURNS ( 'NUMBER'
-                                    | 'COLOR'
-                                    | 'PATTERN'
-                                    | 'UNIT'
-                                    | 'LAYER'
-                                    | 'SHAPE'
-                                    | 'MODEL'
-                                    | 'NOTHING'
-                                    ) 
-                        '[' statementBlock returnExpr NEWLINE? ']';
-returnExpr -> 'RETURN' (ID | expr);
+// To trzeba zdecydowanie zmienić jakoś, dałem tak na odpierdol póki co xd
+condition   : expression ( '<' | '<=' | '>' | '>=' | '==' | '!=' ) expression ; 
+
+statementBlock  : statement (NEWLINE statement)* ;
+
+forStmt : 'REPEAT' NUMBER 'TIMES' NEWLINE? statementBlock ;
+
+functionDeclaration : 'METHOD' ID '('type*')' 'RETURNS' type '[' statementBlock returnExpr NEWLINE? ']' ;
+
+returnExpr  : 'RETURN' (ID | expression);
+
+type    : 'UNIT'
+        | 'LAYER'
+        | 'SHAPE'
+        | 'MODEL'
+        | 'NUMBER'
+        ;
 
 ID          : [a-zA-Z_][a-zA-Z0-9_]* ;
 NUMBER      : [0-9]+('.'[0-9]+)? ;
 
-COLOR       : '*' ('red' | 'blue' | 'green' | 'white' | 'black') '*';
-PATTERN     : '*' ('striped' | 'dotted' | 'gradient') '*';
+COLOR       : '*' ( 'red' | 'blue' | 'green' | 'white' | 'black' ) '*';
+PATTERN     : '*' ( 'striped' | 'dotted' | 'gradient' ) '*';
 
 WS          : [ \t]+ -> skip ;
 NEWLINE     : '\r'? '\n' ;
