@@ -3,7 +3,7 @@ grammar ConnectIT;
 program     : NEWLINE* ( statement ( NEWLINE+ statement )* )* NEWLINE* EOF ;
 
 statement   : declaration 
-            // | assignment 
+            | assignment 
             | shapeDef 
             | modelDef 
             | showStatement
@@ -31,10 +31,10 @@ layerAssignment : ID ( '=' layerExpr )? ;
 idList  : ID ( ',' ID )* ;
 
 // Przez to jebie się ShapeDef
-// assignment  : ID '=' expression
-//             | layerChain '-->' ID
-//             | shapeChain '-->' ID
-//             ;
+ assignment  : ID '=' expression
+             | layerChain '-->' ID # shapeAssignment
+             | shapeChain '-->' ID # modelAssignment
+             ;
 
 expression  : unitExpr
             | layerExpr
@@ -51,14 +51,15 @@ layerExpr   : ID '*' NUMBER
             |
             ;
 
-shapeDef    : layerChain '-->' ( 'SHAPE' )? ID ;
+shapeDef    : layerChain '-->' 'SHAPE' ID ;
 
 layerChain  : ( layerExpr | ID ) ( '<-' layerChain )?
             | ( layerExpr | ID ) ( '<<-' layerChain )?
             | ( layerExpr | ID ) ( '<-' NUMBER '-' layerChain )?
+            | ( layerExpr | ID ) ( '<<-' NUMBER '-' layerChain )?
             ; 
 
-modelDef    : shapeChain '-->' ( 'MODEL' )? ID ;
+modelDef    : shapeChain '-->' 'MODEL' ID ;
 
 shapeChain  : ID ('<-' shapeChain)? ; // Only SHAPE IDs allowed
 
