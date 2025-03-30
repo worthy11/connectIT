@@ -14,7 +14,7 @@ class Structure:
 class Unit(Structure):
     def __init__(self, name: str, color: str, pattern: str):
         super().__init__(name)
-        self.color = color[1:-1]
+        self.color = color
         self.pattern = pattern
         self.color_map = {
             "red": "rgb(255, 0, 0)",
@@ -130,7 +130,7 @@ class Unit(Structure):
         self.reset_state()
 
 class Layer(Structure):
-    def __init__(self, name: str, units: list[Unit], closed=False, shift=0, mode=1):
+    def __init__(self, name: str, units: list[Unit], closed=False):
         super().__init__(name)
         self.units = units
         self.closed = closed
@@ -138,8 +138,6 @@ class Layer(Structure):
             self.radius = len(self.units)
         else:
             self.radius = 0
-        self.mode = mode
-        self.shift = shift
 
     def add_unit(self, unit: Unit):
         self.units.append(unit)
@@ -155,26 +153,26 @@ class Layer(Structure):
         for unit in self.units:
             unit.rotate(angle)
 
-    def render(self, fig, z):
+    def render(self, fig):
         if self.closed:
-            mod = 0.15 * (2*z+len(self.units)) # numer warstwy * długość
+            # mod = 0.15 * (2*z+len(self.units)) # numer warstwy * długość
             arg = 360 / len(self.units)
 
             for x, unit in enumerate(self.units):
                 angle = (x+self.shift + self.mode / 2)*arg 
                 unit.rotate((-90, 0, angle-90))
-                unit.translate((mod*(np.cos(np.radians(angle))), mod*(np.sin(np.radians(angle))), 0))
+                # unit.translate((mod*(np.cos(np.radians(angle))), mod*(np.sin(np.radians(angle))), 0))
                 unit.render(fig)
         else:
             for x, unit in enumerate(self.units):
-                unit.translate((x+0.15, 0, z))
+                unit.translate((x+0.15, 0, 0))
                 unit.render(fig)
 
 class Shape(Structure):
-    def __init__(self, name: str, layers: list[Layer]):
+    def __init__(self, name: str, layers: list[Layer], connections: list[dict]):
         super().__init__(name)
         self.layers = layers
-        self.connections = []
+        self.connections = connections
 
     def add_layer(self, layer : Layer, connection_type: str = "between", offset: int = 0):
         self.layers.append(layer)
@@ -190,11 +188,13 @@ class Shape(Structure):
     
     def render(self, fig):
         for z, layer in enumerate(self.layers):
-            # if layer.closed:
-            #     layer.rotate((-90, 0, 0))
-            # layer.translate((0, 0, z*0.2))
+            if layer.closed:
+                # layer.rotate((-90, 0, 0))
+                layer.translate((0, z, 0))
+            else:
+                layer.translate((0, 0, z))
             # TODO FIX
-            layer.render(fig, z)
+            layer.render(fig)
     
 class Model(Structure):
     def __init__(self):

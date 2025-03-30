@@ -25,8 +25,8 @@ class EvalVisitor(ConnectITVisitor):
         # print(f"Statement: {ctx.getText()}")
         if ctx.declaration():
             return self.visit(ctx.declaration())
-        # if ctx.assignment():
-        #     return self.visit(ctx.assignment())
+        if ctx.assignment():
+            return self.visit(ctx.assignment())
         if ctx.shapeDef():
             return self.visit(ctx.shapeDef())
         if ctx.modelDef():
@@ -41,25 +41,27 @@ class EvalVisitor(ConnectITVisitor):
         for unit_assignment_ctx in ctx.unitAssigmentList().unitAssignment():
             print(f"UnitAssignment: {unit_assignment_ctx.getText()}")
             unit_name = unit_assignment_ctx.ID().getText()
+            unit_color = None
+            unit_pattern = None
 
             if unit_assignment_ctx.unitExpr():
                 unit_expr_result = self.visit(unit_assignment_ctx.unitExpr())
                 
-                if unit_expr_result.startswith('*') and unit_expr_result.endswith('*'):
-                    if unit_expr_result[1:-1] in ['red', 'blue', 'green', 'white', 'black']:
-                        unit_color = unit_expr_result
-                        unit_pattern = None
-                    elif unit_expr_result[1:-1] in ['striped', 'dotted', 'gradient']:
-                        unit_color = None
-                        unit_pattern = unit_expr_result
+                if unit_expr_result is not None:
+                    print(f"result: {unit_expr_result}")
+                    if unit_expr_result.startswith('*') and unit_expr_result.endswith('*'):
+                        if unit_expr_result[1:-1] in ['red', 'blue', 'green', 'white', 'black']:
+                            unit_color = unit_expr_result[1:-1]
+                            unit_pattern = None
+                        elif unit_expr_result[1:-1] in ['striped', 'dotted', 'gradient']:
+                            unit_color = None
+                            unit_pattern = unit_expr_result[1:-1]
+                        else:
+                            raise Exception(f"Invalid unit expression: {unit_expr_result}")
                     else:
-                        raise Exception(f"Invalid unit expression: {unit_expr_result}")
-                else:
-                    raise Exception(f"Invalid unit expression format: {unit_expr_result}")
-            else:
-                unit_color = None
-                unit_pattern = None
+                        raise Exception(f"Invalid unit expression format: {unit_expr_result}")
 
+            print(unit_name, unit_color, unit_pattern)
             self.variables[unit_name] = Unit(name=unit_name, color=unit_color, pattern=unit_pattern)
 
         return None
@@ -89,6 +91,7 @@ class EvalVisitor(ConnectITVisitor):
 
     def visitLayerExpr(self, ctx):
         print(f"LayerExpr: {ctx.getText()}")
+
         if ctx.getChildCount() == 3 and ctx.getChild(1).getText() == '*':
             name = ctx.ID().getText()
             unit: Unit = self.variables[name]
@@ -109,6 +112,7 @@ class EvalVisitor(ConnectITVisitor):
 
     def visitShapeDeclaration(self, ctx):
         print(f"ShapeDeclaration: {ctx.getText()}")
+
         for shape_id_ctx in ctx.idList().ID():
             print(f"ShapeID: {shape_id_ctx.getText()}")
             shape_name = shape_id_ctx.getText()
@@ -116,74 +120,77 @@ class EvalVisitor(ConnectITVisitor):
             if shape_name in self.variables:
                 print(f"Warning: Shape '{shape_name}' is already defined.")
             else:
-                new_shape = Shape(name=shape_name, layers=[])
+                new_shape = Shape(name=shape_name, layers=[], connections=[])
                 self.variables[shape_name] = new_shape
         return None
 
     def visitShapeDef(self, ctx):
         print(f"ShapeDef: {ctx.getText()}")
 
-        # Visit the layerChain to get the layers
-        layers = self.visit(ctx.layerChain())
-        print(type(layers))
-
-        # Get the shape name (ID)
+        layers, connections = self.visit(ctx.layerChain())
         shape_name = ctx.ID().getText()
-
-        # Check if the 'SHAPE' keyword is present
         is_new_shape = ctx.getChildCount() == 4 and ctx.getChild(2).getText() == 'SHAPE'
 
         if is_new_shape:
-            # Define a new shape
             if shape_name in self.variables:
                 raise Exception(f"Shape '{shape_name}' is already defined.")
-            new_shape = Shape(name=shape_name, layers=layers)
+
+            new_shape = Shape(name=shape_name, layers=layers, connections=connections)
             self.variables[shape_name] = new_shape
-            print(f"New shape '{shape_name}' defined with layers: {layers.name}")
+            print(f"New shape '{shape_name}' defined with layers: {[l.name for l in layers]} and connections: {connections}")
+
         else:
-            # Update an existing shape
             if shape_name not in self.variables:
                 raise Exception(f"Shape '{shape_name}' is not defined.")
+
             existing_shape = self.variables[shape_name]
             if not isinstance(existing_shape, Shape):
                 raise Exception(f"Variable '{shape_name}' is not a shape.")
+                
             existing_shape.layers.extend(layers)
             print(f"Shape '{shape_name}' updated with additional layers: {layers.name}")
 
-        return self.variables[shape_name]
+        return None
 
     def visitLayerChain(self, ctx):
+        # TODO: Dodać implementację SHAPE <- LAYER --> SHAPE 
         print(f"LayerChain: {ctx.getText()}")
-
-        # Base case: Single layerExpr or ID
-        if ctx.layerExpr():
-            return self.visit(ctx.layerExpr())
-        elif ctx.ID():
-            layer_id = ctx.ID().getText()
-            if layer_id in self.variables:
-                layer = self.variables[layer_id]
-                if isinstance(layer, Layer):
-                    return layer
-                else:
-                    raise Exception(f"Variable '{layer_id}' is not a Layer.")
-            else:
-                raise Exception(f"Undefined variable: {layer_id}")
 
         # Recursive case: layerChain with '<-' or '<<-' or '<-' NUMBER '-'
         if ctx.layerChain():
-            left = self.visit(ctx.layerExpr() or ctx.ID())
-            right = self.visit(ctx.layerChain())
+            if ctx.layerExpr():
+                left = [Layer(self.visit(ctx.layerExpr()))]
+            else:
+                left = [self.variables[ctx.ID().getText()]]
+
+            right, connections = self.visit(ctx.layerChain())
 
             if ctx.getChild(1).getText() == '<-':
-                # Combine chains for '<-' operator
-                return right + left
+                if ctx.NUMBER():
+                    return right + left, [{"type": "between", "shift": int(ctx.NUMBER().getText())}] + connections
+                return right + left, [{"type": "between", "shift": 0}]  + connections
+
             elif ctx.getChild(1).getText() == '<<-':
-                # Combine chains for '<<-' operator
-                return left + right
-            elif ctx.NUMBER():
-                # Handle '<-' NUMBER '-' layerChain
-                number = int(ctx.NUMBER().getText())
-                return [left] * number + right
+                if ctx.NUMBER():
+                    return right + left, [{"type": "stack", "shift": int(ctx.NUMBER().getText())}]  + connections
+                return left + right, [{"type": "stack", "shift": 0}]  + connections
+
+        # Base case: Single layerExpr or ID
+        else:
+            if ctx.layerExpr():
+                units = self.visit(ctx.layerExpr())
+                return [Layer("none", units)], []
+
+            elif ctx.ID():
+                layer_id = ctx.ID().getText()
+                if layer_id in self.variables:
+                    layer = self.variables[layer_id]
+                    if isinstance(layer, Layer):
+                        return [layer], []
+                    else:
+                        raise Exception(f"Variable '{layer_id}' is not a Layer.")
+                else:
+                    raise Exception(f"Undefined variable: {layer_id}")
 
         raise Exception("Invalid LayerChain")
 
@@ -201,7 +208,7 @@ class EvalVisitor(ConnectITVisitor):
 
             structure = self.variables[shape_name]
             if isinstance(structure, Structure):
-                show_figure(self.fig, structure)
+                structure.render(self.fig)
             else:
                 print(f"SHOW only supports STRUCTUREs, not {type(structure)}.")
 
@@ -220,7 +227,7 @@ def evaluate_expression(expression):
     return visitor.visit(tree)
 
 if __name__ == "__main__":
-    with open('examples/hello_world/programs/trailing_newlines.txt', 'r') as f:
+    with open('programs/hello_world.txt', 'r') as f:
         program = f.read()
     try:
         result = evaluate_expression(program)
