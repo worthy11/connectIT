@@ -220,7 +220,7 @@ def evaluate_expression(expression):
     return visitor.visit(tree)
 
 if __name__ == "__main__":
-    with open('examples/hello_world/programs/hello_world.txt', 'r') as f:
+    with open('examples/hello_world/programs/trailing_newlines.txt', 'r') as f:
         program = f.read()
     try:
         result = evaluate_expression(program)

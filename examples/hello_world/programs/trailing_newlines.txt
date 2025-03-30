@@ -1,10 +1,9 @@
-UNIT a = *blue*
-UNIT b = *blue*
+UNIT a = *red*
+UNIT b = *green*
 UNIT c = *blue*
 
+LAYER third = a * 1 + b * 8 + c * 2
 
-SHOW a
-SHOW b
-SHOW c
+SHOW third
 
 
