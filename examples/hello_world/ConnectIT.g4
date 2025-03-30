@@ -3,7 +3,7 @@ grammar ConnectIT;
 program     : NEWLINE* ( statement ( NEWLINE+ statement )* )* NEWLINE* EOF ;
 
 statement   : declaration 
-            | assignment 
+            // | assignment 
             | shapeDef 
             | modelDef 
             | showStatement
@@ -30,10 +30,11 @@ layerAssignment : ID ( '=' layerExpr )? ;
 
 idList  : ID ( ',' ID )* ;
 
-assignment  : ID '=' expression
-            | layerChain '-->' ID
-            | shapeChain '-->' ID
-            ;
+// Przez to jebie się ShapeDef
+// assignment  : ID '=' expression
+//             | layerChain '-->' ID
+//             | shapeChain '-->' ID
+//             ;
 
 expression  : unitExpr
             | layerExpr
@@ -76,7 +77,7 @@ statementBlock  : statement (NEWLINE statement)* ;
 
 forStmt : 'REPEAT' NUMBER 'TIMES' NEWLINE? statementBlock ;
 
-functionDeclaration : 'METHOD' ID '('type*')' 'RETURNS' type '[' statementBlock returnExpr NEWLINE? ']' ;
+functionDeclaration : 'METHOD' ID '('( type ID ( ',' type ID )* )?')' 'RETURNS' type '[' statementBlock returnExpr NEWLINE? ']' ;
 
 returnExpr  : 'RETURN' (ID | expression);
 

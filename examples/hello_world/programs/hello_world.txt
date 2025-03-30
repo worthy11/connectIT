@@ -1,17 +1,7 @@
-UNIT r = *red*
-UNIT g = *green*
-UNIT b = *blue*
+UNIT r = *red*, g = *green*, b
 
-LAYER first = r *  3
-LAYER second = g * 2
-LAYER third = r * 1 + g * 4
+LAYER first = r *  3, second = g * 2, third = r * 1 + g * 4
 
+SHAPE sigma, pawel_co
 
-
-SHOW r
-SHOW g
-SHOW b
-
-SHOW first
-SHOW second
-SHOW third
+first <- second <- third --> SHAPE sigma2
