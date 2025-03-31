@@ -30,11 +30,10 @@ layerAssignment : ID ( '=' layerExpr )? ;
 
 idList  : ID ( ',' ID )* ;
 
-// Przez to jebie się ShapeDef
- assignment  : ID '=' expression
-             | layerChain '-->' ID # shapeAssignment
-             | shapeChain '-->' ID # modelAssignment
-             ;
+assignment  : ID '=' expression         # standardAssignment
+            | layerChain '-->' ID       # shapeAssignment
+            | shapeChain '-->' ID       # modelAssignment
+            ;
 
 expression  : unitExpr
             | layerExpr

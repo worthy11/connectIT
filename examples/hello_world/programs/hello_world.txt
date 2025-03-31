@@ -4,7 +4,7 @@ LAYER first = r *  3, second = g * 2, third = r * 1 + g * 4
 
 SHAPE sigma, pawel_co
 
-first <- second <- third --> SHAPE sigma2
+first <- second <- third --> sigma
 
 first <<- second <<- third --> SHAPE sigma3
 
@@ -14,4 +14,4 @@ first <<-2- second <<-1- third --> SHAPE sigma5
 
 first <- second <<- third <-4- first <<-7- second --> SHAPE sigma6
 
-SHOW sigma2
+SHOW sigma

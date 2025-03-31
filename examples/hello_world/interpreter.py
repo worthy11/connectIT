@@ -110,6 +110,42 @@ class EvalVisitor(ConnectITVisitor):
         else:
             raise Exception("Invalid layerExpr")
 
+    def visitStandardAssignment(self, ctx):
+        var_name = ctx.ID().getText()
+        value = self.visit(ctx.expression())
+        self.variables[var_name] = value
+        print(f"Assigned {value} to {var_name}")
+        return value
+
+    def visitShapeAssignment(self, ctx):
+        layer_chain, connections = self.visit(ctx.layerChain())
+        shape_name = ctx.ID().getText()
+
+        if shape_name in self.variables:
+            shape = self.variables[shape_name]
+            if not isinstance(shape, Shape):
+                raise Exception(f"Variable '{shape_name}' is not a Shape.")
+            shape.layers.extend(layer_chain)
+            shape.connections.extend(connections)
+            print(f"Updated shape '{shape_name}' with layers: {[l.name for l in layer_chain]} and connections: {connections}")
+        else:
+            raise Exception(f"Shape '{shape_name}' not defined. Try SHAPE {shape_name}")
+        return shape_name
+
+    def visitModelAssignment(self, ctx):
+        shape_chain = self.visit(ctx.shapeChain())
+        model_name = ctx.ID().getText()
+
+        if model_name in self.variables:
+            model = self.variables[model_name]
+            if not isinstance(model, Model):
+                raise Exception(f"Variable '{model_name}' is not a Model.")
+            model.shapes.extend(shape_chain)
+            print(f"Updated model '{model_name}' with shapes: {[sh.name for sh in shape_chain]}")
+        else:
+            raise Exception(f"Model '{model_name}' not defined. Try MODEL {model_name}")
+        return model_name
+
     def visitShapeDeclaration(self, ctx):
         print(f"ShapeDeclaration: {ctx.getText()}")
 
