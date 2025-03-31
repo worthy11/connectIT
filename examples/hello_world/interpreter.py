@@ -37,9 +37,9 @@ class EvalVisitor(ConnectITVisitor):
             raise Exception("Invalid statement")
 
     def visitUnitDeclaration(self, ctx):
-        print(f"UnitDeclaration: {ctx.getText()}")
+        # print(f"UnitDeclaration: {ctx.getText()}")
         for unit_assignment_ctx in ctx.unitAssigmentList().unitAssignment():
-            print(f"UnitAssignment: {unit_assignment_ctx.getText()}")
+            # print(f"UnitAssignment: {unit_assignment_ctx.getText()}")
             unit_name = unit_assignment_ctx.ID().getText()
             unit_color = None
             unit_pattern = None
@@ -48,7 +48,6 @@ class EvalVisitor(ConnectITVisitor):
                 unit_expr_result = self.visit(unit_assignment_ctx.unitExpr())
                 
                 if unit_expr_result is not None:
-                    print(f"result: {unit_expr_result}")
                     if unit_expr_result.startswith('*') and unit_expr_result.endswith('*'):
                         if unit_expr_result[1:-1] in ['red', 'blue', 'green', 'white', 'black']:
                             unit_color = unit_expr_result[1:-1]
@@ -61,13 +60,12 @@ class EvalVisitor(ConnectITVisitor):
                     else:
                         raise Exception(f"Invalid unit expression format: {unit_expr_result}")
 
-            print(unit_name, unit_color, unit_pattern)
             self.variables[unit_name] = Unit(name=unit_name, color=unit_color, pattern=unit_pattern)
 
         return None
 
     def visitUnitExpr(self, ctx):
-        print(f"UnitExpr: {ctx.getText()}")
+        # print(f"UnitExpr: {ctx.getText()}")
         if ctx.COLOR():
             return ctx.COLOR().getText()
         elif ctx.PATTERN():
@@ -75,9 +73,9 @@ class EvalVisitor(ConnectITVisitor):
         return None
     
     def visitLayerDeclaration(self, ctx):
-        print(f"LayerDeclaration: {ctx.getText()}")
+        # print(f"LayerDeclaration: {ctx.getText()}")
         for layer_assignment_ctx in ctx.layerAssigmentList().layerAssignment():
-            print(f"LayerAssignment: {layer_assignment_ctx.getText()}")
+            # print(f"LayerAssignment: {layer_assignment_ctx.getText()}")
             layer_name = layer_assignment_ctx.ID().getText()
 
             if layer_assignment_ctx.layerExpr():
@@ -90,7 +88,7 @@ class EvalVisitor(ConnectITVisitor):
         return None
 
     def visitLayerExpr(self, ctx):
-        print(f"LayerExpr: {ctx.getText()}")
+        # print(f"LayerExpr: {ctx.getText()}")
 
         if ctx.getChildCount() == 3 and ctx.getChild(1).getText() == '*':
             name = ctx.ID().getText()
@@ -147,10 +145,10 @@ class EvalVisitor(ConnectITVisitor):
         return model_name
 
     def visitShapeDeclaration(self, ctx):
-        print(f"ShapeDeclaration: {ctx.getText()}")
+        # print(f"ShapeDeclaration: {ctx.getText()}")
 
         for shape_id_ctx in ctx.idList().ID():
-            print(f"ShapeID: {shape_id_ctx.getText()}")
+            # print(f"ShapeID: {shape_id_ctx.getText()}")
             shape_name = shape_id_ctx.getText()
 
             if shape_name in self.variables:
@@ -161,7 +159,7 @@ class EvalVisitor(ConnectITVisitor):
         return None
 
     def visitShapeDef(self, ctx):
-        print(f"ShapeDef: {ctx.getText()}")
+        # print(f"ShapeDef: {ctx.getText()}")
 
         layers, connections = self.visit(ctx.layerChain())
         shape_name = ctx.ID().getText()
@@ -190,7 +188,7 @@ class EvalVisitor(ConnectITVisitor):
 
     def visitLayerChain(self, ctx):
         # TODO: Dodać implementację SHAPE <- LAYER --> SHAPE 
-        print(f"LayerChain: {ctx.getText()}")
+        # print(f"LayerChain: {ctx.getText()}")
 
         # Recursive case: layerChain with '<-' or '<<-' or '<-' NUMBER '-'
         if ctx.layerChain():
@@ -203,13 +201,13 @@ class EvalVisitor(ConnectITVisitor):
 
             if ctx.getChild(1).getText() == '<-':
                 if ctx.NUMBER():
-                    return right + left, [{"type": "between", "shift": int(ctx.NUMBER().getText())}] + connections
-                return right + left, [{"type": "between", "shift": 0}]  + connections
+                    return left + right, [{"type": 1, "shift": int(ctx.NUMBER().getText())}] + connections
+                return left + right, [{"type": 1, "shift": 0}]  + connections
 
             elif ctx.getChild(1).getText() == '<<-':
                 if ctx.NUMBER():
-                    return right + left, [{"type": "stack", "shift": int(ctx.NUMBER().getText())}]  + connections
-                return left + right, [{"type": "stack", "shift": 0}]  + connections
+                    return left + right, [{"type": 0, "shift": int(ctx.NUMBER().getText())}]  + connections
+                return left + right, [{"type": 0, "shift": 0}]  + connections
 
         # Base case: Single layerExpr or ID
         else:
@@ -233,9 +231,6 @@ class EvalVisitor(ConnectITVisitor):
     def visitShowStatement(self, ctx):
         # print(f"ShowStatement: {ctx.getText()}")
         if ctx.getChildCount() == 2:
-            name: str = ctx.ID().getText()
-            var: Structure = self.variables[name]
-            # return(str(var))
             shape_name = ctx.ID().getText()
 
             if shape_name not in self.variables:
@@ -244,7 +239,7 @@ class EvalVisitor(ConnectITVisitor):
 
             structure = self.variables[shape_name]
             if isinstance(structure, Structure):
-                structure.render(self.fig)
+                show_figure(self.fig, structure)
             else:
                 print(f"SHOW only supports STRUCTUREs, not {type(structure)}.")
 

@@ -110,6 +110,7 @@ class Unit(Structure):
         ])
 
     def render(self, fig):
+        # print("Render Unit")
         x_vals, y_vals, z_vals = zip(*(self.vertices))
         fig.add_trace(go.Mesh3d(
             x=x_vals, y=y_vals, z=z_vals,
@@ -138,6 +139,8 @@ class Layer(Structure):
             self.radius = len(self.units)
         else:
             self.radius = 0
+        self.x = self.y = self.z = 0
+        self.rot_x = self.rot_y = self.rot_z = 0
 
     def add_unit(self, unit: Unit):
         self.units.append(unit)
@@ -146,33 +149,41 @@ class Layer(Structure):
         self.units.pop(index)
 
     def translate(self, vector = (0, 0, 0)):
-        for unit in self.units:
-            unit.translate(vector)
+        self.x += vector[0]
+        self.y += vector[1]
+        self.z += vector[2]
 
     def rotate(self, angle = (0, 0, 0)):
-        for unit in self.units:
-            unit.rotate(angle)
+        self.rot_x += angle[0]
+        self.rot_y += angle[1]
+        self.rot_z += angle[2]
 
     def render(self, fig):
+        # print("Render Layer")
         if self.closed:
-            # mod = 0.15 * (2*z+len(self.units)) # numer warstwy * długość
+            mod = 0.15 * (2*self.z + len(self.units)) # numer warstwy * długość
             arg = 360 / len(self.units)
 
             for x, unit in enumerate(self.units):
-                angle = (x+self.shift + self.mode / 2)*arg 
+                angle = (x + self.rot_z) * arg 
                 unit.rotate((-90, 0, angle-90))
-                # unit.translate((mod*(np.cos(np.radians(angle))), mod*(np.sin(np.radians(angle))), 0))
+                unit.translate((mod*(np.cos(np.radians(angle))), mod*(np.sin(np.radians(angle))), 0))
                 unit.render(fig)
         else:
             for x, unit in enumerate(self.units):
-                unit.translate((x+0.15, 0, 0))
+                unit.translate((x+0.15, 0, self.z))
                 unit.render(fig)
+        self.reset_state()
+
+    def reset_state(self):
+        self.x = self.y = self.z = 0
+        self.rot_x = self.rot_y = self.rot_z = 0
 
 class Shape(Structure):
     def __init__(self, name: str, layers: list[Layer], connections: list[dict]):
         super().__init__(name)
         self.layers = layers
-        self.connections = connections
+        self.connections = [{"type": 0, "shift": 0}] + connections
 
     def add_layer(self, layer : Layer, connection_type: str = "between", offset: int = 0):
         self.layers.append(layer)
@@ -187,13 +198,16 @@ class Shape(Structure):
         return "\n".join(str(layer) for layer in self.layers)
     
     def render(self, fig):
-        for z, layer in enumerate(self.layers):
+        # print("Render Shape")
+
+        for z, (layer, connection) in enumerate(zip(self.layers, self.connections)):
+            # layer.closed = True
             if layer.closed:
                 # layer.rotate((-90, 0, 0))
-                layer.translate((0, z, 0))
-            else:
                 layer.translate((0, 0, z))
-            # TODO FIX
+                layer.rotate((0, 0, connection["shift"] + connection["type"] * 0.5))
+            else:
+                layer.translate((connection["shift"] + connection["type"] * 0.5, 0, z))
             layer.render(fig)
     
 class Model(Structure):

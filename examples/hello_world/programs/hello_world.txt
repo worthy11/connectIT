@@ -1,6 +1,6 @@
 UNIT r = *red*, g = *green*, b
 
-LAYER first = r *  3, second = g * 2, third = r * 1 + g * 4
+LAYER first = r*5 + g*5, second = g * 10, third = r * 10
 
 SHAPE sigma, pawel_co
 
