@@ -26,6 +26,7 @@ def show_figure(fig, structure: Structure):
             aspectmode="data",
         ),
     )
+    print("HERE")
     fig.write_html("out.html")
 
 # r = Layer('a', [Unit('a', 'red', 'red')]*10, True, 0, 0)
