@@ -165,13 +165,16 @@ class Layer(Structure):
             arg = 360 / len(self.units)
 
             for x, unit in enumerate(self.units):
-                angle = (x + self.rot_z) * arg 
+                angle = x * arg 
                 unit.rotate((-90, 0, angle-90))
-                unit.translate((mod*(np.cos(np.radians(angle))), mod*(np.sin(np.radians(angle))), 0))
+                unit.rotate((self.rot_x, self.rot_y, self.rot_z))
+                # unit.translate((mod*(np.cos(np.radians(angle))), mod*(np.sin(np.radians(angle))), 0))
+                unit.translate((self.x, self.y, self.z))
                 unit.render(fig)
         else:
             for x, unit in enumerate(self.units):
-                unit.translate((x+0.15, 0, self.z))
+                unit.translate((x+0.15, 0, 0))
+                unit.translate((self.x, self.y, self.z))
                 unit.render(fig)
         self.reset_state()
 
@@ -183,7 +186,11 @@ class Shape(Structure):
     def __init__(self, name: str, layers: list[Layer], connections: list[dict]):
         super().__init__(name)
         self.layers = layers
-        self.connections = [{"type": 0, "shift": 0}] + connections
+        self.connections = [{"shift": 0, "type": 0}] + connections
+
+    def update(self, layers: list, connections: dict):
+        self.layers = layers
+        self.connections = [{"shift": 0, "type": 0}] + connections
 
     def add_layer(self, layer : Layer, connection_type: str = "between", offset: int = 0):
         self.layers.append(layer)
@@ -198,16 +205,19 @@ class Shape(Structure):
         return "\n".join(str(layer) for layer in self.layers)
     
     def render(self, fig):
-        # print("Render Shape")
+        shifts = [self.connections[0]["type"]]
+        for idx in range(1, len(self.connections)):
+            shifts.append((shifts[idx-1] + self.connections[idx]["type"]) % 2)
+        # print(shifts)
 
         for z, (layer, connection) in enumerate(zip(self.layers, self.connections)):
             # layer.closed = True
             if layer.closed:
                 # layer.rotate((-90, 0, 0))
-                layer.translate((0, 0, z))
-                layer.rotate((0, 0, connection["shift"] + connection["type"] * 0.5))
+                layer.translate((0, z, 0))
+                layer.rotate((0, 0, connection["shift"] + shifts[z] * 0.5))
             else:
-                layer.translate((connection["shift"] + connection["type"] * 0.5, 0, z))
+                layer.translate((connection["shift"] + shifts[z] * 0.5, 0, z))
             layer.render(fig)
     
 class Model(Structure):

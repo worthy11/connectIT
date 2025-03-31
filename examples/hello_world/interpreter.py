@@ -1,4 +1,6 @@
 from antlr4 import *
+from antlr4 import CommonTokenStream, InputStream
+from antlr4.error.ErrorListener import ErrorListener
 from ConnectITLexer import ConnectITLexer
 from ConnectITParser import ConnectITParser
 from ConnectITVisitor import ConnectITVisitor
@@ -112,23 +114,23 @@ class EvalVisitor(ConnectITVisitor):
         var_name = ctx.ID().getText()
         value = self.visit(ctx.expression())
         self.variables[var_name] = value
-        print(f"Assigned {value} to {var_name}")
-        return value
+        # print(f"Assigned {value} to {var_name}")
+        return None
 
     def visitShapeAssignment(self, ctx):
+        # print(f"ShapeAssignment: {ctx.getText()}")
+
         layer_chain, connections = self.visit(ctx.layerChain())
         shape_name = ctx.ID().getText()
-
         if shape_name in self.variables:
             shape = self.variables[shape_name]
             if not isinstance(shape, Shape):
                 raise Exception(f"Variable '{shape_name}' is not a Shape.")
-            shape.layers.extend(layer_chain)
-            shape.connections.extend(connections)
-            print(f"Updated shape '{shape_name}' with layers: {[l.name for l in layer_chain]} and connections: {connections}")
+            shape.update(layers=layer_chain, connections=connections)
+            # print(f"Updated shape '{shape_name}' with layers: {[l.name for l in layer_chain]} and connections: {connections}")
         else:
             raise Exception(f"Shape '{shape_name}' not defined. Try SHAPE {shape_name}")
-        return shape_name
+        return None
 
     def visitModelAssignment(self, ctx):
         shape_chain = self.visit(ctx.shapeChain())
@@ -139,10 +141,10 @@ class EvalVisitor(ConnectITVisitor):
             if not isinstance(model, Model):
                 raise Exception(f"Variable '{model_name}' is not a Model.")
             model.shapes.extend(shape_chain)
-            print(f"Updated model '{model_name}' with shapes: {[sh.name for sh in shape_chain]}")
+            # print(f"Updated model '{model_name}' with shapes: {[sh.name for sh in shape_chain]}")
         else:
             raise Exception(f"Model '{model_name}' not defined. Try MODEL {model_name}")
-        return model_name
+        return None
 
     def visitShapeDeclaration(self, ctx):
         # print(f"ShapeDeclaration: {ctx.getText()}")
@@ -171,7 +173,7 @@ class EvalVisitor(ConnectITVisitor):
 
             new_shape = Shape(name=shape_name, layers=layers, connections=connections)
             self.variables[shape_name] = new_shape
-            print(f"New shape '{shape_name}' defined with layers: {[l.name for l in layers]} and connections: {connections}")
+            # print(f"New shape '{shape_name}' defined with layers: {[l.name for l in layers]} and connections: {connections}")
 
         else:
             if shape_name not in self.variables:
@@ -182,7 +184,7 @@ class EvalVisitor(ConnectITVisitor):
                 raise Exception(f"Variable '{shape_name}' is not a shape.")
                 
             existing_shape.layers.extend(layers)
-            print(f"Shape '{shape_name}' updated with additional layers: {layers.name}")
+            # print(f"Shape '{shape_name}' updated with additional layers: {layers.name}")
 
         return None
 
@@ -252,7 +254,38 @@ def evaluate_expression(expression):
     lexer = ConnectITLexer(input_stream)
     token_stream = CommonTokenStream(lexer)
     parser = ConnectITParser(token_stream)
+
+    class SyntaxErrorListener(ErrorListener):
+        def __init__(self):
+            super().__init__()
+            self.has_error = 0  # Flaga do zatrzymania programu
+            self.errors = []
+
+        def syntaxError(self, recognizer, offendingSymbol, line, column, msg, e):
+            self.has_error = True  # Oznaczamy, że wystąpił błąd
+            error_token = offendingSymbol.text if offendingSymbol else "<EOF>"
+            if '\\':
+                error_token = "<EOL>"
+
+            if "mismatched input" in msg:
+                self.errors.append(f"Błąd składniowy: nieoczekiwany token w linii {line}, kolumna {column}: {error_token}")
+            elif "no viable alternative" in msg:
+                self.errors.append(f"Błąd składniowy: niepoprawna składnia w linii {line}, kolumna {column}: {error_token}")
+            elif "extraneous input" in msg:
+                self.errors.append(f"Błąd składniowy: nadmiarowy token w linii {line}, kolumna {column}: {error_token}")
+            elif "missing" in msg:
+                self.errors.append(f"Błąd składniowy: brakujący token (linia {line}, kolumna {column}): {error_token}")
+            else:
+                self.errors.append(f"Błąd składniowy: {msg} (linia {line}, kolumna {column})")
+
+    error_listener = SyntaxErrorListener()
+    parser.removeErrorListeners()  # Remove default error listener
+    parser.addErrorListener(error_listener)
+
     tree = parser.program()
+
+    if error_listener.has_error:
+        return "\n".join(error_listener.errors)
 
     visitor = EvalVisitor()
     return visitor.visit(tree)

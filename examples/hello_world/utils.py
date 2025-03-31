@@ -26,12 +26,4 @@ def show_figure(fig, structure: Structure):
             aspectmode="data",
         ),
     )
-    print("HERE")
     fig.write_html("out.html")
-
-# r = Layer('a', [Unit('a', 'red', 'red')]*10, True, 0, 0)
-# g = Layer('a', [Unit('a', 'green', 'red')]*10, True, 0, 1)
-# b = Layer('a', [Unit('a', 'blue', 'red')]*10, True, 0, 0)
-# s = Shape('a', [r, g, b])
-# fig = go.Figure()
-# show_figure(fig, s)
