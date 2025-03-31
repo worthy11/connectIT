@@ -248,7 +248,6 @@ class EvalVisitor(ConnectITVisitor):
         else:
             raise Exception("Invalid instruction")
 
-
 def evaluate_expression(expression):
     input_stream = InputStream(expression)
     lexer = ConnectITLexer(input_stream)
@@ -258,37 +257,41 @@ def evaluate_expression(expression):
     class SyntaxErrorListener(ErrorListener):
         def __init__(self):
             super().__init__()
-            self.has_error = 0  # Flaga do zatrzymania programu
+            self.has_error = False
             self.errors = []
 
         def syntaxError(self, recognizer, offendingSymbol, line, column, msg, e):
-            self.has_error = True  # Oznaczamy, że wystąpił błąd
+            self.has_error = True
             error_token = offendingSymbol.text if offendingSymbol else "<EOF>"
-            if '\\':
-                error_token = "<EOL>"
 
             if "mismatched input" in msg:
-                self.errors.append(f"Błąd składniowy: nieoczekiwany token w linii {line}, kolumna {column}: {error_token}")
+                self.errors.append(f"Syntax Error: Unexpected token '{error_token}' at line {line}, column {column}.")
             elif "no viable alternative" in msg:
-                self.errors.append(f"Błąd składniowy: niepoprawna składnia w linii {line}, kolumna {column}: {error_token}")
+                self.errors.append(f"Syntax Error: Invalid syntax at line {line}, column {column}, near '{"<EOL>" if error_token == '\n' else error_token}'.")
             elif "extraneous input" in msg:
-                self.errors.append(f"Błąd składniowy: nadmiarowy token w linii {line}, kolumna {column}: {error_token}")
+                self.errors.append(f"Syntax Error: Extraneous token '{error_token}' at line {line}, column {column}.")
             elif "missing" in msg:
-                self.errors.append(f"Błąd składniowy: brakujący token (linia {line}, kolumna {column}): {error_token}")
+                self.errors.append(f"Syntax Error: Missing token at line {line}, column {column}, near '{"<EOL>" if error_token == '\n' else error_token}'.")
             else:
-                self.errors.append(f"Błąd składniowy: {msg} (linia {line}, kolumna {column})")
+                self.errors.append(f"Syntax Error: {msg} at line {line}, column {column}.")
 
     error_listener = SyntaxErrorListener()
     parser.removeErrorListeners()  # Remove default error listener
     parser.addErrorListener(error_listener)
 
-    tree = parser.program()
+    try:
+        tree = parser.program()
+    except Exception as e:
+        return f"Parsing Error: {str(e)}"
 
     if error_listener.has_error:
         return "\n".join(error_listener.errors)
 
-    visitor = EvalVisitor()
-    return visitor.visit(tree)
+    try:
+        visitor = EvalVisitor()
+        return visitor.visit(tree)
+    except Exception as e:
+        return f"Runtime Error: {str(e)}"
 
 if __name__ == "__main__":
     with open('programs/hello_world.txt', 'r') as f:
