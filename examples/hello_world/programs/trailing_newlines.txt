@@ -1,9 +1,0 @@
-UNIT a = *white*
-UNIT b = *black*
-UNIT c = *blue*
-
-LAYER first = a*5 + b*5 + c*5 CLOSED
-
-first <<- first <-5- first <<-3- first --> SHAPE boom
-SHOW boom
-

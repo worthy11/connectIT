@@ -279,7 +279,7 @@ def evaluate_expression(expression):
         return f"Runtime Error: {str(e)}"
 
 if __name__ == "__main__":
-    with open('programs/tree.txt', 'r') as f:
+    with open('programs/playground.txt', 'r') as f:
         program = f.read()
     try:
         result = evaluate_expression(program)
