@@ -2,8 +2,10 @@ UNIT a = *red*
 UNIT b = *green*
 UNIT c = *blue*
 
-LAYER third = a * 1 + b * 8 + c * 2
+LAYER first = a * 10 CLOSED, second = b * 10 CLOSED, third = c * 10 CLOSED
+SHAPE boom
+first <- second <- third --> boom
 
-SHOW third
+SHOW boom
 
 

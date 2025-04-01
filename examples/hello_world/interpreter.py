@@ -79,29 +79,30 @@ class EvalVisitor(ConnectITVisitor):
         for layer_assignment_ctx in ctx.layerAssigmentList().layerAssignment():
             # print(f"LayerAssignment: {layer_assignment_ctx.getText()}")
             layer_name = layer_assignment_ctx.ID().getText()
+            layer_closed = layer_assignment_ctx.getChildCount() > 3 and layer_assignment_ctx.getChild(3).getText() == "CLOSED"
 
             if layer_assignment_ctx.layerExpr():
                 layer_units = self.visit(layer_assignment_ctx.layerExpr())
             else:
-                layer_units = []
+                layer_units = [], False
 
-            self.variables[layer_name] = Layer(name=layer_name, units=layer_units)
+            self.variables[layer_name] = Layer(name=layer_name, units=layer_units, closed=layer_closed)
 
         return None
 
     def visitLayerExpr(self, ctx):
         # print(f"LayerExpr: {ctx.getText()}")
 
-        if ctx.getChildCount() == 3 and ctx.getChild(1).getText() == '*':
+        if ctx.getChild(1).getText() == '*':
             name = ctx.ID().getText()
             unit: Unit = self.variables[name]
-            length = ctx.NUMBER().getText()
+            length: str = ctx.NUMBER().getText()
 
             return [unit] * int(length)
         
         elif ctx.getChildCount() == 3 and ctx.getChild(1).getText() == '+':
-            units_left: list = self.visit(ctx.layerExpr(0))
-            units_right: list = self.visit(ctx.layerExpr(1))
+            units_left = self.visit(ctx.layerExpr(0))
+            units_right = self.visit(ctx.layerExpr(1))
             return units_left + units_right
 
         elif ctx.getChildCount() == 0:

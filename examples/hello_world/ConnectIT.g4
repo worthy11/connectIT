@@ -26,7 +26,7 @@ unitAssignment  : ID ( '=' unitExpr )? ;
 
 layerAssigmentList  : layerAssignment ( ',' layerAssignment )* ;
 
-layerAssignment : ID ( '=' layerExpr )? ;
+layerAssignment : ID ( '=' layerExpr )? ( 'CLOSED' )? ;
 
 idList  : ID ( ',' ID )* ;
 

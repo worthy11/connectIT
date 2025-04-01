@@ -25,5 +25,6 @@ def show_figure(fig, structure: Structure):
             zaxis=dict(visible=False),
             aspectmode="data",
         ),
+        showlegend=False
     )
     fig.write_html("out.html")

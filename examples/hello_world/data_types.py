@@ -117,7 +117,7 @@ class Unit(Structure):
             i=self.i_faces, j=self.j_faces, k=self.k_faces,
             color=self.color_map[self.color],
             opacity=1,
-            lighting=dict(ambient=0.7, diffuse=0.6, specular=0.2, roughness=0.1)
+            lighting=dict(specular=0.1, diffuse=1.0, ambient=0.5, fresnel=0)
         ))
 
         for edge in self.edges:
@@ -135,10 +135,11 @@ class Layer(Structure):
         super().__init__(name)
         self.units = units
         self.closed = closed
-        if closed:
-            self.radius = len(self.units)
-        else:
-            self.radius = 0
+
+        self.shift = 0
+        self.level = 0
+        self.radius = len(self.units)
+        
         self.x = self.y = self.z = 0
         self.rot_x = self.rot_y = self.rot_z = 0
 
@@ -160,22 +161,30 @@ class Layer(Structure):
 
     def render(self, fig):
         # print("Render Layer")
-        if self.closed:
-            mod = 0.15 * (2*self.z + len(self.units)) # numer warstwy * długość
-            arg = 360 / len(self.units)
+        # if self.closed:
+        #     mod = 0.15 * (2*self.level + len(self.units)) # numer warstwy * długość
+        #     arg = 360 / len(self.units)
 
-            for x, unit in enumerate(self.units):
-                angle = x * arg 
+        #     for x, unit in enumerate(self.units):
+        #         angle = (x + self.shift) * arg 
+        #         unit.rotate((-90, 0, angle-90))
+        #         unit.translate((mod*(np.cos(np.radians(angle))), mod*(np.sin(np.radians(angle))), 0))
+        #         unit.render(fig)
+        # else:
+        #     for x, unit in enumerate(self.units):
+        #         unit.translate((self.shift + x + 0.15, self.radius, self.level))
+        #         unit.render(fig)
+        arg = 360 / self.radius
+        for x, unit in enumerate(self.units):
+            # self.closed = False
+            if self.closed:
+                unit.translate((0, self.radius / 6, self.level / 3 + self.radius / 6))
+                angle = (x + self.shift) * arg 
                 unit.rotate((-90, 0, angle-90))
-                unit.rotate((self.rot_x, self.rot_y, self.rot_z))
-                # unit.translate((mod*(np.cos(np.radians(angle))), mod*(np.sin(np.radians(angle))), 0))
-                unit.translate((self.x, self.y, self.z))
-                unit.render(fig)
-        else:
-            for x, unit in enumerate(self.units):
-                unit.translate((x+0.15, 0, 0))
-                unit.translate((self.x, self.y, self.z))
-                unit.render(fig)
+            else:
+                unit.translate(((self.shift + x) * 0.8, self.radius / 6, self.level / 3))
+            unit.render(fig)
+
         self.reset_state()
 
     def reset_state(self):
@@ -212,12 +221,8 @@ class Shape(Structure):
 
         for z, (layer, connection) in enumerate(zip(self.layers, self.connections)):
             # layer.closed = True
-            if layer.closed:
-                # layer.rotate((-90, 0, 0))
-                layer.translate((0, z, 0))
-                layer.rotate((0, 0, connection["shift"] + shifts[z] * 0.5))
-            else:
-                layer.translate((connection["shift"] + shifts[z] * 0.5, 0, z))
+            layer.shift = connection["shift"] + shifts[z]*0.5 # o ile unitów w prawo przekręcić layer
+            layer.level = z
             layer.render(fig)
     
 class Model(Structure):
