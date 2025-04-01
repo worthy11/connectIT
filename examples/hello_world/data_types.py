@@ -21,7 +21,8 @@ class Unit(Structure):
             "green": "rgb(0, 255, 0)",
             "blue": "rgb(0, 0, 255)",
             "white": "rgb(255, 255, 255)",
-            "black": "rgb(0, 0, 0)"
+            "black": "rgb(0, 0, 0)",
+            "yellow": "rgb(255, 255, 0)"
         }
 
         self.x = self.y = self.z = 0
@@ -120,13 +121,16 @@ class Unit(Structure):
             lighting=dict(specular=0.1, diffuse=1.0, ambient=0.5, fresnel=0)
         ))
 
+        color = "black"
+        if self.color == "black":
+            color = "gray"
         for edge in self.edges:
             fig.add_trace(go.Scatter3d(
                 x=[x_vals[edge[0]], x_vals[edge[1]]],
                 y=[y_vals[edge[0]], y_vals[edge[1]]],
                 z=[z_vals[edge[0]], z_vals[edge[1]]],
                 mode="lines",
-                line=dict(color="black", width=4)
+                line=dict(color=color, width=4)
             ))
         self.reset_state()
 
@@ -138,7 +142,7 @@ class Layer(Structure):
 
         self.shift = 0
         self.level = 0
-        self.radius = len(self.units)
+        self.radius = len(self.units) if self.closed else 0
         
         self.x = self.y = self.z = 0
         self.rot_x = self.rot_y = self.rot_z = 0
@@ -161,28 +165,14 @@ class Layer(Structure):
 
     def render(self, fig):
         # print("Render Layer")
-        # if self.closed:
-        #     mod = 0.15 * (2*self.level + len(self.units)) # numer warstwy * długość
-        #     arg = 360 / len(self.units)
-
-        #     for x, unit in enumerate(self.units):
-        #         angle = (x + self.shift) * arg 
-        #         unit.rotate((-90, 0, angle-90))
-        #         unit.translate((mod*(np.cos(np.radians(angle))), mod*(np.sin(np.radians(angle))), 0))
-        #         unit.render(fig)
-        # else:
-        #     for x, unit in enumerate(self.units):
-        #         unit.translate((self.shift + x + 0.15, self.radius, self.level))
-        #         unit.render(fig)
-        arg = 360 / self.radius
         for x, unit in enumerate(self.units):
-            # self.closed = False
             if self.closed:
-                unit.translate((0, self.radius / 6, self.level / 3 + self.radius / 6))
+                arg = 360 / self.radius
                 angle = (x + self.shift) * arg 
-                unit.rotate((-90, 0, angle-90))
+                unit.translate((0, self.radius / 6, self.level / 3 + self.radius / 6))
+                unit.rotate((0, 0, angle-90))
             else:
-                unit.translate(((self.shift + x) * 0.8, self.radius / 6, self.level / 3))
+                unit.translate(((self.shift + x) * 0.8, self.radius, self.level / 3))
             unit.render(fig)
 
         self.reset_state()
@@ -214,14 +204,12 @@ class Shape(Structure):
         return "\n".join(str(layer) for layer in self.layers)
     
     def render(self, fig):
-        shifts = [self.connections[0]["type"]]
+        shifts = [0]
         for idx in range(1, len(self.connections)):
-            shifts.append((shifts[idx-1] + self.connections[idx]["type"]) % 2)
-        # print(shifts)
+            shifts.append(shifts[idx-1] + self.connections[idx]["shift"] + self.connections[idx]["type"]*0.5)
 
         for z, (layer, connection) in enumerate(zip(self.layers, self.connections)):
-            # layer.closed = True
-            layer.shift = connection["shift"] + shifts[z]*0.5 # o ile unitów w prawo przekręcić layer
+            layer.shift = shifts[z] # o ile unitów w prawo przekręcić layer
             layer.level = z
             layer.render(fig)
     

@@ -43,36 +43,21 @@ class EvalVisitor(ConnectITVisitor):
         for unit_assignment_ctx in ctx.unitAssigmentList().unitAssignment():
             # print(f"UnitAssignment: {unit_assignment_ctx.getText()}")
             unit_name = unit_assignment_ctx.ID().getText()
-            unit_color = None
-            unit_pattern = None
-
+            color, pattern = None, None
             if unit_assignment_ctx.unitExpr():
-                unit_expr_result = self.visit(unit_assignment_ctx.unitExpr())
-                
-                if unit_expr_result is not None:
-                    if unit_expr_result.startswith('*') and unit_expr_result.endswith('*'):
-                        if unit_expr_result[1:-1] in ['red', 'blue', 'green', 'white', 'black']:
-                            unit_color = unit_expr_result[1:-1]
-                            unit_pattern = None
-                        elif unit_expr_result[1:-1] in ['striped', 'dotted', 'gradient']:
-                            unit_color = None
-                            unit_pattern = unit_expr_result[1:-1]
-                        else:
-                            raise Exception(f"Invalid unit expression: {unit_expr_result}")
-                    else:
-                        raise Exception(f"Invalid unit expression format: {unit_expr_result}")
-
-            self.variables[unit_name] = Unit(name=unit_name, color=unit_color, pattern=unit_pattern)
+                color, pattern = self.visit(unit_assignment_ctx.unitExpr())
+            self.variables[unit_name] = Unit(name=unit_name, color=color, pattern=pattern)
 
         return None
 
     def visitUnitExpr(self, ctx):
         # print(f"UnitExpr: {ctx.getText()}")
+        color, pattern = None, None
         if ctx.COLOR():
-            return ctx.COLOR().getText()
+            color = ctx.COLOR().getText()[1:-1]
         elif ctx.PATTERN():
-            return ctx.PATTERN().getText()
-        return None
+            pattern = ctx.PATTERN().getText()[1:-1]
+        return color, pattern
     
     def visitLayerDeclaration(self, ctx):
         # print(f"LayerDeclaration: {ctx.getText()}")
@@ -196,7 +181,7 @@ class EvalVisitor(ConnectITVisitor):
         # Recursive case: layerChain with '<-' or '<<-' or '<-' NUMBER '-'
         if ctx.layerChain():
             if ctx.layerExpr():
-                left = [Layer(self.visit(ctx.layerExpr()))]
+                left = [Layer("none", self.visit(ctx.layerExpr()))]
             else:
                 left = [self.variables[ctx.ID().getText()]]
 
@@ -215,8 +200,7 @@ class EvalVisitor(ConnectITVisitor):
         # Base case: Single layerExpr or ID
         else:
             if ctx.layerExpr():
-                units = self.visit(ctx.layerExpr())
-                return [Layer("none", units)], []
+                return [Layer("none", self.visit(ctx.layerExpr()))], []
 
             elif ctx.ID():
                 layer_id = ctx.ID().getText()
@@ -267,12 +251,12 @@ def evaluate_expression(expression):
 
             if "mismatched input" in msg:
                 self.errors.append(f"Syntax Error: Unexpected token '{error_token}' at line {line}, column {column}.")
-            elif "no viable alternative" in msg:
-                self.errors.append(f"Syntax Error: Invalid syntax at line {line}, column {column}, near '{"<EOL>" if error_token == '\n' else error_token}'.")
-            elif "extraneous input" in msg:
-                self.errors.append(f"Syntax Error: Extraneous token '{error_token}' at line {line}, column {column}.")
-            elif "missing" in msg:
-                self.errors.append(f"Syntax Error: Missing token at line {line}, column {column}, near '{"<EOL>" if error_token == '\n' else error_token}'.")
+            # elif "no viable alternative" in msg:
+                # self.errors.append(f"Syntax Error: Invalid syntax at line {line}, column {column}, near '{"<EOL>" if error_token == '\n' else error_token}'.")
+            # elif "extraneous input" in msg:
+            #     self.errors.append(f"Syntax Error: Extraneous token '{error_token}' at line {line}, column {column}.")
+            # elif "missing" in msg:
+            #     self.errors.append(f"Syntax Error: Missing token at line {line}, column {column}, near '{"<EOL>" if error_token == '\n' else error_token}'.")
             else:
                 self.errors.append(f"Syntax Error: {msg} at line {line}, column {column}.")
 
@@ -295,7 +279,7 @@ def evaluate_expression(expression):
         return f"Runtime Error: {str(e)}"
 
 if __name__ == "__main__":
-    with open('programs/hello_world.txt', 'r') as f:
+    with open('programs/tree.txt', 'r') as f:
         program = f.read()
     try:
         result = evaluate_expression(program)

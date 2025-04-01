@@ -40,9 +40,8 @@ expression  : unitExpr
             | ID
             ;
 
-unitExpr    : COLOR
-            | PATTERN
-            | // Empty for uninitialized units
+unitExpr    : COLOR (PATTERN)?
+            | (COLOR)? PATTERN
             ;
 
 layerExpr   : ID '*' NUMBER
@@ -89,9 +88,9 @@ type    : 'UNIT'
         ;
 
 ID          : [a-zA-Z_][a-zA-Z0-9_]* ;
-NUMBER      : [0-9]+('.'[0-9]+)? ;
+NUMBER      : ('-')?[0-9]+('.'[0-9]+)? ;
 
-COLOR       : '*' ( 'red' | 'blue' | 'green' | 'white' | 'black' ) '*';
+COLOR       : '*' ( 'red' | 'blue' | 'green' | 'white' | 'black' | 'yellow' ) '*';
 PATTERN     : '*' ( 'striped' | 'dotted' | 'gradient' ) '*';
 
 WS          : [ \t]+ -> skip ;

@@ -1,11 +1,9 @@
-UNIT a = *red*
-UNIT b = *green*
+UNIT a = *white*
+UNIT b = *black*
 UNIT c = *blue*
 
-LAYER first = a * 10 CLOSED, second = b * 10 CLOSED, third = c * 10 CLOSED
-SHAPE boom
-first <- second <- third --> boom
+LAYER first = a*5 + b*5 + c*5 CLOSED
 
+first <<- first <-5- first <<-3- first --> SHAPE boom
 SHOW boom
-
 
