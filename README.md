@@ -13,9 +13,13 @@ connectIT is a domain-specific language designed for describing and visualizing 
 ## 🔺Example Code
 
 ```
-LAYER first = *red* * 3;
-LAYER second = *green* * 2;
-LAYER third = *blue* * 1;
+UNIT r = *red*
+UNIT g = *green*
+UNIT b = *blue*
+
+LAYER first = r * 3
+LAYER second = g * 2
+LAYER third = b * 1
 
 SHAPE pyramid
 first <- second <- third --> pyramid
