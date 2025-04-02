@@ -280,7 +280,7 @@ class EvalVisitor(ConnectITVisitor):
             return f"Runtime Error: {str(e)}"
 
     def sample_render(self):
-        with open('programs/fish.txt', 'r') as f:
+        with open('programs/playground.txt', 'r') as f:
             program = f.read()
         try:
             result = self.evaluate_expression(program)
