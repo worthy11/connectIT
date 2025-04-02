@@ -15,6 +15,11 @@ export default function App() {
     setFigData([]);
     setShowPlot(true);
     const ws = new WebSocket(WebSocketURL);
+
+    ws.onopen = () => {
+      ws.send(code); // Send the code to the backend when the connection is open
+    };
+
     ws.onmessage = (event) => {
       const figJson = JSON.parse(event.data);
       setLayout(figJson.layout);
@@ -69,4 +74,3 @@ export default function App() {
     </div>
   );
 }
-

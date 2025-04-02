@@ -287,3 +287,10 @@ class EvalVisitor(ConnectITVisitor):
             return result
         except Exception as e:
             print(f"Error: {e}")
+
+    def interpret(self, program: str):
+        try:
+            result = self.evaluate_expression(program)
+            return result
+        except Exception as e:
+            print(f"Error: {e}")
