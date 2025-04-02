@@ -1,3 +1,0 @@
-# connectIT: 3D Swan Model
-
-Hopefully something meaningful will appear here in the future...

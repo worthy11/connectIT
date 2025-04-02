@@ -31,30 +31,40 @@ SHOW pyramid
 
 ### Installing Dependencies
 
-Ensure you have Python and ANTLR4 installed:
+Ensure you have Python and all the required dependencies installed:
 
 ```
-pip install antlr4-python3-runtime antlr4-tools plotly
+pip install -r requirements.txt
+cd frontend
+npm install vite plotly.js-dist react-plotly.js
 ```
 
-### Cloning the Repository
+### Running Web App
+
+To run the web application, execute the following commands in two separate terminals:
+First terminal:
 
 ```
-git clone https://github.com/worthy11/connectIT.git
+cd backend
+uvicorn backend:app --reload
 ```
 
-### Running the Interpreter
-
-Check out the `examples/` directory. After generating all necessary components, run one of the example interpreters:
+Second terminal:
 
 ```
-py examples/antlr_demo/ExprInterpreter.py
+cd frontend
+npm run dev
 ```
 
-See `examples/antlr_demo/README.md` for more instructions.
+Then, visit the address `npm` gives you (usually [localhost at port 5137](http://localhost:5173/))
 
-### Visualization
+### Running Samples
 
-```py
-# TODO
+Check out the `backend/programs/` directory. Choose a sample program you want to run and substitute the filename in `main.py`, then type the commands:
+
 ```
+cd backend
+py main.py
+```
+
+Your figure can be viewed by opening `out.html` in the browser.

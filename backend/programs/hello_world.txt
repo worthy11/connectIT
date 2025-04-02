@@ -1,0 +1,21 @@
+UNIT r = *red*, 
+UNIT g = *green*, b
+
+LAYER first = r**10, second == g * 10 third = r * 10
+
+SHAPEs pawel_co
+
+first <- third --> SHAPE sigma
+
+first <<- second <<- third --> SHAPE sigma3
+
+first <-5- second <-3- third --> SHAPE sigma4
+
+first <<-2- second <<-1- third --> SHAPE sigma5
+
+first <- second <- third --> sigma
+
+first <- second <<- third <-4- first <<-7- second --> SHAPE sigma6
+
+first <- second <- third --> sigma
+SHOW sigma
