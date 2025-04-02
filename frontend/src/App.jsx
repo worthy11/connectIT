@@ -66,8 +66,39 @@ export default function App() {
             X
           </button>
           <div className="info-content">
-            <h3>Instructions</h3>
-            <p>Here you can add your instructions or information...</p>
+          <span class="Heading2">Instructions:</span><br />
+            <p>
+            <span class="Heading">Connection methods:</span><br />
+    A &lt;- B : connecting B on top of A<br />
+    (one output to one input - horizontal connection)<br /><br />
+
+    A &lt;&lt;- B : connecting B on top of A<br />
+    (both outputs to both inputs - vertical connection)<br /><br />
+
+    A &lt;-1- B : connection with a shift of 1 module<br /><br />
+
+    A &lt;-/- B : disconnecting B from the top of A<br /><br />
+
+    A -/-&gt; B : disconnecting A from the bottom of B<br /><br />
+
+    A &lt;- B --&gt; C : assigning the result of the connection to C<br /><br />
+
+    <span class="Heading">Variable declaration:</span><br /><br />
+    UNIT unit1, unit2, unit3<br /><br />
+
+    LAYER first = unit1 * 3<br />
+    LAYER second = unit2 * 2<br />
+    LAYER third = unit3<br /><br />
+
+    SHAPE pyramid<br />
+    first &lt;- second &lt;- third --&gt; pyramid<br /><br />
+
+    SHAPE flipped_pyramid<br />
+    first &lt;-1- second &lt;-1- third --&gt; flipped_pyramid<br /><br />
+
+    flipped_pyramid &lt;-/- third<br />
+    first -/-&gt; flipped_pyramid
+</p>
           </div>
         </div>
       )}
