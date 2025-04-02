@@ -249,17 +249,18 @@ def evaluate_expression(expression):
         def syntaxError(self, recognizer, offendingSymbol, line, column, msg, e):
             self.has_error = True
             error_token = offendingSymbol.text if offendingSymbol else "<EOF>"
+            error_token = "<EOL>" if error_token == '\n' else error_token
 
             if "mismatched input" in msg:
-                self.errors.append(f"Syntax Error: Unexpected token '{error_token}' at line {line}, column {column}.")
-            elif "no viable alternative" in msg:
-                self.errors.append(f"Syntax Error: Invalid syntax at line {line}, column {column}, near '{"<EOL>" if error_token == '\n' else error_token}'.")
+                self.errors.append(f"\033[91mSyntax Error:\033[0m Unexpected token '{error_token}' at line {line}, column {column}. Did you mistype one of the keywords?")
             elif "extraneous input" in msg:
-                self.errors.append(f"Syntax Error: Extraneous token '{error_token}' at line {line}, column {column}.")
+                self.errors.append(f"\033[91mSyntax Error:\033[0m Extraneous token '{error_token}' at line {line}, column {column}. Did some extra characters slip in by accident?")
             elif "missing" in msg:
-                self.errors.append(f"Syntax Error: Missing token at line {line}, column {column}, near '{"<EOL>" if error_token == '\n' else error_token}'.")
+                self.errors.append(f"\033[91mSyntax Error:\033[0m Missing token at line {line}, column {column}, near '{error_token}'. Did you forget to finish an instruction?")
+            elif "no viable alternative" in msg:
+                self.errors.append(f"\033[91mSyntax Error:\033[0m Invalid syntax at line {line}, column {column}, near '{error_token}'. Did you get an instruction mixed up?")
             else:
-                self.errors.append(f"Syntax Error: {msg} at line {line}, column {column}.")
+                self.errors.append(f"\033[91mSyntax Error:\033[0m {msg} at line {line}, column {column}.")
 
     error_listener = SyntaxErrorListener()
     parser.removeErrorListeners()  # Remove default error listener
@@ -271,7 +272,8 @@ def evaluate_expression(expression):
         return f"Parsing Error: {str(e)}"
 
     if error_listener.has_error:
-        return "\n".join(error_listener.errors)
+        print("\n".join(error_listener.errors))
+        return None
 
     try:
         visitor = EvalVisitor()
@@ -284,7 +286,8 @@ if __name__ == '__main__':
         program = f.read()
     try:
         result = evaluate_expression(program)
-        print("Success!")
+        if result is not None:
+            print("Success!")
     except Exception as e:
         print(f"Error: {e}")
 

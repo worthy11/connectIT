@@ -1,12 +1,12 @@
-UNIT r = *red*
-UNIT g = *green*
-UNIT b = *blue*
+UNIT r = *red*,
+UNITs g = *green*
+UNIT b = *blue* *blue*
 
 LAYER first = r * 3
 LAYER second = g * 2
 LAYER third = b * 1
 
 SHAPE pyramid
-first <- second <- third --> pyramid
+first <- second <- third 1 --> pyramid
 
 SHOW pyramid
