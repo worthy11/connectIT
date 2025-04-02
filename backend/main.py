@@ -279,11 +279,13 @@ def evaluate_expression(expression):
     except Exception as e:
         return f"Runtime Error: {str(e)}"
 
-def sample_render():
+if __name__ == '__main__':
     with open('programs/playground.txt', 'r') as f:
         program = f.read()
     try:
         result = evaluate_expression(program)
-        return result
+        print("Success!")
     except Exception as e:
         print(f"Error: {e}")
+
+

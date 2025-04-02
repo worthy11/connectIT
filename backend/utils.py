@@ -28,6 +28,7 @@ def show_figure(fig, structure: Structure):
         ),
         showlegend=False
     )
+    print("Generating figure...")
     fig.write_html("out.html")
     return fig.to_json()
     with open("fig.json", "w") as f:
