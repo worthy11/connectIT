@@ -252,12 +252,12 @@ def evaluate_expression(expression):
 
             if "mismatched input" in msg:
                 self.errors.append(f"Syntax Error: Unexpected token '{error_token}' at line {line}, column {column}.")
-            # elif "no viable alternative" in msg:
-                # self.errors.append(f"Syntax Error: Invalid syntax at line {line}, column {column}, near '{"<EOL>" if error_token == '\n' else error_token}'.")
-            # elif "extraneous input" in msg:
-            #     self.errors.append(f"Syntax Error: Extraneous token '{error_token}' at line {line}, column {column}.")
-            # elif "missing" in msg:
-            #     self.errors.append(f"Syntax Error: Missing token at line {line}, column {column}, near '{"<EOL>" if error_token == '\n' else error_token}'.")
+            elif "no viable alternative" in msg:
+                self.errors.append(f"Syntax Error: Invalid syntax at line {line}, column {column}, near '{"<EOL>" if error_token == '\n' else error_token}'.")
+            elif "extraneous input" in msg:
+                self.errors.append(f"Syntax Error: Extraneous token '{error_token}' at line {line}, column {column}.")
+            elif "missing" in msg:
+                self.errors.append(f"Syntax Error: Missing token at line {line}, column {column}, near '{"<EOL>" if error_token == '\n' else error_token}'.")
             else:
                 self.errors.append(f"Syntax Error: {msg} at line {line}, column {column}.")
 

@@ -22,7 +22,8 @@ class Unit(Structure):
             "blue": "rgb(0, 0, 255)",
             "white": "rgb(255, 255, 255)",
             "black": "rgb(0, 0, 0)",
-            "yellow": "rgb(255, 255, 0)"
+            "yellow": "rgb(255, 255, 0)",
+            "lilac": "rgb(246, 159, 255)"
         }
 
         self.x = self.y = self.z = 0
