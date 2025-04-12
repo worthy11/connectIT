@@ -1,97 +1,91 @@
 grammar ConnectIT;
 
-program     : NEWLINE* ( statement ( NEWLINE+ statement )* )* NEWLINE* EOF ;
+program:
+	NEWLINE* (statement ( NEWLINE+ statement)*)* NEWLINE* EOF;
 
-statement   : declaration 
-            | assignment 
-            | shapeDef 
-            | modelDef 
-            | showStatement
-            | whileStmt
-            | forStmt
-            | ifStmt
-            | functionDeclaration
-            | returnExpr
-            ;
+statement:
+	declaration
+	| assignment
+	| showStatement
+	| whileStmt
+	| forStmt
+	| ifStmt
+	| functionDeclaration
+	| returnExpr;
 
-declaration : 'UNIT' unitAssigmentList        # unitDeclaration
-            | 'LAYER' layerAssigmentList      # layerDeclaration
-            | 'SHAPE' idList                  # shapeDeclaration
-            | 'MODEL' idList                  # modelDeclaration
-            ;
+declaration:
+	'UNIT' unitDeclarationList		# newUnit
+	| 'LAYER' layerDeclarationList	# newLayer
+	| 'SHAPE' shapeDeclarationList	# newShape
+	| 'MODEL' modelDeclarationList	# newModel;
 
-unitAssigmentList   : unitAssignment (',' unitAssignment)* ;
+// DECLARATION TYPES
+unitDeclarationList: unitDeclaration (',' unitDeclaration)*;
+unitDeclaration: ID ( '=' unitExpr)?;
+unitExpr: (PATTERN)? COLOR | (COLOR)? PATTERN;
 
-unitAssignment  : ID ( '=' unitExpr )? ;
+layerDeclarationList: layerDeclaration ( ',' layerDeclaration)*;
+layerDeclaration: ID ( '=' layerExpr)? ( 'CLOSED')?;
+layerExpr: ID '*' NUMBER | layerExpr '+' layerExpr |;
 
-layerAssigmentList  : layerAssignment ( ',' layerAssignment )* ;
+shapeDeclarationList:
+	shapeDeclaration (',' shapeDeclarationList)*;
+shapeDeclaration: ID ('=' ID | shapeExpr);
+shapeExpr: (layerExpr | ID) ('<-' shapeExpr)?
+	| ( layerExpr | ID) ( '<<-' shapeExpr)?
+	| ( layerExpr | ID) ( '<-' NUMBER '-' shapeExpr)?
+	| ( layerExpr | ID) ( '<<-' NUMBER '-' shapeExpr)?;
 
-layerAssignment : ID ( '=' layerExpr )? ( 'CLOSED' )? ;
+modelDeclarationList:
+	modelDeclaration (',' modelDeclarationList)*;
+modelDeclaration: ID ('=' ID | modelExpr);
+modelExpr: (shapeExpr | ID) ('<-' shapeExpr)?
+	| ( layerExpr | ID) ( '<<-' shapeExpr)?
+	| ( layerExpr | ID) ( '<-' NUMBER '-' shapeExpr)?
+	| ( layerExpr | ID) ( '<<-' NUMBER '-' shapeExpr)?;
 
-idList  : ID ( ',' ID )* ;
+// ASSIGNMENTS
+assignment: ID ('=' | '-->') expression;
+expression: unitExpr | layerExpr | shapeExpr | modelExpr;
 
-assignment  : ID '=' expression         # standardAssignment
-            | layerChain '-->' ID       # shapeAssignment
-            | shapeChain '-->' ID       # modelAssignment
-            ;
+showStatement: 'SHOW' ID;
 
-expression  : unitExpr
-            | layerExpr
-            | ID
-            ;
+ifStmt:
+	'IF' condition NEWLINE? '[' statementBlock NEWLINE? ']' (
+		NEWLINE? 'ELSE IF' condition NEWLINE? '[' statementBlock NEWLINE? ']'
+	)* (NEWLINE? 'ELSE' NEWLINE? '[' statementBlock NEWLINE? ']')?;
 
-unitExpr    : COLOR (PATTERN)?
-            | (COLOR)? PATTERN
-            ;
+whileStmt:
+	'REPEAT WHILE' condition NEWLINE? '[' statementBlock NEWLINE? ']';
 
-layerExpr   : ID '*' NUMBER
-            | layerExpr '+' layerExpr
-            |
-            ;
+condition:
+	expression ('<' | '<=' | '>' | '>=' | '==' | '!=') expression;
 
-shapeDef    : layerChain '-->' 'SHAPE' ID ;
+statementBlock: statement (NEWLINE statement)*;
 
-layerChain  : ( layerExpr | ID ) ( '<-' layerChain )?
-            | ( layerExpr | ID ) ( '<<-' layerChain )?
-            | ( layerExpr | ID ) ( '<-' NUMBER '-' layerChain )?
-            | ( layerExpr | ID ) ( '<<-' NUMBER '-' layerChain )?
-            ; 
+forStmt: 'REPEAT' NUMBER 'TIMES' NEWLINE? statementBlock;
 
-modelDef    : shapeChain '-->' 'MODEL' ID ;
+functionDeclaration:
+	'METHOD' ID '(' (type ID ( ',' type ID)*)? ')' 'RETURNS' type '[' statementBlock returnExpr
+		NEWLINE? ']';
+returnExpr: 'RETURN' (ID | expression);
 
-shapeChain  : ID ('<-' shapeChain)? ; // Only SHAPE IDs allowed
+type: 'UNIT' | 'LAYER' | 'SHAPE' | 'MODEL' | 'NUMBER';
 
-showStatement   : 'SHOW' ID ; 
+ID: [a-zA-Z_][a-zA-Z0-9_]*;
+NUMBER: ('-')? [0-9]+ ('.' [0-9]+)?;
 
-ifStmt  : 'IF' condition NEWLINE? '[' statementBlock NEWLINE? ']'
-        ( NEWLINE? 'ELSE IF' condition NEWLINE? '[' statementBlock NEWLINE? ']' )*
-        ( NEWLINE? 'ELSE' NEWLINE? '[' statementBlock NEWLINE? ']' )? ;
+COLOR:
+	'*' (
+		'red'
+		| 'blue'
+		| 'green'
+		| 'white'
+		| 'black'
+		| 'yellow'
+		| 'lilac'
+	) '*';
+PATTERN: '*' ( 'striped' | 'dotted' | 'gradient') '*';
 
-whileStmt   : 'REPEAT WHILE' condition NEWLINE? '[' statementBlock NEWLINE? ']' ;
-
-// To trzeba zdecydowanie zmienić jakoś, dałem tak na odpierdol póki co xd
-condition   : expression ( '<' | '<=' | '>' | '>=' | '==' | '!=' ) expression ; 
-
-statementBlock  : statement (NEWLINE statement)* ;
-
-forStmt : 'REPEAT' NUMBER 'TIMES' NEWLINE? statementBlock ;
-
-functionDeclaration : 'METHOD' ID '('( type ID ( ',' type ID )* )?')' 'RETURNS' type '[' statementBlock returnExpr NEWLINE? ']' ;
-
-returnExpr  : 'RETURN' (ID | expression);
-
-type    : 'UNIT'
-        | 'LAYER'
-        | 'SHAPE'
-        | 'MODEL'
-        | 'NUMBER'
-        ;
-
-ID          : [a-zA-Z_][a-zA-Z0-9_]* ;
-NUMBER      : ('-')?[0-9]+('.'[0-9]+)? ;
-
-COLOR       : '*' ( 'red' | 'blue' | 'green' | 'white' | 'black' | 'yellow' | 'lilac' ) '*';
-PATTERN     : '*' ( 'striped' | 'dotted' | 'gradient' ) '*';
-
-WS          : [ \t]+ -> skip ;
-NEWLINE     : '\r'? '\n' ;
+WS: [ \t]+ -> skip;
+NEWLINE: '\r'? '\n';

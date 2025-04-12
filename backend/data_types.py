@@ -64,11 +64,6 @@ class Unit(Structure):
             (4, 3), (5, 2)   # Vertical edges
         ]
 
-    def __str__(self) -> str:
-        color_code = self.color_codes.get(self.color, '')
-        reset_code = '\033[0m'
-        return f"{color_code}▲{reset_code}"
-    
     def translate(self, vector=(0, 0, 0)):
         self.vertices[:, 0] += vector[0]
         self.vertices[:, 1] += vector[1]

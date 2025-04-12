@@ -26,120 +26,57 @@ class ConnectITListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by ConnectITParser#newUnit.
+    def enterNewUnit(self, ctx:ConnectITParser.NewUnitContext):
+        pass
+
+    # Exit a parse tree produced by ConnectITParser#newUnit.
+    def exitNewUnit(self, ctx:ConnectITParser.NewUnitContext):
+        pass
+
+
+    # Enter a parse tree produced by ConnectITParser#newLayer.
+    def enterNewLayer(self, ctx:ConnectITParser.NewLayerContext):
+        pass
+
+    # Exit a parse tree produced by ConnectITParser#newLayer.
+    def exitNewLayer(self, ctx:ConnectITParser.NewLayerContext):
+        pass
+
+
+    # Enter a parse tree produced by ConnectITParser#newShape.
+    def enterNewShape(self, ctx:ConnectITParser.NewShapeContext):
+        pass
+
+    # Exit a parse tree produced by ConnectITParser#newShape.
+    def exitNewShape(self, ctx:ConnectITParser.NewShapeContext):
+        pass
+
+
+    # Enter a parse tree produced by ConnectITParser#newModel.
+    def enterNewModel(self, ctx:ConnectITParser.NewModelContext):
+        pass
+
+    # Exit a parse tree produced by ConnectITParser#newModel.
+    def exitNewModel(self, ctx:ConnectITParser.NewModelContext):
+        pass
+
+
+    # Enter a parse tree produced by ConnectITParser#unitDeclarationList.
+    def enterUnitDeclarationList(self, ctx:ConnectITParser.UnitDeclarationListContext):
+        pass
+
+    # Exit a parse tree produced by ConnectITParser#unitDeclarationList.
+    def exitUnitDeclarationList(self, ctx:ConnectITParser.UnitDeclarationListContext):
+        pass
+
+
     # Enter a parse tree produced by ConnectITParser#unitDeclaration.
     def enterUnitDeclaration(self, ctx:ConnectITParser.UnitDeclarationContext):
         pass
 
     # Exit a parse tree produced by ConnectITParser#unitDeclaration.
     def exitUnitDeclaration(self, ctx:ConnectITParser.UnitDeclarationContext):
-        pass
-
-
-    # Enter a parse tree produced by ConnectITParser#layerDeclaration.
-    def enterLayerDeclaration(self, ctx:ConnectITParser.LayerDeclarationContext):
-        pass
-
-    # Exit a parse tree produced by ConnectITParser#layerDeclaration.
-    def exitLayerDeclaration(self, ctx:ConnectITParser.LayerDeclarationContext):
-        pass
-
-
-    # Enter a parse tree produced by ConnectITParser#shapeDeclaration.
-    def enterShapeDeclaration(self, ctx:ConnectITParser.ShapeDeclarationContext):
-        pass
-
-    # Exit a parse tree produced by ConnectITParser#shapeDeclaration.
-    def exitShapeDeclaration(self, ctx:ConnectITParser.ShapeDeclarationContext):
-        pass
-
-
-    # Enter a parse tree produced by ConnectITParser#modelDeclaration.
-    def enterModelDeclaration(self, ctx:ConnectITParser.ModelDeclarationContext):
-        pass
-
-    # Exit a parse tree produced by ConnectITParser#modelDeclaration.
-    def exitModelDeclaration(self, ctx:ConnectITParser.ModelDeclarationContext):
-        pass
-
-
-    # Enter a parse tree produced by ConnectITParser#unitAssigmentList.
-    def enterUnitAssigmentList(self, ctx:ConnectITParser.UnitAssigmentListContext):
-        pass
-
-    # Exit a parse tree produced by ConnectITParser#unitAssigmentList.
-    def exitUnitAssigmentList(self, ctx:ConnectITParser.UnitAssigmentListContext):
-        pass
-
-
-    # Enter a parse tree produced by ConnectITParser#unitAssignment.
-    def enterUnitAssignment(self, ctx:ConnectITParser.UnitAssignmentContext):
-        pass
-
-    # Exit a parse tree produced by ConnectITParser#unitAssignment.
-    def exitUnitAssignment(self, ctx:ConnectITParser.UnitAssignmentContext):
-        pass
-
-
-    # Enter a parse tree produced by ConnectITParser#layerAssigmentList.
-    def enterLayerAssigmentList(self, ctx:ConnectITParser.LayerAssigmentListContext):
-        pass
-
-    # Exit a parse tree produced by ConnectITParser#layerAssigmentList.
-    def exitLayerAssigmentList(self, ctx:ConnectITParser.LayerAssigmentListContext):
-        pass
-
-
-    # Enter a parse tree produced by ConnectITParser#layerAssignment.
-    def enterLayerAssignment(self, ctx:ConnectITParser.LayerAssignmentContext):
-        pass
-
-    # Exit a parse tree produced by ConnectITParser#layerAssignment.
-    def exitLayerAssignment(self, ctx:ConnectITParser.LayerAssignmentContext):
-        pass
-
-
-    # Enter a parse tree produced by ConnectITParser#idList.
-    def enterIdList(self, ctx:ConnectITParser.IdListContext):
-        pass
-
-    # Exit a parse tree produced by ConnectITParser#idList.
-    def exitIdList(self, ctx:ConnectITParser.IdListContext):
-        pass
-
-
-    # Enter a parse tree produced by ConnectITParser#standardAssignment.
-    def enterStandardAssignment(self, ctx:ConnectITParser.StandardAssignmentContext):
-        pass
-
-    # Exit a parse tree produced by ConnectITParser#standardAssignment.
-    def exitStandardAssignment(self, ctx:ConnectITParser.StandardAssignmentContext):
-        pass
-
-
-    # Enter a parse tree produced by ConnectITParser#shapeAssignment.
-    def enterShapeAssignment(self, ctx:ConnectITParser.ShapeAssignmentContext):
-        pass
-
-    # Exit a parse tree produced by ConnectITParser#shapeAssignment.
-    def exitShapeAssignment(self, ctx:ConnectITParser.ShapeAssignmentContext):
-        pass
-
-
-    # Enter a parse tree produced by ConnectITParser#modelAssignment.
-    def enterModelAssignment(self, ctx:ConnectITParser.ModelAssignmentContext):
-        pass
-
-    # Exit a parse tree produced by ConnectITParser#modelAssignment.
-    def exitModelAssignment(self, ctx:ConnectITParser.ModelAssignmentContext):
-        pass
-
-
-    # Enter a parse tree produced by ConnectITParser#expression.
-    def enterExpression(self, ctx:ConnectITParser.ExpressionContext):
-        pass
-
-    # Exit a parse tree produced by ConnectITParser#expression.
-    def exitExpression(self, ctx:ConnectITParser.ExpressionContext):
         pass
 
 
@@ -152,6 +89,24 @@ class ConnectITListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by ConnectITParser#layerDeclarationList.
+    def enterLayerDeclarationList(self, ctx:ConnectITParser.LayerDeclarationListContext):
+        pass
+
+    # Exit a parse tree produced by ConnectITParser#layerDeclarationList.
+    def exitLayerDeclarationList(self, ctx:ConnectITParser.LayerDeclarationListContext):
+        pass
+
+
+    # Enter a parse tree produced by ConnectITParser#layerDeclaration.
+    def enterLayerDeclaration(self, ctx:ConnectITParser.LayerDeclarationContext):
+        pass
+
+    # Exit a parse tree produced by ConnectITParser#layerDeclaration.
+    def exitLayerDeclaration(self, ctx:ConnectITParser.LayerDeclarationContext):
+        pass
+
+
     # Enter a parse tree produced by ConnectITParser#layerExpr.
     def enterLayerExpr(self, ctx:ConnectITParser.LayerExprContext):
         pass
@@ -161,39 +116,75 @@ class ConnectITListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by ConnectITParser#shapeDef.
-    def enterShapeDef(self, ctx:ConnectITParser.ShapeDefContext):
+    # Enter a parse tree produced by ConnectITParser#shapeDeclarationList.
+    def enterShapeDeclarationList(self, ctx:ConnectITParser.ShapeDeclarationListContext):
         pass
 
-    # Exit a parse tree produced by ConnectITParser#shapeDef.
-    def exitShapeDef(self, ctx:ConnectITParser.ShapeDefContext):
-        pass
-
-
-    # Enter a parse tree produced by ConnectITParser#layerChain.
-    def enterLayerChain(self, ctx:ConnectITParser.LayerChainContext):
-        pass
-
-    # Exit a parse tree produced by ConnectITParser#layerChain.
-    def exitLayerChain(self, ctx:ConnectITParser.LayerChainContext):
+    # Exit a parse tree produced by ConnectITParser#shapeDeclarationList.
+    def exitShapeDeclarationList(self, ctx:ConnectITParser.ShapeDeclarationListContext):
         pass
 
 
-    # Enter a parse tree produced by ConnectITParser#modelDef.
-    def enterModelDef(self, ctx:ConnectITParser.ModelDefContext):
+    # Enter a parse tree produced by ConnectITParser#shapeDeclaration.
+    def enterShapeDeclaration(self, ctx:ConnectITParser.ShapeDeclarationContext):
         pass
 
-    # Exit a parse tree produced by ConnectITParser#modelDef.
-    def exitModelDef(self, ctx:ConnectITParser.ModelDefContext):
+    # Exit a parse tree produced by ConnectITParser#shapeDeclaration.
+    def exitShapeDeclaration(self, ctx:ConnectITParser.ShapeDeclarationContext):
         pass
 
 
-    # Enter a parse tree produced by ConnectITParser#shapeChain.
-    def enterShapeChain(self, ctx:ConnectITParser.ShapeChainContext):
+    # Enter a parse tree produced by ConnectITParser#shapeExpr.
+    def enterShapeExpr(self, ctx:ConnectITParser.ShapeExprContext):
         pass
 
-    # Exit a parse tree produced by ConnectITParser#shapeChain.
-    def exitShapeChain(self, ctx:ConnectITParser.ShapeChainContext):
+    # Exit a parse tree produced by ConnectITParser#shapeExpr.
+    def exitShapeExpr(self, ctx:ConnectITParser.ShapeExprContext):
+        pass
+
+
+    # Enter a parse tree produced by ConnectITParser#modelDeclarationList.
+    def enterModelDeclarationList(self, ctx:ConnectITParser.ModelDeclarationListContext):
+        pass
+
+    # Exit a parse tree produced by ConnectITParser#modelDeclarationList.
+    def exitModelDeclarationList(self, ctx:ConnectITParser.ModelDeclarationListContext):
+        pass
+
+
+    # Enter a parse tree produced by ConnectITParser#modelDeclaration.
+    def enterModelDeclaration(self, ctx:ConnectITParser.ModelDeclarationContext):
+        pass
+
+    # Exit a parse tree produced by ConnectITParser#modelDeclaration.
+    def exitModelDeclaration(self, ctx:ConnectITParser.ModelDeclarationContext):
+        pass
+
+
+    # Enter a parse tree produced by ConnectITParser#modelExpr.
+    def enterModelExpr(self, ctx:ConnectITParser.ModelExprContext):
+        pass
+
+    # Exit a parse tree produced by ConnectITParser#modelExpr.
+    def exitModelExpr(self, ctx:ConnectITParser.ModelExprContext):
+        pass
+
+
+    # Enter a parse tree produced by ConnectITParser#assignment.
+    def enterAssignment(self, ctx:ConnectITParser.AssignmentContext):
+        pass
+
+    # Exit a parse tree produced by ConnectITParser#assignment.
+    def exitAssignment(self, ctx:ConnectITParser.AssignmentContext):
+        pass
+
+
+    # Enter a parse tree produced by ConnectITParser#expression.
+    def enterExpression(self, ctx:ConnectITParser.ExpressionContext):
+        pass
+
+    # Exit a parse tree produced by ConnectITParser#expression.
+    def exitExpression(self, ctx:ConnectITParser.ExpressionContext):
         pass
 
 

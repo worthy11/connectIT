@@ -1,21 +1,20 @@
-UNIT r = *red*, 
+UNIT r = *red*
 UNIT g = *green*, b
 
 LAYER first = r**10, second == g * 10 third = r * 10
 
-SHAPEs pawel_co
+SHAPEs shape
 
-first <- third --> SHAPE sigma
+first <- 1 third --> SHAPE boom1
 
-first <<- second <<- third --> SHAPE sigma3
+first <<- second <<- third --> SHAPE boom2
 
-first <-5- second <-3- third --> SHAPE sigma4
+first <-5- second <-3- third --> SHAPE boom3
 
-first <<-2- second <<-1- third --> SHAPE sigma5
+first <<-2- second <<-1- third --> SHAPE boom4
 
-first <- second <- third --> sigma
+first <- second <<- third <--4- first <<-7- second --> SHAPE boom5
 
-first <- second <<- third <-4- first <<-7- second --> SHAPE sigma6
+first <- second <- third --> boom1
 
-first <- second <- third --> sigma
-SHOW sigma
+SHOW boom1
