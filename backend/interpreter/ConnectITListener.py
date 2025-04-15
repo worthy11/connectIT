@@ -26,39 +26,39 @@ class ConnectITListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by ConnectITParser#newUnit.
-    def enterNewUnit(self, ctx:ConnectITParser.NewUnitContext):
+    # Enter a parse tree produced by ConnectITParser#newUnits.
+    def enterNewUnits(self, ctx:ConnectITParser.NewUnitsContext):
         pass
 
-    # Exit a parse tree produced by ConnectITParser#newUnit.
-    def exitNewUnit(self, ctx:ConnectITParser.NewUnitContext):
-        pass
-
-
-    # Enter a parse tree produced by ConnectITParser#newLayer.
-    def enterNewLayer(self, ctx:ConnectITParser.NewLayerContext):
-        pass
-
-    # Exit a parse tree produced by ConnectITParser#newLayer.
-    def exitNewLayer(self, ctx:ConnectITParser.NewLayerContext):
+    # Exit a parse tree produced by ConnectITParser#newUnits.
+    def exitNewUnits(self, ctx:ConnectITParser.NewUnitsContext):
         pass
 
 
-    # Enter a parse tree produced by ConnectITParser#newShape.
-    def enterNewShape(self, ctx:ConnectITParser.NewShapeContext):
+    # Enter a parse tree produced by ConnectITParser#newLayers.
+    def enterNewLayers(self, ctx:ConnectITParser.NewLayersContext):
         pass
 
-    # Exit a parse tree produced by ConnectITParser#newShape.
-    def exitNewShape(self, ctx:ConnectITParser.NewShapeContext):
+    # Exit a parse tree produced by ConnectITParser#newLayers.
+    def exitNewLayers(self, ctx:ConnectITParser.NewLayersContext):
         pass
 
 
-    # Enter a parse tree produced by ConnectITParser#newModel.
-    def enterNewModel(self, ctx:ConnectITParser.NewModelContext):
+    # Enter a parse tree produced by ConnectITParser#newShapes.
+    def enterNewShapes(self, ctx:ConnectITParser.NewShapesContext):
         pass
 
-    # Exit a parse tree produced by ConnectITParser#newModel.
-    def exitNewModel(self, ctx:ConnectITParser.NewModelContext):
+    # Exit a parse tree produced by ConnectITParser#newShapes.
+    def exitNewShapes(self, ctx:ConnectITParser.NewShapesContext):
+        pass
+
+
+    # Enter a parse tree produced by ConnectITParser#newModels.
+    def enterNewModels(self, ctx:ConnectITParser.NewModelsContext):
+        pass
+
+    # Exit a parse tree produced by ConnectITParser#newModels.
+    def exitNewModels(self, ctx:ConnectITParser.NewModelsContext):
         pass
 
 
@@ -176,6 +176,15 @@ class ConnectITListener(ParseTreeListener):
 
     # Exit a parse tree produced by ConnectITParser#assignment.
     def exitAssignment(self, ctx:ConnectITParser.AssignmentContext):
+        pass
+
+
+    # Enter a parse tree produced by ConnectITParser#expansion.
+    def enterExpansion(self, ctx:ConnectITParser.ExpansionContext):
+        pass
+
+    # Exit a parse tree produced by ConnectITParser#expansion.
+    def exitExpansion(self, ctx:ConnectITParser.ExpansionContext):
         pass
 
 

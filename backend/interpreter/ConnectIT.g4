@@ -3,7 +3,7 @@ grammar ConnectIT;
 program:
 	NEWLINE* (statement ( NEWLINE+ statement)*)* NEWLINE* EOF;
 
-statement: 
+statement:
 	declaration
 	| assignment
 	| showStatement
@@ -14,45 +14,49 @@ statement:
 	| returnExpr;
 
 declaration:
-	'UNIT' unitDeclarationList		# newUnit
-	| 'LAYER' layerDeclarationList	# newLayer
-	| 'SHAPE' shapeDeclarationList	# newShape
-	| 'MODEL' modelDeclarationList	# newModel
-    | 'NUMBER' numberDeclarationList # newNumber
-    | 'BOOLEAN' booleanDeclarationList # newBoolean;
+	'UNIT' unitDeclarationList			# newUnit
+	| 'LAYER' layerDeclarationList		# newLayer
+	| 'SHAPE' shapeDeclarationList		# newShape
+	| 'MODEL' modelDeclarationList		# newModel
+	| 'NUMBER' numberDeclarationList	# newNumber
+	| 'BOOLEAN' booleanDeclarationList	# newBoolean;
 
 // DECLARATION TYPES
-unitDeclarationList	: unitDeclaration (',' unitDeclaration)*;
-unitDeclaration		: ID ( '=' unitExpr)?;
-unitExpr			: (PATTERN)? COLOR | (COLOR)? PATTERN;
+unitDeclarationList: unitDeclaration (',' unitDeclaration)*;
+unitDeclaration: ID ( '=' unitExpr)?;
+unitExpr: (PATTERN)? COLOR | (COLOR)? PATTERN;
 
 layerDeclarationList: layerDeclaration ( ',' layerDeclaration)*;
-layerDeclaration	: ID ( '=' layerExpr)? ( 'CLOSED')?;
-layerExpr			: ID '*' NUMBER | layerExpr '+' layerExpr |;
+layerDeclaration: ID ( '=' layerExpr)? ( 'CLOSED')?;
+layerExpr: ID '*' NUMBER | layerExpr '+' layerExpr |;
 
-shapeDeclarationList: shapeDeclaration (',' shapeDeclarationList)*;
-shapeDeclaration	: ID ('=' ID | shapeExpr);
-shapeExpr			: (layerExpr | ID) ('<-' shapeExpr)?
-					| ( layerExpr | ID) ( '<<-' shapeExpr)?
-					| ( layerExpr | ID) ( '<-' NUMBER '-' shapeExpr)?
-					| ( layerExpr | ID) ( '<<-' NUMBER '-' shapeExpr)?;
+shapeDeclarationList:
+	shapeDeclaration (',' shapeDeclarationList)*;
+shapeDeclaration: ID ('=' ID | shapeExpr);
+shapeExpr: (layerExpr | ID) ('<-' shapeExpr)?
+	| ( layerExpr | ID) ( '<<-' shapeExpr)?
+	| ( layerExpr | ID) ( '<-' NUMBER '-' shapeExpr)?
+	| ( layerExpr | ID) ( '<<-' NUMBER '-' shapeExpr)?;
 
-modelDeclarationList: modelDeclaration (',' modelDeclarationList)*;
-modelDeclaration	: ID ('=' ID | modelExpr);
-modelExpr			: (shapeExpr | ID) ('<-' shapeExpr)?
-					| ( layerExpr | ID) ( '<<-' shapeExpr)?
-					| ( layerExpr | ID) ( '<-' NUMBER '-' shapeExpr)?
-					| ( layerExpr | ID) ( '<<-' NUMBER '-' shapeExpr)?;
+modelDeclarationList:
+	modelDeclaration (',' modelDeclarationList)*;
+modelDeclaration: ID ('=' ID | modelExpr);
+modelExpr: (shapeExpr | ID) ('<-' shapeExpr)?
+	| ( layerExpr | ID) ( '<<-' shapeExpr)?
+	| ( layerExpr | ID) ( '<-' NUMBER '-' shapeExpr)?
+	| ( layerExpr | ID) ( '<<-' NUMBER '-' shapeExpr)?;
 
-numberDeclarationList	: numberDeclaration (',' numberDeclaration)*;
-numberDeclaration		: ID ( '=' NUMBER)?;
+numberDeclarationList:
+	numberDeclaration (',' numberDeclaration)*;
+numberDeclaration: ID ( '=' NUMBER)?;
 
-booleanDeclarationList	: booleanDeclaration (',' booleanDeclaration)*;
-booleanDeclaration		: ID ( '=' BOOLEAN)?;
+booleanDeclarationList:
+	booleanDeclaration (',' booleanDeclaration)*;
+booleanDeclaration: ID ( '=' BOOLEAN)?;
 
 // ASSIGNMENTS
-assignment	: ID ('=' | '-->') expression;
-expression	: unitExpr | layerExpr | shapeExpr | modelExpr;
+assignment: ID ('=' | '-->') expression;
+expression: unitExpr | layerExpr | shapeExpr | modelExpr;
 
 showStatement: 'SHOW' ID;
 
@@ -76,7 +80,13 @@ functionDeclaration:
 		NEWLINE? ']';
 returnExpr: 'RETURN' (ID | expression);
 
-type	: 'UNIT' | 'LAYER' | 'SHAPE' | 'MODEL' | 'NUMBER' | 'BOOLEAN';
+type:
+	'UNIT'
+	| 'LAYER'
+	| 'SHAPE'
+	| 'MODEL'
+	| 'NUMBER'
+	| 'BOOLEAN';
 
 ID: [a-zA-Z_][a-zA-Z0-9_]*;
 NUMBER: ('-')? [0-9]+ ('.' [0-9]+)?;

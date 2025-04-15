@@ -19,23 +19,23 @@ class ConnectITVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by ConnectITParser#newUnit.
-    def visitNewUnit(self, ctx:ConnectITParser.NewUnitContext):
+    # Visit a parse tree produced by ConnectITParser#newUnits.
+    def visitNewUnits(self, ctx:ConnectITParser.NewUnitsContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by ConnectITParser#newLayer.
-    def visitNewLayer(self, ctx:ConnectITParser.NewLayerContext):
+    # Visit a parse tree produced by ConnectITParser#newLayers.
+    def visitNewLayers(self, ctx:ConnectITParser.NewLayersContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by ConnectITParser#newShape.
-    def visitNewShape(self, ctx:ConnectITParser.NewShapeContext):
+    # Visit a parse tree produced by ConnectITParser#newShapes.
+    def visitNewShapes(self, ctx:ConnectITParser.NewShapesContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by ConnectITParser#newModel.
-    def visitNewModel(self, ctx:ConnectITParser.NewModelContext):
+    # Visit a parse tree produced by ConnectITParser#newModels.
+    def visitNewModels(self, ctx:ConnectITParser.NewModelsContext):
         return self.visitChildren(ctx)
 
 
@@ -101,6 +101,11 @@ class ConnectITVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by ConnectITParser#assignment.
     def visitAssignment(self, ctx:ConnectITParser.AssignmentContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ConnectITParser#expansion.
+    def visitExpansion(self, ctx:ConnectITParser.ExpansionContext):
         return self.visitChildren(ctx)
 
 
