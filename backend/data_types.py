@@ -196,6 +196,7 @@ class Shape(Structure):
         return "\n".join(str(layer) for layer in self.layers)
     
     def render(self, fig):
+        print("Render Shape")
         shifts = [0]
         for idx in range(len(self.connections)):
             shifts.append(shifts[idx-1] + self.connections[idx]["shift"] + self.connections[idx]["type"]*0.5)

@@ -3,60 +3,56 @@ grammar ConnectIT;
 program:
 	NEWLINE* (statement ( NEWLINE+ statement)*)* NEWLINE* EOF;
 
-statement:
-	declaration
-	| assignment
-	| showStatement
-	| whileStmt
-	| forStmt
-	| ifStmt
-	| functionDeclaration
-	| returnExpr;
+statement	: declaration
+			| assignment
+			| showStatement
+			| whileStmt
+			| forStmt
+			| ifStmt
+			| functionDeclaration
+			| returnExpr
+			;
 
-declaration:
-	'UNIT' unitDeclarationList			# newUnit
-	| 'LAYER' layerDeclarationList		# newLayer
-	| 'SHAPE' shapeDeclarationList		# newShape
-	| 'MODEL' modelDeclarationList		# newModel
-	| 'NUMBER' numberDeclarationList	# newNumber
-	| 'BOOLEAN' booleanDeclarationList	# newBoolean;
+declaration	: 'UNIT' unitDeclarationList		# newUnit
+			| 'LAYER' layerDeclarationList		# newLayer
+			| 'SHAPE' shapeDeclarationList		# newShape
+			| 'MODEL' modelDeclarationList		# newModel
+    		| 'NUMBER' numberDeclarationList 	# newNumber
+    		| 'BOOLEAN' booleanDeclarationList 	# newBoolean
+			;
 
 // DECLARATION TYPES
-unitDeclarationList: unitDeclaration (',' unitDeclaration)*;
-unitDeclaration: ID ( '=' unitExpr)?;
-unitExpr: (PATTERN)? COLOR | (COLOR)? PATTERN;
+unitDeclarationList	: unitDeclaration (',' unitDeclaration)*;
+unitDeclaration		: ID '=' (unitExpr | ID);
+unitExpr			: COLOR (PATTERN)? | (COLOR)? PATTERN;
 
-layerDeclarationList: layerDeclaration ( ',' layerDeclaration)*;
-layerDeclaration: ID ( '=' layerExpr)? ( 'CLOSED')?;
-layerExpr: ID '*' NUMBER | layerExpr '+' layerExpr |;
+layerDeclarationList: layerDeclaration (',' layerDeclaration)*;
+layerDeclaration	: ID '=' (layerExpr | ID) ('CLOSED')?;
+layerExpr			: ID '*' (NUMBER | ID) | layerExpr '+' layerExpr;
 
-shapeDeclarationList:
-	shapeDeclaration (',' shapeDeclarationList)*;
-shapeDeclaration: ID ('=' ID | shapeExpr);
-shapeExpr: (layerExpr | ID) ('<-' shapeExpr)?
-	| ( layerExpr | ID) ( '<<-' shapeExpr)?
-	| ( layerExpr | ID) ( '<-' NUMBER '-' shapeExpr)?
-	| ( layerExpr | ID) ( '<<-' NUMBER '-' shapeExpr)?;
+shapeDeclarationList: shapeDeclaration (',' shapeDeclaration)*;
+shapeDeclaration	: ID '<--' shapeExpr | ID ('=' ID)?;							
+shapeExpr			: (layerExpr | ID) ('<-' shapeExpr)?
+					| (layerExpr | ID) ('<<-' shapeExpr)?
+					| (layerExpr | ID) ('<-' (NUMBER | ID) '-' shapeExpr)?
+					| (layerExpr | ID) ('<<-' (NUMBER | ID) '-' shapeExpr)?;
 
-modelDeclarationList:
-	modelDeclaration (',' modelDeclarationList)*;
-modelDeclaration: ID ('=' ID | modelExpr);
-modelExpr: (shapeExpr | ID) ('<-' shapeExpr)?
-	| ( layerExpr | ID) ( '<<-' shapeExpr)?
-	| ( layerExpr | ID) ( '<-' NUMBER '-' shapeExpr)?
-	| ( layerExpr | ID) ( '<<-' NUMBER '-' shapeExpr)?;
+modelDeclarationList: modelDeclaration (',' modelDeclarationList)*;
+modelDeclaration	: ID '<--' modelExpr | ID ('=' ID)?;
+modelExpr			: (shapeExpr | ID) ('<-' modelExpr)?
+					| (shapeExpr | ID) ('<<-' modelExpr)?
+					| (shapeExpr | ID) ('<-' (NUMBER | ID) '-' modelExpr)?
+					| (shapeExpr | ID) ('<<-' (NUMBER | ID) '-' modelExpr)?;
 
-numberDeclarationList:
-	numberDeclaration (',' numberDeclaration)*;
-numberDeclaration: ID ( '=' NUMBER)?;
+numberDeclarationList	: numberDeclaration (',' numberDeclaration)*;
+numberDeclaration		: ID ('=' (NUMBER | ID))?;
 
-booleanDeclarationList:
-	booleanDeclaration (',' booleanDeclaration)*;
-booleanDeclaration: ID ( '=' BOOLEAN)?;
+booleanDeclarationList	: booleanDeclaration (',' booleanDeclaration)*;
+booleanDeclaration		: ID ('=' (BOOLEAN | ID))?;
 
 // ASSIGNMENTS
-assignment: ID ('=' | '-->') expression;
-expression: unitExpr | layerExpr | shapeExpr | modelExpr;
+assignment	: ID ('=' | '<--') expression | expression '-->' (type)? ID;
+expression	: unitExpr | layerExpr | shapeExpr | modelExpr;
 
 showStatement: 'SHOW' ID;
 
@@ -80,8 +76,7 @@ functionDeclaration:
 		NEWLINE? ']';
 returnExpr: 'RETURN' (ID | expression);
 
-type:
-	'UNIT'
+type: 'UNIT'
 	| 'LAYER'
 	| 'SHAPE'
 	| 'MODEL'
@@ -93,15 +88,13 @@ NUMBER: ('-')? [0-9]+ ('.' [0-9]+)?;
 BOOLEAN: 'TRUE' | 'FALSE' | '1' | '0';
 
 COLOR:
-	'*' (
-		'red'
+	'*' ( 'red'
 		| 'blue'
 		| 'green'
 		| 'white'
 		| 'black'
 		| 'yellow'
-		| 'lilac'
-	) '*';
+		| 'lilac' ) '*';
 
 PATTERN: '*' ( 'striped' | 'dotted' | 'gradient') '*';
 
