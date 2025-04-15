@@ -26,39 +26,57 @@ class ConnectITListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by ConnectITParser#newUnits.
-    def enterNewUnits(self, ctx:ConnectITParser.NewUnitsContext):
+    # Enter a parse tree produced by ConnectITParser#newUnit.
+    def enterNewUnit(self, ctx:ConnectITParser.NewUnitContext):
         pass
 
-    # Exit a parse tree produced by ConnectITParser#newUnits.
-    def exitNewUnits(self, ctx:ConnectITParser.NewUnitsContext):
-        pass
-
-
-    # Enter a parse tree produced by ConnectITParser#newLayers.
-    def enterNewLayers(self, ctx:ConnectITParser.NewLayersContext):
-        pass
-
-    # Exit a parse tree produced by ConnectITParser#newLayers.
-    def exitNewLayers(self, ctx:ConnectITParser.NewLayersContext):
+    # Exit a parse tree produced by ConnectITParser#newUnit.
+    def exitNewUnit(self, ctx:ConnectITParser.NewUnitContext):
         pass
 
 
-    # Enter a parse tree produced by ConnectITParser#newShapes.
-    def enterNewShapes(self, ctx:ConnectITParser.NewShapesContext):
+    # Enter a parse tree produced by ConnectITParser#newLayer.
+    def enterNewLayer(self, ctx:ConnectITParser.NewLayerContext):
         pass
 
-    # Exit a parse tree produced by ConnectITParser#newShapes.
-    def exitNewShapes(self, ctx:ConnectITParser.NewShapesContext):
+    # Exit a parse tree produced by ConnectITParser#newLayer.
+    def exitNewLayer(self, ctx:ConnectITParser.NewLayerContext):
         pass
 
 
-    # Enter a parse tree produced by ConnectITParser#newModels.
-    def enterNewModels(self, ctx:ConnectITParser.NewModelsContext):
+    # Enter a parse tree produced by ConnectITParser#newShape.
+    def enterNewShape(self, ctx:ConnectITParser.NewShapeContext):
         pass
 
-    # Exit a parse tree produced by ConnectITParser#newModels.
-    def exitNewModels(self, ctx:ConnectITParser.NewModelsContext):
+    # Exit a parse tree produced by ConnectITParser#newShape.
+    def exitNewShape(self, ctx:ConnectITParser.NewShapeContext):
+        pass
+
+
+    # Enter a parse tree produced by ConnectITParser#newModel.
+    def enterNewModel(self, ctx:ConnectITParser.NewModelContext):
+        pass
+
+    # Exit a parse tree produced by ConnectITParser#newModel.
+    def exitNewModel(self, ctx:ConnectITParser.NewModelContext):
+        pass
+
+
+    # Enter a parse tree produced by ConnectITParser#newNumber.
+    def enterNewNumber(self, ctx:ConnectITParser.NewNumberContext):
+        pass
+
+    # Exit a parse tree produced by ConnectITParser#newNumber.
+    def exitNewNumber(self, ctx:ConnectITParser.NewNumberContext):
+        pass
+
+
+    # Enter a parse tree produced by ConnectITParser#newBoolean.
+    def enterNewBoolean(self, ctx:ConnectITParser.NewBooleanContext):
+        pass
+
+    # Exit a parse tree produced by ConnectITParser#newBoolean.
+    def exitNewBoolean(self, ctx:ConnectITParser.NewBooleanContext):
         pass
 
 
@@ -170,21 +188,48 @@ class ConnectITListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by ConnectITParser#numberDeclarationList.
+    def enterNumberDeclarationList(self, ctx:ConnectITParser.NumberDeclarationListContext):
+        pass
+
+    # Exit a parse tree produced by ConnectITParser#numberDeclarationList.
+    def exitNumberDeclarationList(self, ctx:ConnectITParser.NumberDeclarationListContext):
+        pass
+
+
+    # Enter a parse tree produced by ConnectITParser#numberDeclaration.
+    def enterNumberDeclaration(self, ctx:ConnectITParser.NumberDeclarationContext):
+        pass
+
+    # Exit a parse tree produced by ConnectITParser#numberDeclaration.
+    def exitNumberDeclaration(self, ctx:ConnectITParser.NumberDeclarationContext):
+        pass
+
+
+    # Enter a parse tree produced by ConnectITParser#booleanDeclarationList.
+    def enterBooleanDeclarationList(self, ctx:ConnectITParser.BooleanDeclarationListContext):
+        pass
+
+    # Exit a parse tree produced by ConnectITParser#booleanDeclarationList.
+    def exitBooleanDeclarationList(self, ctx:ConnectITParser.BooleanDeclarationListContext):
+        pass
+
+
+    # Enter a parse tree produced by ConnectITParser#booleanDeclaration.
+    def enterBooleanDeclaration(self, ctx:ConnectITParser.BooleanDeclarationContext):
+        pass
+
+    # Exit a parse tree produced by ConnectITParser#booleanDeclaration.
+    def exitBooleanDeclaration(self, ctx:ConnectITParser.BooleanDeclarationContext):
+        pass
+
+
     # Enter a parse tree produced by ConnectITParser#assignment.
     def enterAssignment(self, ctx:ConnectITParser.AssignmentContext):
         pass
 
     # Exit a parse tree produced by ConnectITParser#assignment.
     def exitAssignment(self, ctx:ConnectITParser.AssignmentContext):
-        pass
-
-
-    # Enter a parse tree produced by ConnectITParser#expansion.
-    def enterExpansion(self, ctx:ConnectITParser.ExpansionContext):
-        pass
-
-    # Exit a parse tree produced by ConnectITParser#expansion.
-    def exitExpansion(self, ctx:ConnectITParser.ExpansionContext):
         pass
 
 

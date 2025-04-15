@@ -2,9 +2,6 @@ import numpy as np
 import plotly.graph_objects as go
 
 class Structure:
-    def __init__(self, name):
-        self.name = name
-
     def render(self):
         print(self)
 
@@ -12,8 +9,8 @@ class Structure:
         return "Base render() method"
 
 class Unit(Structure):
-    def __init__(self, name: str, color: str, pattern: str):
-        super().__init__(name)
+    def __init__(self, color: str, pattern: str):
+        super().__init__()
         self.color = color
         self.pattern = pattern
         self.color_map = {
@@ -107,7 +104,6 @@ class Unit(Structure):
         ])
 
     def render(self, fig):
-        # print("Render Unit")
         x_vals, y_vals, z_vals = zip(*(self.vertices))
         fig.add_trace(go.Mesh3d(
             x=x_vals, y=y_vals, z=z_vals,
@@ -131,9 +127,9 @@ class Unit(Structure):
         self.reset_state()
 
 class Layer(Structure):
-    def __init__(self, name: str, units: list[Unit], closed=False):
-        super().__init__(name)
-        self.units = units
+    def __init__(self, units: list[Unit], closed=False):
+        super().__init__()
+        self.units = list(units)
         self.closed = closed
 
         self.shift = 0
@@ -178,14 +174,14 @@ class Layer(Structure):
         self.rot_x = self.rot_y = self.rot_z = 0
 
 class Shape(Structure):
-    def __init__(self, name: str, layers: list[Layer], connections: list[dict]):
-        super().__init__(name)
-        self.layers = layers
-        self.connections = [{"shift": 0, "type": 0}] + connections
+    def __init__(self, layers: list[Layer], connections: list[dict]):
+        super().__init__()
+        self.layers = list(layers)
+        self.connections = dict(connections)
 
     def update(self, layers: list, connections: dict):
-        self.layers = layers
-        self.connections = [{"shift": 0, "type": 0}] + connections
+        self.layers = list(layers)
+        self.connections = dict(connections)
 
     def add_layer(self, layer : Layer, connection_type: str = "between", offset: int = 0):
         self.layers.append(layer)
@@ -201,10 +197,10 @@ class Shape(Structure):
     
     def render(self, fig):
         shifts = [0]
-        for idx in range(1, len(self.connections)):
+        for idx in range(len(self.connections)):
             shifts.append(shifts[idx-1] + self.connections[idx]["shift"] + self.connections[idx]["type"]*0.5)
 
-        for z, (layer, connection) in enumerate(zip(self.layers, self.connections)):
+        for z, layer in enumerate(self.layers):
             layer.shift = shifts[z] # o ile unitów w prawo przekręcić layer
             layer.level = z
             layer.render(fig)

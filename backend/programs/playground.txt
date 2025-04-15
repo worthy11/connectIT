@@ -1,1 +1,2 @@
-UNIT r = *red*, g = *green*, b = *blue*
+UNIT r = *red* *striped*, g = *dotted*, b = *gradient* *blue*
+UNIT copy = r

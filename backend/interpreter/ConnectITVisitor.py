@@ -19,23 +19,33 @@ class ConnectITVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by ConnectITParser#newUnits.
-    def visitNewUnits(self, ctx:ConnectITParser.NewUnitsContext):
+    # Visit a parse tree produced by ConnectITParser#newUnit.
+    def visitNewUnit(self, ctx:ConnectITParser.NewUnitContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by ConnectITParser#newLayers.
-    def visitNewLayers(self, ctx:ConnectITParser.NewLayersContext):
+    # Visit a parse tree produced by ConnectITParser#newLayer.
+    def visitNewLayer(self, ctx:ConnectITParser.NewLayerContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by ConnectITParser#newShapes.
-    def visitNewShapes(self, ctx:ConnectITParser.NewShapesContext):
+    # Visit a parse tree produced by ConnectITParser#newShape.
+    def visitNewShape(self, ctx:ConnectITParser.NewShapeContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by ConnectITParser#newModels.
-    def visitNewModels(self, ctx:ConnectITParser.NewModelsContext):
+    # Visit a parse tree produced by ConnectITParser#newModel.
+    def visitNewModel(self, ctx:ConnectITParser.NewModelContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ConnectITParser#newNumber.
+    def visitNewNumber(self, ctx:ConnectITParser.NewNumberContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ConnectITParser#newBoolean.
+    def visitNewBoolean(self, ctx:ConnectITParser.NewBooleanContext):
         return self.visitChildren(ctx)
 
 
@@ -99,13 +109,28 @@ class ConnectITVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by ConnectITParser#assignment.
-    def visitAssignment(self, ctx:ConnectITParser.AssignmentContext):
+    # Visit a parse tree produced by ConnectITParser#numberDeclarationList.
+    def visitNumberDeclarationList(self, ctx:ConnectITParser.NumberDeclarationListContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by ConnectITParser#expansion.
-    def visitExpansion(self, ctx:ConnectITParser.ExpansionContext):
+    # Visit a parse tree produced by ConnectITParser#numberDeclaration.
+    def visitNumberDeclaration(self, ctx:ConnectITParser.NumberDeclarationContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ConnectITParser#booleanDeclarationList.
+    def visitBooleanDeclarationList(self, ctx:ConnectITParser.BooleanDeclarationListContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ConnectITParser#booleanDeclaration.
+    def visitBooleanDeclaration(self, ctx:ConnectITParser.BooleanDeclarationContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ConnectITParser#assignment.
+    def visitAssignment(self, ctx:ConnectITParser.AssignmentContext):
         return self.visitChildren(ctx)
 
 
