@@ -1,0 +1,10 @@
+LAYER l = 2[*red*] + 2[*blue*] + 2[*green*]
+SHAPE s
+
+s = l <- l <- l <- l <- l
+? SHOW s
+
+l = 2[*red*] + 2[*blue*] + 2[*green*] CLOSED
+? SHOW s
+s = l <- l <- l <- l <- l 
+SHOW s

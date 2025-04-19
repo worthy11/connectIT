@@ -1,0 +1,6 @@
+UNIT r = *red*, g = *green*, b = *blue*
+LAYER l
+
+l = 3r + 3g + 3b
+l = 3r + 3g + 3b CLOSED
+SHOW l

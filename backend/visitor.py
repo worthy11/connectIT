@@ -1,7 +1,4 @@
 from antlr4 import *
-from antlr4 import CommonTokenStream, InputStream
-from antlr4.error.ErrorListener import ErrorListener
-from interpreter.ConnectITLexer import ConnectITLexer
 from interpreter.ConnectITParser import ConnectITParser
 from interpreter.ConnectITVisitor import ConnectITVisitor
 
@@ -11,7 +8,6 @@ from utils import *
 class CustomVisitor(ConnectITVisitor):
     def __init__(self, scope):
         self.scope = scope
-        self.variables = {}
         self.render = []
         self.fig = go.Figure()
 
@@ -26,29 +22,89 @@ class CustomVisitor(ConnectITVisitor):
         return output
     
     def visitStatement(self, ctx):
-        if ctx.declaration():
-            return self.visit(ctx.declaration())
+        if ctx.getChildCount() > 1 and ctx.getChild(0).getText() == "?":
+            return None
+        if ctx.declarationList():
+            return self.visit(ctx.declarationList())
         if ctx.assignment():
             return self.visit(ctx.assignment())
         if ctx.showStatement():
             return self.visit(ctx.showStatement())
         else:
             raise Exception("Invalid statement")
+        
+    def visitDeclarationList(self, ctx):
+        for dec in ctx.declaration():
+            if dec.assignment():
+                self.visit(dec.assignment())
 
-    def visitNewUnits(self, ctx):
-        for unit in ctx.unitDeclarationList().unitDeclaration():
-            name = unit.getChild(0).getText()
-            color, pattern = None, None
-            if unit.unitExpr():
-                color, pattern = self.visit(unit.unitExpr())
-            else:
-                source = unit.getChild(2).getText()
-                # TODO: Raise exception if name is not defined or not of type UNIT
-                source = self.variables[source]
-                color, pattern = source.color, source.pattern
-            self.scope[name] = Unit(color=color, pattern=pattern)
-            print(color, pattern)
-        return None
+    def visitAssignment(self, ctx):
+        token = ctx.ID().getSymbol()
+        line = token.line
+        column = token.column
+        name = token.text
+        expected_type = self.scope.get_type(name)
+        received_type = self.getExpressionType(ctx.expression())
+        # TODO: Raise exception if types don't match
+        if expected_type != received_type:
+            raise Exception(f"Error: Types {types[expected_type]} and {types[received_type]} don't match at line {line}, column {column}")
+        value = self.visit(ctx.expression())
+        self.scope.fill(name, value)
+
+    def getExpressionType(self, e):
+        if e.idCast():
+            return self.getCastType(e.idCast())[1]
+        elif e.unitExpr():
+            return 0
+        elif e.layerExpr():
+            return 1
+        elif e.shapeExpr():
+            return 2
+        elif e.modelExpr():
+            return 3
+        elif e.numericExpr():
+            return 4
+        elif e.booleanExpr():
+            return 5
+        
+    def getCastType(self, cast):
+        base_type = 0
+        cast_type = 0
+        if cast.idCast():
+            result = self.getCastType(cast.idCast())
+            base_type = result[0]
+            cast_type = result[1] + 1
+        else:
+            base_type = self.scope.get_type(cast.ID().getText())
+            cast_type = base_type
+            if base_type > 2:
+                raise Exception(f"Error: Cannot cast {types[base_type]} to another type")
+        if cast_type > 3:
+            raise Exception(f"Error: Cannot cast {types[base_type]} to a type other than LAYER, SHAPE, or MODEL")
+        return base_type, cast_type
+        
+    def visitExpression(self, ctx):
+        return self.visit(ctx.getChild(0))
+
+    def visitIdCast(self, ctx):
+        base_type, cast_type = self.getCastType(ctx)
+        if ctx.idCast():
+            value = self.visit(ctx.idCast())
+            match base_type:
+                case 2:
+                    return Model()
+                case 1:
+                    if cast_type == 2:
+                        return Shape(layers=[value], connections=[])
+                    return Model()
+                case 0:
+                    if cast_type == 1:
+                        return Layer(units=[value], closed=False)
+                    elif cast_type == 2:
+                        return Shape(layers=[Layer(units=[value], closed=False)], connections=[])
+                    return Model()
+        # TODO: Check if value is initialized
+        return self.scope.get_value(ctx.ID().getText())
 
     def visitUnitExpr(self, ctx):
         color, pattern = None, None
@@ -56,148 +112,120 @@ class CustomVisitor(ConnectITVisitor):
             color = ctx.COLOR().getText()[1:-1]
         if ctx.PATTERN():
             pattern = ctx.PATTERN().getText()[1:-1]
-        return color, pattern
+        return Unit(color=color, pattern=pattern)
     
-    def visitNewLayers(self, ctx):
-        for layer in ctx.layerDeclarationList().layerDeclaration():
-            name = layer.getChild(0).getText()
-            units = []
-            closed = (
-                layer.getChildCount() == 2 and layer.getChild(1).getText() == "CLOSED"
-                or layer.getChildCount() == 4 and layer.getChild(3).getText() == "CLOSED"
-            )
-            if layer.layerExpr():
-                units = self.visit(layer.layerExpr())
-            else:
-                source = layer.getChild(2).getText()
-                # TODO: Raise exception if name is not defined or not of type UNIT or LAYER
-                source = self.scope[source]
-                if source["type"] == "UNIT":
-                    units = [source["value"]]
-                else:
-                    units, closed = source["value"].units, source["value"].closed
-            self.scope[name] = Layer(units=units, closed=closed)
-        return None
-
     def visitLayerExpr(self, ctx):
-        if ctx.getChild(1).getText() == '*':
-            name = ctx.ID().getText()
-            unit: Unit = self.variables[name]
-            length: str = ctx.NUMBER().getText()
-            return [unit] * int(length)
-        
+        units = []
+        closed = ctx.getChildCount() % 2 == 0
+        for term in ctx.layerTerm():
+            units.extend(self.visit(term))
+        return Layer(units=units, closed=closed)
+    
+    def visitLayerTerm(self, ctx):
+        units = []
+        number = 1
+        if ctx.getChildCount() == 1:
+            unit = self.visit(ctx.idCast())
         else:
-            units_left = self.visit(ctx.layerExpr(0))
-            units_right = self.visit(ctx.layerExpr(1))
-            return units_left + units_right
-
-    def visitNewShapes(self, ctx):
-        for shape in ctx.shapeDeclarationList().shapeDeclaration():
-            name = shape.getChild(0).getText()
-            layers, connections = [], {}
-            if shape.shapeExpr():
-                layers, connections = self.visit(shape.shapeExpr())
-            else:
-                source = shape.getChild(2).getText()
-                # TODO: Raise exception if name is not defined or not of type UNIT, LAYER, or SHAPE
-                source = self.variables[source]
-                if source["type"] == "UNIT":
-                    layers = [Layer([source["value"], False])]
-                elif source["type"] == "LAYER":
-                    layers = [source["value"]]
+            if ctx.numericExpr():
+                if ctx.idCast():
+                    unit = self.visit(ctx.idCast())
                 else:
-                    layers, connections = source["value"].layers, source["value"].connections
-            self.scope[name] = Shape(layers=layers, connections=connections)
-        return None
+                    unit = self.visit(ctx.unitExpr())
+                number = self.visit(ctx.numericExpr())
+            else:
+                unit = self.visit(ctx.unitExpr())
+        # TODO: Check if unit is of type UNIT
+        # TODO: Check if number is positive
+        units.extend([unit] * number)
+        return units
 
     def visitShapeExpr(self, ctx):
-        if ctx.shapeExpr():
-            if ctx.layerExpr():
-                left = [Layer(self.visit(ctx.layerExpr()))]
-            else:
-                source = ctx.ID().getText()
-                # TODO: Raise exception if name is not defined or not of type LAYER
-                source = self.scope[source]
-                left = [source["value"]]
-            right, connections = self.visit(ctx.shapeExpr())
-
-            if ctx.getChild(1).getText() == '<-':
-                if ctx.NUMBER():
-                    return left + right, [{"type": 1, "shift": int(ctx.NUMBER().getText())}] + connections
-                return left + right, [{"type": 1, "shift": 0}]  + connections
-
-            elif ctx.getChild(1).getText() == '<<-':
-                if ctx.NUMBER():
-                    return left + right, [{"type": 0, "shift": int(ctx.NUMBER().getText())}]  + connections
-                return left + right, [{"type": 0, "shift": 0}]  + connections
-
+        layers = []
+        connections = []
+        layers.append(self.visit(ctx.shapeTerm()))
+        for con in ctx.shapeConnector():
+            layer, connection = self.visit(con)
+            layers.append(layer)
+            connections.append(connection)
+        # TODO: Raise exception if only some layers are closed
+        # TODO: Raise exception if layer length varies if all layers are closed
+        # TODO: Raise exception if shift is larger than the length of the previous layer
+        return Shape(layers=layers, connections=connections)
+    
+    def visitShapeConnector(self, ctx):
+        layer = self.visit(ctx.shapeTerm())
+        shift = 0
+        if ctx.numericExpr():
+            shift = self.visit(ctx.numericExpr())
+        if ctx.getChild(0).getText() == "<-":
+            type = 1
         else:
-            if ctx.layerExpr():
-                return [Layer(self.visit(ctx.layerExpr()))], []
-            else:
-                source = ctx.ID().getText()
-                # TODO: Raise exception if name is not defined or not of type LAYER
-                source = self.variables[source]
-                return [source["value"]], []
-
-    def visitNewModels(self, ctx):
-        for model in ctx.modelDeclarationList().modelDeclaration():
-            name = model.getChild(0).getText()
-            layers, connections = [], {}
-            if model.modelExpr():
-                layers, connections = self.visit(model.modelExpr())
-            else:
-                source = model.getChild(2).getText()
-                # TODO: Raise exception if name is not defined or not of type UNIT, LAYER, or SHAPE
-                source = self.variables[source]
-                if source["type"] == "UNIT":
-                    layers = [Layer([source["value"], False])]
-                elif source["type"] == "LAYER":
-                    layers = [source["value"]]
-                else:
-                    layers, connections = source["value"].layers, source["value"].connections
-            self.scope[name] = Shape(layers=layers, connections=connections)
-        return None
+            type = 0
+        connection = {"type": type, "shift": shift}
+        return layer, connection
+    
+    def visitShapeTerm(self, ctx):
+        if ctx.idCast():
+            layer = self.visit(ctx.idCast())
+        else:
+            layer = self.visit(ctx.layerExpr())
+        # TODO: Check if layer is of type LAYER
+        return layer
 
     def visitModelExpr(self, ctx):
-        if ctx.shapeExpr():
-            if ctx.layerExpr():
-                left = [Layer(self.visit(ctx.layerExpr()))]
-            else:
-                source = ctx.ID().getText()
-                # TODO: Raise exception if name is not defined or not of type LAYER
-                source = self.scope[source]
-                left = [source["value"]]
-            right, connections = self.visit(ctx.shapeExpr())
+        pass
+    def visitModelConnector(self, ctx):
+        pass
 
-            if ctx.getChild(1).getText() == '<-':
-                if ctx.NUMBER():
-                    return left + right, [{"type": 1, "shift": int(ctx.NUMBER().getText())}] + connections
-                return left + right, [{"type": 1, "shift": 0}]  + connections
-
-            elif ctx.getChild(1).getText() == '<<-':
-                if ctx.NUMBER():
-                    return left + right, [{"type": 0, "shift": int(ctx.NUMBER().getText())}]  + connections
-                return left + right, [{"type": 0, "shift": 0}]  + connections
-
+    def visitModelTerm(self, ctx):
+        if ctx.idCast():
+            shape = self.visit(ctx.idCast())
         else:
-            if ctx.layerExpr():
-                return [Layer(self.visit(ctx.layerExpr()))], []
+            shape = self.visit(ctx.shapeExpr())
+        # TODO: Check if shape is of type SHAPE
+        return shape
+
+    def visitNumericExpr(self, ctx):
+        if ctx.ID():
+            name = ctx.ID().getText()
+            # TODO: Raise exception if name is not defined
+            type = self.scope.get_type(name)
+            # TODO: Raise exception if name is not of type NUMBER
+            # TODO: Check if value is initialized 
+            value = self.scope.get_value(name)
+            return value
+        else:
+            return int(ctx.NUMBER().getText())
+
+    def visitBooleanExpr(self, ctx):
+        if ctx.ID():
+            name = ctx.ID().getText()
+            # TODO: Raise exception if name is not defined
+            type = self.scope.get_type(name)
+            # TODO: Raise exception if name is not of type BOOLEAN
+            # TODO: Check if value is initialized 
+            value = self.scope.get_value(name)
+            return value
+        else:
+            value: str = ctx.BOOLEAN().getText()
+            if value.isdigit():
+                return int(value)
+            elif value == "TRUE":
+                return 1
             else:
-                source = ctx.ID().getText()
-                # TODO: Raise exception if name is not defined or not of type LAYER
-                source = self.variables[source]
-                return [source["value"]], []
+                return 0
 
     def visitShowStatement(self, ctx):
         if ctx.getChildCount() == 2:
             shape_name = ctx.ID().getText()
 
-            if shape_name not in self.variables:
+            if shape_name not in self.scope:
                 print(f"Error: '{shape_name}' is not defined.")
                 return
 
-            structure = self.variables[shape_name]
+            # TODO: Check if value is initialized 
+            structure = self.scope.get_value(shape_name)
             if isinstance(structure, Structure):
                 return show_figure(self.fig, structure)
             else:

@@ -1,2 +1,9 @@
 UNIT r = *red* *striped*, g = *dotted*, b = *gradient* *blue*
 UNIT copy = r
+
+LAYER boom, boom1 = 4*r + b*2
+LAYER boom2 = boom1
+
+SHAPE s = boom1 <- boom2
+
+SHOW s

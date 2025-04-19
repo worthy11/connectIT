@@ -1,6 +1,15 @@
 import numpy as np
 import plotly.graph_objects as go
 
+types = {
+    0: "UNIT",
+    1: "LAYER",
+    2: "SHAPE",
+    3: "MODEL",
+    4: "NUMBER",
+    5: "BOOLEAN",
+}
+
 class Structure:
     def render(self):
         print(self)
@@ -177,15 +186,15 @@ class Shape(Structure):
     def __init__(self, layers: list[Layer], connections: list[dict]):
         super().__init__()
         self.layers = list(layers)
-        self.connections = dict(connections)
+        self.connections = list(connections)
 
     def update(self, layers: list, connections: dict):
         self.layers = list(layers)
         self.connections = dict(connections)
 
-    def add_layer(self, layer : Layer, connection_type: str = "between", offset: int = 0):
+    def add_layer(self, layer: Layer, type: int=1, shift: int=0):
         self.layers.append(layer)
-        self.connections.append({"type": connection_type, "offset": offset})
+        self.connections.append({"type": type, "shift": shift})
     
     def remove_layer(self):
         if self.layers:
@@ -196,10 +205,9 @@ class Shape(Structure):
         return "\n".join(str(layer) for layer in self.layers)
     
     def render(self, fig):
-        print("Render Shape")
         shifts = [0]
         for idx in range(len(self.connections)):
-            shifts.append(shifts[idx-1] + self.connections[idx]["shift"] + self.connections[idx]["type"]*0.5)
+            shifts.append(shifts[idx] + self.connections[idx]["shift"] + self.connections[idx]["type"]*0.5)
 
         for z, layer in enumerate(self.layers):
             layer.shift = shifts[z] # o ile unitów w prawo przekręcić layer

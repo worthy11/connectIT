@@ -60,11 +60,11 @@ Then, visit the address `npm` gives you (usually [localhost at port 5137](http:/
 
 ### Running Samples
 
-Check out the `backend/programs/` directory. Choose a sample program you want to run and substitute the filename in `main.py`, then type the commands:
+Check out the `backend/programs/` directory. Choose a sample program you want to run and pass the name as a console argument to `main.py`, for example:
 
 ```
 cd backend
-py main.py
+py main.py shape_showcase.txt
 ```
 
 Your figure can be viewed by opening `out.html` in the browser.

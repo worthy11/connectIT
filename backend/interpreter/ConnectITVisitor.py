@@ -19,113 +19,13 @@ class ConnectITVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by ConnectITParser#newUnit.
-    def visitNewUnit(self, ctx:ConnectITParser.NewUnitContext):
+    # Visit a parse tree produced by ConnectITParser#declarationList.
+    def visitDeclarationList(self, ctx:ConnectITParser.DeclarationListContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by ConnectITParser#newLayer.
-    def visitNewLayer(self, ctx:ConnectITParser.NewLayerContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by ConnectITParser#newShape.
-    def visitNewShape(self, ctx:ConnectITParser.NewShapeContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by ConnectITParser#newModel.
-    def visitNewModel(self, ctx:ConnectITParser.NewModelContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by ConnectITParser#newNumber.
-    def visitNewNumber(self, ctx:ConnectITParser.NewNumberContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by ConnectITParser#newBoolean.
-    def visitNewBoolean(self, ctx:ConnectITParser.NewBooleanContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by ConnectITParser#unitDeclarationList.
-    def visitUnitDeclarationList(self, ctx:ConnectITParser.UnitDeclarationListContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by ConnectITParser#unitDeclaration.
-    def visitUnitDeclaration(self, ctx:ConnectITParser.UnitDeclarationContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by ConnectITParser#unitExpr.
-    def visitUnitExpr(self, ctx:ConnectITParser.UnitExprContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by ConnectITParser#layerDeclarationList.
-    def visitLayerDeclarationList(self, ctx:ConnectITParser.LayerDeclarationListContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by ConnectITParser#layerDeclaration.
-    def visitLayerDeclaration(self, ctx:ConnectITParser.LayerDeclarationContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by ConnectITParser#layerExpr.
-    def visitLayerExpr(self, ctx:ConnectITParser.LayerExprContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by ConnectITParser#shapeDeclarationList.
-    def visitShapeDeclarationList(self, ctx:ConnectITParser.ShapeDeclarationListContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by ConnectITParser#shapeDeclaration.
-    def visitShapeDeclaration(self, ctx:ConnectITParser.ShapeDeclarationContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by ConnectITParser#shapeExpr.
-    def visitShapeExpr(self, ctx:ConnectITParser.ShapeExprContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by ConnectITParser#modelDeclarationList.
-    def visitModelDeclarationList(self, ctx:ConnectITParser.ModelDeclarationListContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by ConnectITParser#modelDeclaration.
-    def visitModelDeclaration(self, ctx:ConnectITParser.ModelDeclarationContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by ConnectITParser#modelExpr.
-    def visitModelExpr(self, ctx:ConnectITParser.ModelExprContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by ConnectITParser#numberDeclarationList.
-    def visitNumberDeclarationList(self, ctx:ConnectITParser.NumberDeclarationListContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by ConnectITParser#numberDeclaration.
-    def visitNumberDeclaration(self, ctx:ConnectITParser.NumberDeclarationContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by ConnectITParser#booleanDeclarationList.
-    def visitBooleanDeclarationList(self, ctx:ConnectITParser.BooleanDeclarationListContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by ConnectITParser#booleanDeclaration.
-    def visitBooleanDeclaration(self, ctx:ConnectITParser.BooleanDeclarationContext):
+    # Visit a parse tree produced by ConnectITParser#declaration.
+    def visitDeclaration(self, ctx:ConnectITParser.DeclarationContext):
         return self.visitChildren(ctx)
 
 
@@ -134,8 +34,73 @@ class ConnectITVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by ConnectITParser#extension.
+    def visitExtension(self, ctx:ConnectITParser.ExtensionContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by ConnectITParser#expression.
     def visitExpression(self, ctx:ConnectITParser.ExpressionContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ConnectITParser#unitExpr.
+    def visitUnitExpr(self, ctx:ConnectITParser.UnitExprContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ConnectITParser#layerExpr.
+    def visitLayerExpr(self, ctx:ConnectITParser.LayerExprContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ConnectITParser#layerTerm.
+    def visitLayerTerm(self, ctx:ConnectITParser.LayerTermContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ConnectITParser#shapeExpr.
+    def visitShapeExpr(self, ctx:ConnectITParser.ShapeExprContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ConnectITParser#shapeTerm.
+    def visitShapeTerm(self, ctx:ConnectITParser.ShapeTermContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ConnectITParser#shapeConnector.
+    def visitShapeConnector(self, ctx:ConnectITParser.ShapeConnectorContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ConnectITParser#modelExpr.
+    def visitModelExpr(self, ctx:ConnectITParser.ModelExprContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ConnectITParser#modelTerm.
+    def visitModelTerm(self, ctx:ConnectITParser.ModelTermContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ConnectITParser#modelConnector.
+    def visitModelConnector(self, ctx:ConnectITParser.ModelConnectorContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ConnectITParser#idCast.
+    def visitIdCast(self, ctx:ConnectITParser.IdCastContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ConnectITParser#numericExpr.
+    def visitNumericExpr(self, ctx:ConnectITParser.NumericExprContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ConnectITParser#booleanExpr.
+    def visitBooleanExpr(self, ctx:ConnectITParser.BooleanExprContext):
         return self.visitChildren(ctx)
 
 
@@ -179,8 +144,8 @@ class ConnectITVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by ConnectITParser#type.
-    def visitType(self, ctx:ConnectITParser.TypeContext):
+    # Visit a parse tree produced by ConnectITParser#dataType.
+    def visitDataType(self, ctx:ConnectITParser.DataTypeContext):
         return self.visitChildren(ctx)
 
 

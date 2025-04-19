@@ -8,39 +8,31 @@
   - <- -- standardowe łączenie 'pomiędzy'
   - <<- -- standardowe łączenie 'stack'
   - <-- -- standardowe łączenie 'stack'
+- Assignmenty: UNIT, LAYER ---> **(unit = \*blue\*, layer = unit \* 10)**
+- Dowolna kolejność w deklaracji UNIT ---> **(\*red\* \*striped\* == \*striped\* \*red\*)**
+- Dowolna kolejność w deklaracji LAYER ---> **(r \* 10 == 10 \* r)**
+- Rzutowanie typów
 
 ## Do zrobienia
 
 ### Gramatyka
 
-- Assignmenty: UNIT, LAYER ---> **(unit = \*blue\*, layer = unit \* 10)**
-- Łączenie UNIT do istniejącego LAYER ---> **(layer += unit)**
-- Łączenie LAYER do istniejącego SHAPE ---> **(shape <- layer --> shape)**
-- Łączenie SHAPE do istniejącego MODEL ---> **(model <- shape --> model)**
+- Weryfikacja IF / ELSE, FOR / WHILE, funkcji
+- Extension (-->)
 - MODEL: deklaracja, assignment
 - BEND
 - Przesuwanie i rotowanie brył
-- Dowolna kolejność w deklaracji UNIT ---> **(\*red\* \*striped\* == \*striped\* \*red\*)**
-- Dowolna kolejność w deklaracji LAYER ---> **(r \* 10 == 10 \* r)**
-- Rozszerzenie deklaracji i assignmentów o podtypy ---> **(UNIT u = \*red\*, LAYER l = u, SHAPE s = l)**
 - Potencjalnie rozłączanie brył
-- ...?
 
 ### Interpreter
 
-- Assignmenty: UNIT, LAYER
+- Obsługa błędów
+- Implementacja IF / ELSE, FOR / WHILE, funkcji
+- Extension (-->)
 - MODEL: deklaracja, assignment
-- Łączenie UNIT do istniejącego LAYER
-- Łączenie LAYER do istniejącego SHAPE
-- Łączenie SHAPE do istniejącego MODEL
 - BEND
 - Przesuwanie i rotowanie brył
 - Rozszerzenie deklaracji i assignmentów o podtypy
-- If / Else
-- For / While
-- Funkcje
-- Scopy
-- ...?
 
 ### Wizualizacja
 

@@ -5,6 +5,7 @@ from antlr4.error.ErrorListener import ErrorListener
 from interpreter.ConnectITLexer import ConnectITLexer
 from interpreter.ConnectITParser import ConnectITParser
 from listener import GlobalScope, CustomListener
+import argparse
 
 class SyntaxErrorListener(ErrorListener):
     def __init__(self):
@@ -33,35 +34,45 @@ def evaluate_expression(expression):
     lexer = ConnectITLexer(input_stream)
     tokens = CommonTokenStream(lexer)
     parser = ConnectITParser(tokens)
-    tree = parser.program()
-
-    # global_scope = GlobalScope()
-    # listener = CustomListener(global_scope)
-    # walker = ParseTreeWalker()
-    # walker.walk(listener, tree)
 
     error_listener = SyntaxErrorListener()
     parser.removeErrorListeners()
     parser.addErrorListener(error_listener)
 
+    tree = parser.program()
+
     if error_listener.has_error:
         print("\n".join(error_listener.errors))
         return None
 
+    global_scope = GlobalScope()
+    listener = CustomListener(global_scope)
+    walker = ParseTreeWalker()
+    walker.walk(listener, tree)
+
     try:
-        visitor = CustomVisitor()
-        return visitor.visit(tree)
+        visitor = CustomVisitor(global_scope)
+        result = visitor.visit(tree)
+        return result
     except Exception as e:
         return f"Runtime Error: {str(e)}"
 
+def parse_args():
+    parser = argparse.ArgumentParser(description="Process a file with a custom extension.")
+    parser.add_argument('filename', type=str, help='The path to the file to be processed')
+    return parser.parse_args()
 
 if __name__ == '__main__':
-    with open('programs/playground.txt', 'r') as f:
-        program = f.read()
+    args = parse_args()
     try:
+        with open(f"programs/{args.filename}", 'r') as f:
+            program = f.read()
         result = evaluate_expression(program)
         if result is not None:
-            print(result)
+            if result[0] == "{":
+                print("Generated figure successfully")
+            else:
+                print(result)
     except Exception as e:
         print(f"Error: {e}")
 

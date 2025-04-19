@@ -1,0 +1,39 @@
+UNIT u, u1 = *blue*
+LAYER l, l1 = u1 + u1
+SHAPE s, s1 = l1 <- l1
+
+u = *red*
+? u = [*red*]
+u = u1
+? u = [u1]
+? SHOW u
+
+u = *red*
+? l = u
+l = [u]
+
+l = l1
+? l = [l1]
+
+l = 2u + 2u1 + u
+l = 2 [*blue*] + 2 [*red* *striped*]
+? SHOW l
+
+? s = *blue*
+? s = [*blue*]
+s = [[*blue*]]
+? s = u
+? s = [u]
+s = [[u]]
+
+l = 2u + 2u1
+s = l <- l <<- l 
+s = l <-(1)- l <<-(1)- l
+s = l <-(-1)- l <<-(-1)- l
+
+? s = u <- u1 <- u
+
+s = [2u] <- [2u1] <- [2u]
+s = [2[*red*]] <- [2[*blue*]] <- [2[*green*]]
+
+SHOW s
