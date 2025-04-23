@@ -52,59 +52,80 @@ class CustomVisitor(ConnectITVisitor):
         self.scope.fill(name, value)
 
     def getExpressionType(self, e):
-        if e.idCast():
-            return self.getCastType(e.idCast())[1]
+        if e.ID():
+            self.scope.get_type(e.ID().getText())
         elif e.unitExpr():
             return 0
-        elif e.layerExpr():
-            return 1
-        elif e.shapeExpr():
-            return 2
-        elif e.modelExpr():
-            return 3
         elif e.numericExpr():
             return 4
         elif e.booleanExpr():
             return 5
-        
-    def getCastType(self, cast):
-        base_type = 0
-        cast_type = 0
-        if cast.idCast():
-            result = self.getCastType(cast.idCast())
-            base_type = result[0]
-            cast_type = result[1] + 1
+        elif e.arrowOperator():
+            return self.getChainType(e)+1
         else:
-            base_type = self.scope.get_type(cast.ID().getText())
-            cast_type = base_type
-            if base_type > 2:
-                raise Exception(f"Error: Cannot cast {types[base_type]} to another type")
-        if cast_type > 3:
-            raise Exception(f"Error: Cannot cast {types[base_type]} to a type other than LAYER, SHAPE, or MODEL")
-        return base_type, cast_type
+            return self.getCastType(e)
+        
+    def getChainType(self, e):
+        if e.arrowOperator():
+            # SHAPE s = l1 <- l2 <- l3
+            left = self.getChainType(e.expression(0))
+            right = self.getChainType(e.expression(1))
+            if left != right:
+                raise Exception(f"Type Error: Cannot connect types {left} and {right}")
+            return left
+        return self.getExpressionType(e)
+
+    def getCastType(self, e):
+        # [ expression ]
+        if e.expression():
+            base = self.getCastType(e.expression())
+            if base in [3, 4, 5]:
+                raise Exception(f"Type Error: Cannot cast type {base} to another type")
+            return base+1
+        return self.getExpressionType(e)
         
     def visitExpression(self, ctx):
-        return self.visit(ctx.getChild(0))
-
-    def visitIdCast(self, ctx):
-        base_type, cast_type = self.getCastType(ctx)
-        if ctx.idCast():
-            value = self.visit(ctx.idCast())
-            match base_type:
-                case 2:
-                    return Model()
+        print(ctx.getText())
+        if ctx.ID():
+            # TODO: Check if value is initialized
+            return self.scope.get_value(ctx.ID().getText())
+        elif ctx.unitExpr():
+            return self.visit(ctx.unitExpr())
+        elif ctx.numericExpr():
+            return self.visit(ctx.numericExpr())
+        elif ctx.booleanExpr():
+            return self.visit(ctx.booleanExpr())
+        elif ctx.castExpr():
+            return self.visit(ctx.castExpr())
+        else:
+            type = self.getExpressionType(ctx)
+            match type:
                 case 1:
-                    if cast_type == 2:
-                        return Shape(layers=[value], connections=[])
-                    return Model()
-                case 0:
-                    if cast_type == 1:
-                        return Layer(units=[value], closed=False)
-                    elif cast_type == 2:
-                        return Shape(layers=[Layer(units=[value], closed=False)], connections=[])
-                    return Model()
-        # TODO: Check if value is initialized
-        return self.scope.get_value(ctx.ID().getText())
+                    return self.visitLayerExpr(ctx)
+                case 2:
+                    return self.visitShapeExpr(ctx)
+                case 3:
+                    return self.visitModelExpr(ctx)
+
+    def visitCastExpr(self, ctx):
+        cast_type = self.getExpressionType(ctx)
+        while ctx.getChild(0) == '[':
+            ctx = ctx.expression()
+        base_type = self.getExpressionType(ctx)
+        value = self.visit(ctx)
+        match base_type:
+            case 2:
+                return Model()
+            case 1:
+                if cast_type == 2:
+                    return Shape(layers=[value], connections=[])
+                return Model()
+            case 0:
+                if cast_type == 1:
+                    return Layer(units=[value], closed=False)
+                elif cast_type == 2:
+                    return Shape(layers=[Layer(units=[value], closed=False)], connections=[])
+                return Model()
 
     def visitUnitExpr(self, ctx):
         color, pattern = None, None
@@ -115,11 +136,8 @@ class CustomVisitor(ConnectITVisitor):
         return Unit(color=color, pattern=pattern)
     
     def visitLayerExpr(self, ctx):
-        units = []
-        closed = ctx.getChildCount() % 2 == 0
-        for term in ctx.layerTerm():
-            units.extend(self.visit(term))
-        return Layer(units=units, closed=closed)
+        print(ctx.getText())
+        # return Layer(units=units, closed=closed)
     
     def visitLayerTerm(self, ctx):
         units = []
@@ -170,7 +188,8 @@ class CustomVisitor(ConnectITVisitor):
             layer = self.visit(ctx.idCast())
         else:
             layer = self.visit(ctx.layerExpr())
-        # TODO: Check if layer is of type LAYER
+        if not isinstance(layer, Layer):
+            raise Exception("potezny error")
         return layer
 
     def visitModelExpr(self, ctx):
@@ -184,6 +203,8 @@ class CustomVisitor(ConnectITVisitor):
         else:
             shape = self.visit(ctx.shapeExpr())
         # TODO: Check if shape is of type SHAPE
+        if not isinstance(shape, Shape):
+            raise Exception("potezny error")
         return shape
 
     def visitNumericExpr(self, ctx):
@@ -215,6 +236,11 @@ class CustomVisitor(ConnectITVisitor):
                 return 1
             else:
                 return 0
+
+    def visitBendStatement(self, ctx):
+        shape = ctx.ID().getText()
+        # TODO: Check if shape has type SHAPE
+        
 
     def visitShowStatement(self, ctx):
         if ctx.getChildCount() == 2:

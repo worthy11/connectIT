@@ -44,53 +44,13 @@ class ConnectITVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by ConnectITParser#arrowOperator.
+    def visitArrowOperator(self, ctx:ConnectITParser.ArrowOperatorContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by ConnectITParser#unitExpr.
     def visitUnitExpr(self, ctx:ConnectITParser.UnitExprContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by ConnectITParser#layerExpr.
-    def visitLayerExpr(self, ctx:ConnectITParser.LayerExprContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by ConnectITParser#layerTerm.
-    def visitLayerTerm(self, ctx:ConnectITParser.LayerTermContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by ConnectITParser#shapeExpr.
-    def visitShapeExpr(self, ctx:ConnectITParser.ShapeExprContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by ConnectITParser#shapeTerm.
-    def visitShapeTerm(self, ctx:ConnectITParser.ShapeTermContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by ConnectITParser#shapeConnector.
-    def visitShapeConnector(self, ctx:ConnectITParser.ShapeConnectorContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by ConnectITParser#modelExpr.
-    def visitModelExpr(self, ctx:ConnectITParser.ModelExprContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by ConnectITParser#modelTerm.
-    def visitModelTerm(self, ctx:ConnectITParser.ModelTermContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by ConnectITParser#modelConnector.
-    def visitModelConnector(self, ctx:ConnectITParser.ModelConnectorContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by ConnectITParser#idCast.
-    def visitIdCast(self, ctx:ConnectITParser.IdCastContext):
         return self.visitChildren(ctx)
 
 
@@ -101,6 +61,16 @@ class ConnectITVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by ConnectITParser#booleanExpr.
     def visitBooleanExpr(self, ctx:ConnectITParser.BooleanExprContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ConnectITParser#castExpr.
+    def visitCastExpr(self, ctx:ConnectITParser.CastExprContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ConnectITParser#bendStatement.
+    def visitBendStatement(self, ctx:ConnectITParser.BendStatementContext):
         return self.visitChildren(ctx)
 
 

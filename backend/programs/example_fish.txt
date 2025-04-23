@@ -1,0 +1,12 @@
+UNIT b = *black*
+UNIT w = *white*
+UNIT y = *yellow*
+
+LAYER nose = [w], w1 = 4w, w2 = 5w, w3 = 8w, w4 = 9w
+LAYER b1 = 2b, b2 = 3b, b3 = 10b, b4 = 11b
+LAYER y1 = 3y + b + 2y, y2 = 7y
+LAYER tail1 = 3w, tail2 = 4w, tail3 = 5y, tail4 = 6y, tail5 = 7y
+
+SHAPE fish = nose <-(-1)- b1 <-(-1)- b2 <-(-1)- w1 <-(-1)- w2 <-(-1)- y1 <-(-1)- y2 <-(-1)- w3 <-(-1)- w4 <-(-1)- b3 <-(-1)- b4 <<-(4)- tail1 <-(-1)- tail2 <-(-1)- tail3 <-(-1)- tail4 <-(-1)- tail5
+
+SHOW fish

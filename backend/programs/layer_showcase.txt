@@ -1,6 +1,4 @@
 UNIT r = *red*, g = *green*, b = *blue*
-LAYER l
+LAYER l = *red* <-> *green* <-> *blue*
 
-l = 3r + 3g + 3b
-l = 3r + 3g + 3b CLOSED
-SHOW l
+SHAPE s = l <- *red* *striped* <- l

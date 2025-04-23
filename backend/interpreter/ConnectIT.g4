@@ -19,42 +19,29 @@ declaration: ID | assignment;
 assignment: ID '=' expression;
 extension: expression '-->' ID;
 expression:
-	| idCast
+	ID
 	| unitExpr
-	| layerExpr
-	| shapeExpr
-	| modelExpr
 	| numericExpr
-	| booleanExpr;
+	| booleanExpr
+	| castExpr
+	| expression arrowOperator expression;
+
+arrowOperator:
+	'<->'
+	| '<-'
+	| '<<-'
+	| '<-(' numericExpr ')-'
+	| '<<-(' numericExpr ')-';
 
 unitExpr: (PATTERN)? COLOR | (COLOR)? PATTERN;
-
-layerExpr: layerTerm ('+' layerTerm)* ('CLOSED')?;
-layerTerm:
-	idCast
-	| '[' unitExpr ']'
-	| numericExpr (idCast | '[' unitExpr ']');
-
-shapeExpr: shapeTerm shapeConnector*;
-shapeTerm: (idCast | '[' layerExpr ']');
-shapeConnector:
-	'<-' shapeTerm
-	| '<<-' shapeTerm
-	| '<-' '(' numericExpr ')' '-' shapeTerm
-	| '<<-' '(' numericExpr ')' '-' shapeTerm;
-
-modelExpr: modelTerm modelConnector*;
-modelTerm: (idCast | '[' shapeExpr ']');
-modelConnector:
-	'<-' modelTerm
-	| '<<-' modelTerm
-	| '<-' '(' numericExpr ')' '-' modelTerm
-	| '<<-' '(' numericExpr ')' '-' modelTerm;
-idCast: '[' idCast ']' | ID;
-
 numericExpr: ID | NUMBER; // placeholder
 booleanExpr: ID | BOOLEAN; // placeholder
+castExpr: '[' expression ']';
 
+bendStatement:
+	'BEND' ID ('IN' | 'OUT') 'BY' numericExpr (
+		'AT' numericExpr 'TO' numericExpr
+	);
 showStatement: 'SHOW' ID;
 
 ifStmt:

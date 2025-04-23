@@ -31,8 +31,8 @@ class Unit(Structure):
             "yellow": "rgb(255, 255, 0)",
             "lilac": "rgb(246, 159, 255)"
         }
-
         self.x = self.y = self.z = 0
+
         self.vertices = np.array([
             [-0.25, -0.5, -0.5],
             [+0.25, -0.5, -0.5],
@@ -69,6 +69,9 @@ class Unit(Structure):
             (1, 5), (5, 4), (4, 0),  # Top triangle
             (4, 3), (5, 2)   # Vertical edges
         ]
+
+    def __copy__(self):
+        return Unit(self.color, self.pattern)
 
     def translate(self, vector=(0, 0, 0)):
         self.vertices[:, 0] += vector[0]
@@ -138,21 +141,31 @@ class Unit(Structure):
 class Layer(Structure):
     def __init__(self, units: list[Unit], closed=False):
         super().__init__()
-        self.units = list(units)
-        self.closed = closed
+        self._units = []
+        self._closed = closed
+        for u in units:
+            self.add_unit(u)
 
-        self.shift = 0
-        self.level = 0
-        self.radius = len(self.units) if self.closed else 0
+        self._radius = len(self.units) if self.closed else -1
         
         self.x = self.y = self.z = 0
         self.rot_x = self.rot_y = self.rot_z = 0
 
-    def add_unit(self, unit: Unit):
-        self.units.append(unit)
+    def __copy__(self):
+        return Layer(self._units, self._closed)
+    
+    def __len__(self):
+        return len(self._units)
+
+    def add_unit(self, u: Unit):
+        self._units.append(u.__copy__())
+        if self._closed:
+            self._radius += 1
 
     def remove_unit(self, index: int):
-        self.units.pop(index)
+        self._units.pop(index)
+        if self._closed:
+            self._radius -= 1
 
     def translate(self, vector = (0, 0, 0)):
         self.x += vector[0]
@@ -164,18 +177,29 @@ class Layer(Structure):
         self.rot_y += angle[1]
         self.rot_z += angle[2]
 
-    def render(self, fig):
-        # print("Render Layer")
-        for x, unit in enumerate(self.units):
-            if self.closed:
-                arg = 360 / self.radius
-                angle = (x + self.shift) * arg 
-                unit.translate((0, self.radius / 6, self.level / 3 + self.radius / 6))
-                unit.rotate((0, 0, angle-90))
-            else:
-                unit.translate(((self.shift + x) * 0.8, self.radius, self.level / 3))
-            unit.render(fig)
+    def set_closed(self, closed):
+        self._closed = closed
 
+    def set_length(self, length):
+        self._radius = length
+
+    def is_closed(self):
+        return self._closed
+
+    def render(self, fig, shift=0, z=0):
+        for idx, unit in enumerate(self._units):
+            x = y = arg = 0
+            if self._closed:
+                angle = (360 / self._radius) / 2
+                arg = (idx + shift) * angle
+                x = self._radius * np.cos(np.deg2rad(arg))
+                y = self._radius * np.sin(np.deg2rad(arg))
+            else:
+                x = idx
+                arg = 0
+            unit.rotate((0, 0, arg))
+            unit.translate((x, y, z))
+            unit.render(fig)
         self.reset_state()
 
     def reset_state(self):
@@ -185,35 +209,49 @@ class Layer(Structure):
 class Shape(Structure):
     def __init__(self, layers: list[Layer], connections: list[dict]):
         super().__init__()
-        self.layers = list(layers)
-        self.connections = list(connections)
+        self.layers = []
+        self.connections = []
+        self.base_length = -1
+        for l, c in zip(layers, [{"type": 0, "shift": 0}] + connections):
+            self.add_layer(l, c)
 
-    def update(self, layers: list, connections: dict):
-        self.layers = list(layers)
-        self.connections = dict(connections)
+    def __copy__(self):
+        return Shape(self.layers, self.connections)
 
-    def add_layer(self, layer: Layer, type: int=1, shift: int=0):
-        self.layers.append(layer)
-        self.connections.append({"type": type, "shift": shift})
-    
+    def add_layer(self, l: Layer, c: dict):
+        self.layers.append(l.__copy__())
+        self.connections.append(c)
+
     def remove_layer(self):
         if self.layers:
             self.layers.pop()  
             self.connections.pop()
 
-    def __str__(self):
-        return "\n".join(str(layer) for layer in self.layers)
+    def bend(self, start, end, angle):
+        x = self.radius * np.cos(np.deg2rad(angle))
     
-    def render(self, fig):
-        shifts = [0]
-        for idx in range(len(self.connections)):
-            shifts.append(shifts[idx] + self.connections[idx]["shift"] + self.connections[idx]["type"]*0.5)
+    def render(self, fig, stack):
+        shifts = [self.connections[0]["shift"]*2 + self.connections[0]["type"]]
+        for idx, c in enumerate(self.connections[1:]):
+            shifts.append(shifts[idx] + c["shift"]*2 + c["type"])
 
         for z, layer in enumerate(self.layers):
-            layer.shift = shifts[z] # o ile unitów w prawo przekręcić layer
-            layer.level = z
-            layer.render(fig)
+            layer.render(fig, shift=shifts[z], z=z+stack)
     
 class Model(Structure):
-    def __init__(self):
-        print("Model declared")
+    def __init__(self, shapes: list[Shape], connections: list[dict]):
+        self.shapes = [s.__copy__() for s in shapes]
+        self.connections = [c for c in connections]
+        self.free = []
+
+    def update_free(self):
+        base_length = len(self.shapes[0].layers[0])
+        for s in self.shapes:
+            for l in s.layers:
+                self.free.append([False for _ in range(base_length*2)])
+
+        for l_i, l in enumerate([l for s in self.shapes for l in s.layers][1:]):
+            shift = l.shift
+            length = len(l.units)
+            for _ in range(shift, shift+length):
+                self.free[l_i-1][_] = False

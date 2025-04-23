@@ -71,93 +71,21 @@ class ConnectITListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by ConnectITParser#arrowOperator.
+    def enterArrowOperator(self, ctx:ConnectITParser.ArrowOperatorContext):
+        pass
+
+    # Exit a parse tree produced by ConnectITParser#arrowOperator.
+    def exitArrowOperator(self, ctx:ConnectITParser.ArrowOperatorContext):
+        pass
+
+
     # Enter a parse tree produced by ConnectITParser#unitExpr.
     def enterUnitExpr(self, ctx:ConnectITParser.UnitExprContext):
         pass
 
     # Exit a parse tree produced by ConnectITParser#unitExpr.
     def exitUnitExpr(self, ctx:ConnectITParser.UnitExprContext):
-        pass
-
-
-    # Enter a parse tree produced by ConnectITParser#layerExpr.
-    def enterLayerExpr(self, ctx:ConnectITParser.LayerExprContext):
-        pass
-
-    # Exit a parse tree produced by ConnectITParser#layerExpr.
-    def exitLayerExpr(self, ctx:ConnectITParser.LayerExprContext):
-        pass
-
-
-    # Enter a parse tree produced by ConnectITParser#layerTerm.
-    def enterLayerTerm(self, ctx:ConnectITParser.LayerTermContext):
-        pass
-
-    # Exit a parse tree produced by ConnectITParser#layerTerm.
-    def exitLayerTerm(self, ctx:ConnectITParser.LayerTermContext):
-        pass
-
-
-    # Enter a parse tree produced by ConnectITParser#shapeExpr.
-    def enterShapeExpr(self, ctx:ConnectITParser.ShapeExprContext):
-        pass
-
-    # Exit a parse tree produced by ConnectITParser#shapeExpr.
-    def exitShapeExpr(self, ctx:ConnectITParser.ShapeExprContext):
-        pass
-
-
-    # Enter a parse tree produced by ConnectITParser#shapeTerm.
-    def enterShapeTerm(self, ctx:ConnectITParser.ShapeTermContext):
-        pass
-
-    # Exit a parse tree produced by ConnectITParser#shapeTerm.
-    def exitShapeTerm(self, ctx:ConnectITParser.ShapeTermContext):
-        pass
-
-
-    # Enter a parse tree produced by ConnectITParser#shapeConnector.
-    def enterShapeConnector(self, ctx:ConnectITParser.ShapeConnectorContext):
-        pass
-
-    # Exit a parse tree produced by ConnectITParser#shapeConnector.
-    def exitShapeConnector(self, ctx:ConnectITParser.ShapeConnectorContext):
-        pass
-
-
-    # Enter a parse tree produced by ConnectITParser#modelExpr.
-    def enterModelExpr(self, ctx:ConnectITParser.ModelExprContext):
-        pass
-
-    # Exit a parse tree produced by ConnectITParser#modelExpr.
-    def exitModelExpr(self, ctx:ConnectITParser.ModelExprContext):
-        pass
-
-
-    # Enter a parse tree produced by ConnectITParser#modelTerm.
-    def enterModelTerm(self, ctx:ConnectITParser.ModelTermContext):
-        pass
-
-    # Exit a parse tree produced by ConnectITParser#modelTerm.
-    def exitModelTerm(self, ctx:ConnectITParser.ModelTermContext):
-        pass
-
-
-    # Enter a parse tree produced by ConnectITParser#modelConnector.
-    def enterModelConnector(self, ctx:ConnectITParser.ModelConnectorContext):
-        pass
-
-    # Exit a parse tree produced by ConnectITParser#modelConnector.
-    def exitModelConnector(self, ctx:ConnectITParser.ModelConnectorContext):
-        pass
-
-
-    # Enter a parse tree produced by ConnectITParser#idCast.
-    def enterIdCast(self, ctx:ConnectITParser.IdCastContext):
-        pass
-
-    # Exit a parse tree produced by ConnectITParser#idCast.
-    def exitIdCast(self, ctx:ConnectITParser.IdCastContext):
         pass
 
 
@@ -176,6 +104,24 @@ class ConnectITListener(ParseTreeListener):
 
     # Exit a parse tree produced by ConnectITParser#booleanExpr.
     def exitBooleanExpr(self, ctx:ConnectITParser.BooleanExprContext):
+        pass
+
+
+    # Enter a parse tree produced by ConnectITParser#castExpr.
+    def enterCastExpr(self, ctx:ConnectITParser.CastExprContext):
+        pass
+
+    # Exit a parse tree produced by ConnectITParser#castExpr.
+    def exitCastExpr(self, ctx:ConnectITParser.CastExprContext):
+        pass
+
+
+    # Enter a parse tree produced by ConnectITParser#bendStatement.
+    def enterBendStatement(self, ctx:ConnectITParser.BendStatementContext):
+        pass
+
+    # Exit a parse tree produced by ConnectITParser#bendStatement.
+    def exitBendStatement(self, ctx:ConnectITParser.BendStatementContext):
         pass
 
 
