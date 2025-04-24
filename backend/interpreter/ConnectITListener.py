@@ -125,6 +125,15 @@ class ConnectITListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by ConnectITParser#invExpr.
+    def enterInvExpr(self, ctx:ConnectITParser.InvExprContext):
+        pass
+
+    # Exit a parse tree produced by ConnectITParser#invExpr.
+    def exitInvExpr(self, ctx:ConnectITParser.InvExprContext):
+        pass
+
+
     # Enter a parse tree produced by ConnectITParser#baseExpr.
     def enterBaseExpr(self, ctx:ConnectITParser.BaseExprContext):
         pass

@@ -74,6 +74,11 @@ class ConnectITVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by ConnectITParser#invExpr.
+    def visitInvExpr(self, ctx:ConnectITParser.InvExprContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by ConnectITParser#baseExpr.
     def visitBaseExpr(self, ctx:ConnectITParser.BaseExprContext):
         return self.visitChildren(ctx)

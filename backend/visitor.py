@@ -56,9 +56,9 @@ class CustomVisitor(ConnectITVisitor):
             self.scope.get_type(e.ID().getText())
         elif e.unitExpr():
             return 0
-        elif e.numericExpr():
+        elif e.NUMBER():
             return 4
-        elif e.booleanExpr():
+        elif e.BOOLEAN():
             return 5
         elif e.arrowOperator():
             return self.getChainType(e)+1

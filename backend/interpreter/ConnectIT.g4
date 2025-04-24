@@ -31,7 +31,8 @@ logicExpr: andExpr (OR andExpr)*;
 andExpr: compExpr (AND compExpr)*;
 compExpr: numExpr (COMPARATOR numExpr)?;
 numExpr: mulExpr ((PLUS | MINUS) mulExpr)*;
-mulExpr: (NOT | MINUS)? baseExpr;
+mulExpr: invExpr (MUL | DIV)? invExpr;
+invExpr: (NOT | MINUS)? baseExpr;
 baseExpr:
 	ID
 	| unitExpr
@@ -46,6 +47,8 @@ MINUS: '-';
 NOT: 'NOT';
 OR: 'OR';
 AND: 'AND';
+MUL: '*';
+DIV: '/';
 COMPARATOR: '<' | '<=' | '>' | '>=' | '==' | '!=';
 
 arrowOperator:
