@@ -45,8 +45,8 @@ arrowOperator:
 	'<->'
 	| '<-'
 	| '<<-'
-	| '<-(' numExpr ')-'
-	| '<<-(' numExpr ')-';
+	| '<-(' expression ')-'
+	| '<<-(' expression ')-';
 
 PLUS: '+';
 MINUS: '-';
@@ -57,7 +57,7 @@ MUL: '*';
 DIV: '/';
 COMPARATOR: '<' | '<=' | '>' | '>=' | '==' | '!=';
 
-expression: logicExpr (arrowOperator logicExpr)*;
+expression: logicExpr (arrowOperator logicExpr)* 'CLOSED'?;
 logicExpr: andExpr (OR andExpr)*;
 andExpr: compExpr (AND compExpr)*;
 compExpr: numExpr (COMPARATOR numExpr)?;
