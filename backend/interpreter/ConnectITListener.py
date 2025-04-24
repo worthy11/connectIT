@@ -62,21 +62,12 @@ class ConnectITListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by ConnectITParser#dataType.
-    def enterDataType(self, ctx:ConnectITParser.DataTypeContext):
+    # Enter a parse tree produced by ConnectITParser#extensionOperator.
+    def enterExtensionOperator(self, ctx:ConnectITParser.ExtensionOperatorContext):
         pass
 
-    # Exit a parse tree produced by ConnectITParser#dataType.
-    def exitDataType(self, ctx:ConnectITParser.DataTypeContext):
-        pass
-
-
-    # Enter a parse tree produced by ConnectITParser#arrowOperator.
-    def enterArrowOperator(self, ctx:ConnectITParser.ArrowOperatorContext):
-        pass
-
-    # Exit a parse tree produced by ConnectITParser#arrowOperator.
-    def exitArrowOperator(self, ctx:ConnectITParser.ArrowOperatorContext):
+    # Exit a parse tree produced by ConnectITParser#extensionOperator.
+    def exitExtensionOperator(self, ctx:ConnectITParser.ExtensionOperatorContext):
         pass
 
 
@@ -239,6 +230,24 @@ class ConnectITListener(ParseTreeListener):
 
     # Exit a parse tree produced by ConnectITParser#returnExpr.
     def exitReturnExpr(self, ctx:ConnectITParser.ReturnExprContext):
+        pass
+
+
+    # Enter a parse tree produced by ConnectITParser#dataType.
+    def enterDataType(self, ctx:ConnectITParser.DataTypeContext):
+        pass
+
+    # Exit a parse tree produced by ConnectITParser#dataType.
+    def exitDataType(self, ctx:ConnectITParser.DataTypeContext):
+        pass
+
+
+    # Enter a parse tree produced by ConnectITParser#arrowOperator.
+    def enterArrowOperator(self, ctx:ConnectITParser.ArrowOperatorContext):
+        pass
+
+    # Exit a parse tree produced by ConnectITParser#arrowOperator.
+    def exitArrowOperator(self, ctx:ConnectITParser.ArrowOperatorContext):
         pass
 
 

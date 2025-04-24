@@ -35,17 +35,24 @@ class Unit(Structure):
         self.x = self.y = self.z = 0
 
         self.vertices = np.array([
-            [-0.25, -0.5, -0.5],
-            [+0.25, -0.5, -0.5],
-            [+0.25, 0.5, -0.5],
-            [-0.25, 0.5, -0.5],
-            [-0.25, -0.5, 0.5],
-            [+0.25, -0.5, 0.5]
+            [0, -0.5, -0.5],
+            [+0.2, 0, -0.5],
+            [0, 0.5, -0.5],
+            [-0.2, 0, -0.5],
+            [+0.2, -0.5, 0.5],
+            [-0.2, -0.5, 0.5],
         ])
 
         faces = [
-            (0, 3, 4), (1, 2, 5),  # Bottom and top triangles
-            (0, 1, 2, 3), (0, 1, 5, 4), (4, 5, 2, 3)  # Side rectangles
+            (0, 1, 2, 3),
+            (0, 1, 4), (1, 2, 4),
+            (0, 3, 5), (3, 2, 5),
+            (0, 2, 4), (0, 2, 5)
+        ]
+        self.edges = [
+            (0, 1), (1, 2), (2, 3), (3, 0), (0, 2),
+            (0, 4), (4, 2),
+            (0, 5), (5, 2)
         ]
         self.i_faces = []
         self.j_faces = []
@@ -65,14 +72,6 @@ class Unit(Structure):
                 self.j_faces.append(face[2])
                 self.k_faces.append(face[3])
 
-        self.edges = [
-            (0, 1), (1, 2), (2, 3), (3, 0), # Bottom triangle
-            (1, 5), (5, 4), (4, 0),  # Top triangle
-            (4, 3), (5, 2)   # Vertical edges
-        ]
-
-    def __str__(self):
-        return "I am a UNIT"
 
     def __copy__(self):
         return Unit(self.color, self.pattern)
@@ -155,11 +154,9 @@ class Layer(Structure):
         super().__init__()
         self._units = []
         self._closed = closed
+        self._radius = 0 if self._closed else -1
         for u in units:
             self.add_unit(u)
-
-        self._radius = len(self.units) if self._closed else -1
-        
         self.x = self.y = self.z = 0
         self.rot_x = self.rot_y = self.rot_z = 0
 
@@ -202,15 +199,15 @@ class Layer(Structure):
         for idx, unit in enumerate(self._units):
             x = y = arg = 0
             if self._closed:
-                angle = (360 / self._radius) / 2
-                arg = (idx + shift) * angle
-                x = self._radius * np.cos(np.deg2rad(arg))
-                y = self._radius * np.sin(np.deg2rad(arg))
+                angle = 360 / self._radius
+                arg = (idx + shift*0.5) * angle
+                x = self._radius / 5 * -np.sin(np.deg2rad(arg))
+                y = self._radius / 5 * np.cos(np.deg2rad(arg))
             else:
                 x = idx
                 arg = 0
             unit.rotate((0, 0, arg))
-            unit.translate((x, y, z))
+            unit.translate((x, y, z/2))
             unit.render(fig)
         self.reset_state()
 
@@ -242,7 +239,7 @@ class Shape(Structure):
     def bend(self, start, end, angle):
         x = self.radius * np.cos(np.deg2rad(angle))
     
-    def render(self, fig, stack):
+    def render(self, fig, stack=0):
         shifts = [self.connections[0]["shift"]*2 + self.connections[0]["type"]]
         for idx, c in enumerate(self.connections[1:]):
             shifts.append(shifts[idx] + c["shift"]*2 + c["type"])

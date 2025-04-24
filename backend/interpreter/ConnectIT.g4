@@ -6,7 +6,9 @@ program:
 statement: ('?')? (
 		declarationList
 		| assignment
+		| extension
 		| showStatement
+		| bendStatement
 		| whileStmt
 		| forStmt
 		| ifStmt
@@ -17,45 +19,14 @@ statement: ('?')? (
 declarationList: dataType declaration (',' declaration)*;
 declaration: ID | assignment;
 assignment: ID '=' expression;
-extension: expression '-->' ID;
-dataType:
-	'UNIT'
-	| 'LAYER'
-	| 'SHAPE'
-	| 'MODEL'
-	| 'NUMBER'
-	| 'BOOLEAN';
-
-COLOR:
-	'*' (
-		'red'
-		| 'blue'
-		| 'green'
-		| 'white'
-		| 'black'
-		| 'yellow'
-		| 'lilac'
-	) '*';
-PATTERN: '*' ( 'striped' | 'dotted' | 'gradient') '*';
-ID: [a-zA-Z_][a-zA-Z0-9_]*;
-NUMBER: '-'? [0-9]+;
-BOOLEAN: 'TRUE' | 'FALSE';
-
-arrowOperator:
-	'<->'
-	| '<-'
-	| '<<-'
-	| '<-(' expression ')-'
-	| '<<-(' expression ')-';
-
-PLUS: '+';
-MINUS: '-';
-NOT: 'NOT';
-OR: 'OR';
-AND: 'AND';
-MUL: '*';
-DIV: '/';
-COMPARATOR: '<' | '<=' | '>' | '>=' | '==' | '!=';
+extension: ID extensionOperator expression;
+extensionOperator:
+	'+='
+	| '<+->'
+	| '<+-'
+	| '<<+-'
+	| '<+-(' expression ')-'
+	| '<<+-(' expression ')-';
 
 expression: logicExpr (arrowOperator logicExpr)* 'CLOSED'?;
 logicExpr: andExpr (OR andExpr)*;
@@ -70,7 +41,7 @@ baseExpr:
 	| NUMBER
 	| BOOLEAN
 	| '(' expression ')'
-	| '[' expression ']';
+	| '[' expression 'CLOSED'? ']';
 unitExpr: COLOR (PATTERN)?;
 
 WS: [ \t]+ -> skip;
@@ -101,3 +72,43 @@ functionDeclaration:
 	'METHOD' ID '(' (dataType ID ( ',' dataType ID)*)? ')' 'RETURNS' dataType '[' statementBlock
 		returnExpr NEWLINE? ']';
 returnExpr: 'RETURN' (ID | expression);
+
+dataType:
+	'UNIT'
+	| 'LAYER'
+	| 'SHAPE'
+	| 'MODEL'
+	| 'NUMBER'
+	| 'BOOLEAN';
+
+arrowOperator:
+	'<->'
+	| '<-'
+	| '<<-'
+	| '<-(' expression ')-'
+	| '<<-(' expression ')-';
+
+PLUS: '+';
+MINUS: '-';
+NOT: 'NOT';
+OR: 'OR';
+AND: 'AND';
+MUL: '*';
+DIV: '/';
+COMPARATOR: '<' | '<=' | '>' | '>=' | '==' | '!=';
+
+COLOR:
+	'*' (
+		'red'
+		| 'blue'
+		| 'green'
+		| 'white'
+		| 'black'
+		| 'yellow'
+		| 'lilac'
+	) '*';
+PATTERN: '*' ( 'striped' | 'dotted' | 'gradient') '*';
+
+ID: [a-zA-Z_][a-zA-Z0-9_]*;
+NUMBER: '-'? [0-9]+;
+BOOLEAN: 'TRUE' | 'FALSE';

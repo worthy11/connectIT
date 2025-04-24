@@ -1,17 +1,7 @@
-LAYER l = 2[*blue*] + 2[*yellow*] + 2[*red*] + 2[*green*] CLOSED
-LAYER l1 = 16[*red*] CLOSED
-LAYER l2 = 16[*yellow*] CLOSED
+LAYER l1 = [*red*] <-> [*red*] <-> [*red*] <-> [*red*] <-> [*red*] CLOSED
+LAYER l2 = [*yellow*] <-> [*yellow*] <-> [*yellow*] <-> [*yellow*] <-> [*yellow*] CLOSED
 SHAPE s
 UNIT r1 = *red*, r2 = *blue*
 
 s = l1 <- l2 <- l1 <- l2 <- l1 <- l2 <- l1 <- l2 
-s = r1 <- r2
 SHOW s
-
-s = l <-(-1)- l <-(-1)- l <-(-1)- l <-(-1)- l <-(-1)- l <-(-1)- l <-(-1)- l <-(-1)- l <-(-1)- l <-(-1)- l <-(-1)- l <-(-1)- l <-(-1)- l <-(-1)- l
-? SHOW s
-
-l = 2[*red*] + 2[*blue*] + 2[*green*] + 2[*yellow*] CLOSED
-? SHOW s
-s = l <- l <- l <- l <- l <- l <- l <- l <- l <- l <- l <- l <- l <- l <- l
-? SHOW s

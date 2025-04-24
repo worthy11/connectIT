@@ -39,13 +39,8 @@ class ConnectITVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by ConnectITParser#dataType.
-    def visitDataType(self, ctx:ConnectITParser.DataTypeContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by ConnectITParser#arrowOperator.
-    def visitArrowOperator(self, ctx:ConnectITParser.ArrowOperatorContext):
+    # Visit a parse tree produced by ConnectITParser#extensionOperator.
+    def visitExtensionOperator(self, ctx:ConnectITParser.ExtensionOperatorContext):
         return self.visitChildren(ctx)
 
 
@@ -136,6 +131,16 @@ class ConnectITVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by ConnectITParser#returnExpr.
     def visitReturnExpr(self, ctx:ConnectITParser.ReturnExprContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ConnectITParser#dataType.
+    def visitDataType(self, ctx:ConnectITParser.DataTypeContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ConnectITParser#arrowOperator.
+    def visitArrowOperator(self, ctx:ConnectITParser.ArrowOperatorContext):
         return self.visitChildren(ctx)
 
 

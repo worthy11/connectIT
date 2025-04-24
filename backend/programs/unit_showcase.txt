@@ -1,9 +1,9 @@
 UNIT r = *red*
 UNIT b = *blue*
-? SHOW r
+SHOW r
 ? SHOW b
 
 r = *blue* *striped*
 ? SHOW r
 
-r = *gradient* *red*
+r = *red* *gradient*
