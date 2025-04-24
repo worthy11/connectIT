@@ -34,7 +34,13 @@ andExpr: compExpr (AND compExpr)*;
 compExpr: numExpr (COMPARATOR numExpr)?;
 numExpr: mulExpr ((PLUS | MINUS) mulExpr)*;
 mulExpr: (NOT | MINUS)? baseExpr;
-baseExpr: ID | unitExpr | NUMBER | BOOLEAN | '(' expression ')';
+baseExpr:
+	ID
+	| unitExpr
+	| NUMBER
+	| BOOLEAN
+	| '(' expression ')'
+	| '[' expression ']';
 unitExpr: (PATTERN)? COLOR | (COLOR)? PATTERN;
 
 PLUS: '+';
