@@ -71,7 +71,7 @@ baseExpr:
 	| BOOLEAN
 	| '(' expression ')'
 	| '[' expression ']';
-unitExpr: ((PATTERN)? COLOR) | ((COLOR)? PATTERN);
+unitExpr: COLOR (PATTERN)?;
 
 WS: [ \t]+ -> skip;
 NEWLINE: '\r'? '\n';

@@ -46,71 +46,107 @@ class CustomVisitor(ConnectITVisitor):
         expected_type = self.scope.get_type(name)
         value, received_type = self.visit(ctx.expression())
         if expected_type != received_type:
-            raise Exception(f"Error: Types {types[expected_type]} and {types[received_type]} don't match at line {line}, column {column}")
+            raise Exception(f"Type Error: Types {types[expected_type]} and {types[received_type]} don't match at line {line}, column {column}")
         value = self.visit(ctx.expression())
         self.scope.fill(name, value)
 
     def visitExpression(self, ctx):
-        term, type = self.visit(ctx.logicExpr(0))
-        terms = [term]
-        connections = []
-
-        for i in range(1, len(ctx.logicExpr())):
-            operator = ctx.arrowOperator(i - 1).getText()
-            next, next_type = self.visit(ctx.logicExpr(i))
-            
-            if next_type != type:
-                raise Exception(f"Type Error: Cannot connect types {type} and {next_type}")
-
-            if operator == "<->":
-                if type != "MULTI_UNIT" or next_type != "MULTI_UNIT":
-                    raise Exception(f"Type Error: Cannot connect type {type} using the '<->' connector")
-            else:
-                if type not in ["LAYER", "SHAPE"]:
-                    raise Exception(f"Type Error: Cannot connect type {type} using the {operator.getText()} connector")
-                shift = 0
-                if operator.expression():
-                    shift, type = self.visit(operator.expression())
-                    if type != "NUMBER":
-                        raise Exception(f"Type Error: Shift can only be a NUMBER, not {type}")
-                if "<<" in operator.getText():
-                    connections.append({"type": 0, "shift": shift})
-                else:
-                    connections.append({"type": 1, "shift": shift})
-            terms.append(next)
-
-        result = terms[0]
+        value, type = self.visit(ctx.logicExpr(0))
+        result = value
         match type:
-            case "MULTI_UNIT":
-                closed = ctx.getChildCount() % 2 == 0
-                result = Layer(units=terms, closed=closed)
-                type = "LAYER"
-            case "LAYER":
-                result = Shape(layers=terms, connections=connections)
-                type = "SHAPE"
-            case "SHAPE":
-                result = Model(shapes=terms, connections=connections)
-                type = "MODEL"
+            case 1:
+                result = self.createLayer(ctx)
+                type += 1
+            case 2:
+                result = self.createShape(ctx)
+                type += 1
+            case 3:
+                result = self.createModel(ctx)
+                type += 1
         return result, type
 
+    def createLayer(self, ctx):
+        value, _ = self.visit(ctx.logicExpr(0))
+        first = value.extract_units()
+        closed = ctx.getChildCount() % 2 == 0
+        result = Layer(units=first, closed=closed)
+
+        for i in range(1, len(ctx.logicExpr())):
+            next_value, next_type = self.visit(ctx.logicExpr(i))
+            if next_type != 1:
+                raise Exception(f"Type Error: Can only apply '<->' operator to multiples of UNITs, not {types[next_type]}")
+            next_units = next_value.extract_units()
+            for u in next_units:
+                result.add_unit(u)
+                
+        return result
+
+    def createShape(self, ctx):
+        first, _ = self.visit(ctx.logicExpr(0))
+        result = Shape(layers=[first])
+
+        for i in range(1, len(ctx.logicExpr())):
+            next_value, next_type = self.visit(ctx.logicExpr(i))
+            op = ctx.getChild(2*i-1)
+            if next_type != 2:
+                raise Exception(f"Type Error: Cannot connect types LAYER and {types[next_type]}")
+
+            type = 1
+            shift = 0
+            if "<<" in op.getText():
+                type = 1
+            if op.expression():
+                shift_value, shift_type = self.visit(op.expression())
+                if shift_type != 5:
+                    raise Exception(f"Type Error: Shift can only be a NUMBER, not {types[shift_type]}")
+                shift = shift_value
+            result.add_layer(l=next_value, c={"type": type, "shift": shift})
+            
+        return result
+
+    def createModel(self, ctx):
+        first, _ = self.visit(ctx.logicExpr(0))
+        result = Model(shapes=[first])
+
+        for i in range(1, len(ctx.logicExpr())):
+            next_value, next_type = self.visit(ctx.logicExpr(i))
+            op = ctx.getChild(2*i-1)
+            if next_type != 3:
+                raise Exception(f"Type Error: Cannot connect types SHAPE and {types[next_type]}")
+
+            type = 1
+            shift = 0
+            if "<<" in op.getText():
+                type = 1
+            if op.expression():
+                shift_value, shift_type = self.visit(op.expression())
+                if shift_type != 5:
+                    raise Exception(f"Type Error: Shift can only be a NUMBER, not {types[shift_type]}")
+                shift = shift_value
+            result.add_shape(s=next_value, c={"type": type, "shift": shift})
+
+        return result
+
     def visitLogicExpr(self, ctx):
-        value, type = self.visit(ctx.andExpr())
+        value, type = self.visit(ctx.andExpr(0))
         # TODO: Complete the visitor
         return value, type
 
     def visitAndExpr(self, ctx):
-        value, type = self.visit(ctx.compExpr())
+        value, type = self.visit(ctx.compExpr(0))
         # TODO: Complete the visitor
         return value, type
 
     def visitCompExpr(self, ctx):
-        value, type = self.visit(ctx.numExpr())
+        value, type = self.visit(ctx.numExpr(0))
         # TODO: Complete the visitor
+        # TODO: Only accept NUMBER 
         return value, type
 
     def visitNumExpr(self, ctx):
-        value, type = self.visit(ctx.mulExpr())
+        value, type = self.visit(ctx.mulExpr(0))
         # TODO: Complete the visitor
+        # Only accept NUMBER and NUMBER
         return value, type
 
     def visitMulExpr(self, ctx):
@@ -126,11 +162,11 @@ class CustomVisitor(ConnectITVisitor):
     def visitInvExpr(self, ctx):
         value, type = self.visit(ctx.baseExpr())
         if ctx.NOT():
-            if type != "BOOLEAN":
+            if type != 6:
                 raise Exception(f"Type Error: Cannot apply '{ctx.NOT().getText()}' operator to type {type}")
             value = not value
         elif ctx.MINUS():
-            if type != "NUMBER":
+            if type != 5:
                 raise Exception(f"Type Error: Cannot apply '{ctx.MINUS().getText()}' operator to type {type}")
             value = -value
         return value, type
@@ -140,14 +176,25 @@ class CustomVisitor(ConnectITVisitor):
             name = ctx.ID().getText()
             value, type = self.scope.get_value(name), self.scope.get_type(name)
         elif ctx.unitExpr():
-            value, type = self.visit(ctx.unitExpr()), "UNIT"
+            value, type = self.visit(ctx.unitExpr()), 0
         elif ctx.NUMBER():
-            value, type = int(ctx.NUMBER().getText()), "NUMBER"
+            value, type = int(ctx.NUMBER().getText()), 5
         elif ctx.BOOLEAN():
-            value, type = ctx.BOOLEAN().getText() == "TRUE", "BOOLEAN"
+            value, type = ctx.BOOLEAN().getText() == "TRUE", 6
         elif ctx.expression():
             value, type = self.visit(ctx.expression())
             if ctx.getChild(0).getText() == '[':
+                if type > 3:
+                    raise Exception(f"Type Error: Cannot cast type {types[type]} to another type")
+                match type:
+                    case 0:
+                        value = MultiUnit(u=value)
+                    case 1:
+                        value = Layer(units=value.extract_units())
+                    case 2:
+                        value = Shape(layers=[value])
+                    case 3:
+                        value = Model(shapes=[value])
                 type += 1
         return value, type
     

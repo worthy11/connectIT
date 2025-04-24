@@ -2,12 +2,13 @@ import numpy as np
 import plotly.graph_objects as go
 
 types = {
-    0: "UNIT",
-    1: "LAYER",
-    2: "SHAPE",
-    3: "MODEL",
-    4: "NUMBER",
-    5: "BOOLEAN",
+    0: "UNIT", # *red* *striped*
+    1: "MULTI_UNIT", # 2 * (*red* *striped*), u * 2, [u]
+    2: "LAYER", # 2*u <-> b*5 <-> g, [2*u]
+    3: "SHAPE", # l1 <- ([g] <-> [b]) <<- [2*u] <-(5)- l4
+    4: "MODEL",
+    5: "NUMBER",
+    6: "BOOLEAN"
 }
 
 class Structure:
@@ -138,6 +139,14 @@ class Unit(Structure):
             ))
         self.reset_state()
 
+class MultiUnit():
+    def __init__(self, u: Unit, n: int=1):
+        self.unit = u.__copy__()
+        self.number = n
+
+    def extract_units(self):
+        return [self.unit] * self.number
+
 class Layer(Structure):
     def __init__(self, units: list[Unit], closed=False):
         super().__init__()
@@ -146,7 +155,7 @@ class Layer(Structure):
         for u in units:
             self.add_unit(u)
 
-        self._radius = len(self.units) if self.closed else -1
+        self._radius = len(self.units) if self._closed else -1
         
         self.x = self.y = self.z = 0
         self.rot_x = self.rot_y = self.rot_z = 0
@@ -207,7 +216,7 @@ class Layer(Structure):
         self.rot_x = self.rot_y = self.rot_z = 0
 
 class Shape(Structure):
-    def __init__(self, layers: list[Layer], connections: list[dict]):
+    def __init__(self, layers: list[Layer], connections: list[dict]=[]):
         super().__init__()
         self.layers = []
         self.connections = []
@@ -239,7 +248,7 @@ class Shape(Structure):
             layer.render(fig, shift=shifts[z], z=z+stack)
     
 class Model(Structure):
-    def __init__(self, shapes: list[Shape], connections: list[dict]):
+    def __init__(self, shapes: list[Shape], connections: list[dict]=[]):
         self.shapes = [s.__copy__() for s in shapes]
         self.connections = [c for c in connections]
         self.free = []

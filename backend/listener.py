@@ -1,11 +1,11 @@
 from interpreter.ConnectITListener import ConnectITListener
 types = {
     "UNIT": 0,
-    "LAYER": 1,
-    "SHAPE": 2,
-    "MODEL": 3,
-    "NUMBER": 4,
-    "BOOLEAN": 5,
+    "LAYER": 2,
+    "SHAPE": 3,
+    "MODEL": 4,
+    "NUMBER": 5,
+    "BOOLEAN": 6
 }
 
 class GlobalScope:

@@ -1,2 +1,2 @@
-UNIT r, g = *green*, b = *blue* *striped*
-LAYER l = (2*[(*green* *striped*) + TRUE] <-> 2*g <-> 2*b)
+UNIT r, g = (*green*), b = *blue**striped*
+LAYER l = ([*green**striped*] <-> 2*g <-> 2*b)
