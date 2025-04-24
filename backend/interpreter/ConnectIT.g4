@@ -26,9 +26,7 @@ dataType:
 	| 'NUMBER'
 	| 'BOOLEAN';
 
-expression:
-	logicExpr (arrowOperator logicExpr)*
-	| '[' expression ']';
+expression: logicExpr (arrowOperator logicExpr)*;
 logicExpr: andExpr (OR andExpr)*;
 andExpr: compExpr (AND compExpr)*;
 compExpr: numExpr (COMPARATOR numExpr)?;
