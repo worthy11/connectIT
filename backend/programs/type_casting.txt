@@ -1,6 +1,6 @@
 UNIT u, u1 = *blue*
-LAYER l, l1 = u1 + u1
-SHAPE s, s1 = l1 <- l1
+LAYER l, l1 = [u1] <-> [u1]
+SHAPE s, s1
 
 u = *red*
 ? u = [*red*]
@@ -10,53 +10,29 @@ u = u1
 
 u = *red*
 ? l = u
-l = [u]
+l = [[u]]
 
 l = l1
 ? l = [l1]
 
-l = 2u + 2u1 + u
-l = 2 [*blue*] + 2 [*red* *striped*]
+? l = [u] <-> [u1] <-> u
+l = [*blue*] <-> [*red* *striped*]
 ? SHOW l
 
 ? s = *blue*
 ? s = [*blue*]
-s = [[*blue*]]
+s = [[[*blue*]]]
 ? s = u
 ? s = [u]
-s = [[u]]
+s = [[[u]]]
 
-l = 2u + 2u1
+l = [u] <-> [u1]
 s = l <- l <<- l 
 s = l <-(1)- l <<-(1)- l
 s = l <-(-1)- l <<-(-1)- l
 
 ? s = u <- u1 <- u
 
-s = 2u <- 2u1 <- 2u
-s = [2u] <- [2u1] <- [2u]
-s = [2[*red*]] <- [2[*blue*]] <- [2[*green*]]
-
-SHOW s
-
-UNIT u = *red* *striped* GOOD
-UNIT u = [*red* *striped*] BAD  (UNIT = LAYER)
-UNIT u = 2[*red* *striped*] BAD (UNIT = LAYER)
-UNIT u = u1 GOOD
-UNIT u = [u1] BAD (UNIT = LAYER)
-UNIT u = 2[u1] BAD (UNIT = LAYER)
-
-LAYER l = *red *striped* BAD (LAYER = UNIT)
-LAYER l = [*red *striped*] GOOD
-LAYER l = 2[*red *striped*] GOOD
-LAYER l = 2*u1 <-> 2*u2 <-> 2*u3
-LAYER l = 2*(*red* *striped*) <-> 2*u1 <-> [u1] GOOD
-LAYER l = 2[*red *striped*] <-> 2[u1] <-> u1 BAD (LAYER <-> UNIT)
-
-*red* *striped* == UNIT
-[*red* *striped*] == LAYER
-2*[*red* *striped*] == LAYER
-u == UNIT
-[u] == LAYER
-2*[u] == LAYER
-2*u == LAYER
+s = [[u] <-> [u1] <-> [u]]
+? s = [2u] <- [2u1] <- [2u]
+? s = [2[*red*]] <- [2[*blue*]] <- [2[*green*]]

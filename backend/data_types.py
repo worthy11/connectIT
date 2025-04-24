@@ -71,6 +71,9 @@ class Unit(Structure):
             (4, 3), (5, 2)   # Vertical edges
         ]
 
+    def __str__(self):
+        return "I am a UNIT"
+
     def __copy__(self):
         return Unit(self.color, self.pattern)
 

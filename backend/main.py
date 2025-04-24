@@ -40,7 +40,7 @@ def evaluate_expression(expression):
     parser.addErrorListener(error_listener)
 
     tree = parser.program()
-    print(tree.toStringTree(recog=parser))
+    # print(tree.toStringTree(recog=parser))
 
     if error_listener.has_error:
         print("\n".join(error_listener.errors))

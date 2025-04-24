@@ -38,6 +38,8 @@ class CustomVisitor(ConnectITVisitor):
             if dec.assignment():
                 self.visit(dec.assignment())
 
+        return None
+
     def visitAssignment(self, ctx):
         token = ctx.ID().getSymbol()
         line = token.line
@@ -47,23 +49,26 @@ class CustomVisitor(ConnectITVisitor):
         value, received_type = self.visit(ctx.expression())
         if expected_type != received_type:
             raise Exception(f"Type Error: Types {types[expected_type]} and {types[received_type]} don't match at line {line}, column {column}")
-        value = self.visit(ctx.expression())
         self.scope.fill(name, value)
+
+        return None
 
     def visitExpression(self, ctx):
         value, type = self.visit(ctx.logicExpr(0))
-        result = value
-        match type:
-            case 1:
-                result = self.createLayer(ctx)
-                type += 1
-            case 2:
-                result = self.createShape(ctx)
-                type += 1
-            case 3:
-                result = self.createModel(ctx)
-                type += 1
-        return result, type
+        if ctx.arrowOperator():
+            match type:
+                case 1:
+                    value = self.createLayer(ctx)
+                    type += 1
+                case 2:
+                    value = self.createShape(ctx)
+                    type += 1
+                case 3:
+                    value = self.createModel(ctx)
+                    type += 1
+                case _:
+                    raise Exception(f"Type Error: Cannot use connectors with type {types[type]}")
+        return value, type
 
     def createLayer(self, ctx):
         value, _ = self.visit(ctx.logicExpr(0))
@@ -73,8 +78,11 @@ class CustomVisitor(ConnectITVisitor):
 
         for i in range(1, len(ctx.logicExpr())):
             next_value, next_type = self.visit(ctx.logicExpr(i))
+            op = ctx.getChild(2*i-1)
             if next_type != 1:
-                raise Exception(f"Type Error: Can only apply '<->' operator to multiples of UNITs, not {types[next_type]}")
+                raise Exception(f"Type Error: Can only apply '<->' connector to multiples of UNITs, not {types[next_type]}")
+            if op.getText() != "<->":
+                raise Exception(f"Type Error: Cannot use '{op.getText()}' connector when creating a LAYER")
             next_units = next_value.extract_units()
             for u in next_units:
                 result.add_unit(u)
