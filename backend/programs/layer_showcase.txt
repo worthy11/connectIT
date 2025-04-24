@@ -1,2 +1,4 @@
-UNIT r = *red*, g = *green*, b = *blue*
+UNIT r
+UNIT g = *green*
+UNIT b = *blue*
 LAYER l = 2*r <-> 2*g <-> 2*b

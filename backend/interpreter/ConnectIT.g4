@@ -26,21 +26,27 @@ dataType:
 	| 'NUMBER'
 	| 'BOOLEAN';
 
-expression: logicExpr (arrowOperator logicExpr)*;
-logicExpr: andExpr (OR andExpr)*;
-andExpr: compExpr (AND compExpr)*;
-compExpr: numExpr (COMPARATOR numExpr)?;
-numExpr: mulExpr ((PLUS | MINUS) mulExpr)*;
-mulExpr: invExpr (MUL | DIV)? invExpr;
-invExpr: (NOT | MINUS)? baseExpr;
-baseExpr:
-	ID
-	| unitExpr
-	| NUMBER
-	| BOOLEAN
-	| '(' expression ')'
-	| '[' expression ']';
-unitExpr: (PATTERN)? COLOR | (COLOR)? PATTERN;
+COLOR:
+	'*' (
+		'red'
+		| 'blue'
+		| 'green'
+		| 'white'
+		| 'black'
+		| 'yellow'
+		| 'lilac'
+	) '*';
+PATTERN: '*' ( 'striped' | 'dotted' | 'gradient') '*';
+ID: [a-zA-Z_][a-zA-Z0-9_]*;
+NUMBER: '-'? [0-9]+;
+BOOLEAN: 'TRUE' | 'FALSE';
+
+arrowOperator:
+	'<->'
+	| '<-'
+	| '<<-'
+	| '<-(' numExpr ')-'
+	| '<<-(' numExpr ')-';
 
 PLUS: '+';
 MINUS: '-';
@@ -51,12 +57,24 @@ MUL: '*';
 DIV: '/';
 COMPARATOR: '<' | '<=' | '>' | '>=' | '==' | '!=';
 
-arrowOperator:
-	'<->'
-	| '<-'
-	| '<<-'
-	| '<-(' numExpr ')-'
-	| '<<-(' numExpr ')-';
+expression: logicExpr (arrowOperator logicExpr)*;
+logicExpr: andExpr (OR andExpr)*;
+andExpr: compExpr (AND compExpr)*;
+compExpr: numExpr (COMPARATOR numExpr)?;
+numExpr: mulExpr ((PLUS | MINUS) mulExpr)*;
+mulExpr: invExpr ((MUL | DIV)? invExpr)*;
+invExpr: (NOT | MINUS)? baseExpr;
+baseExpr:
+	ID
+	| unitExpr
+	| NUMBER
+	| BOOLEAN
+	| '(' expression ')'
+	| '[' expression ']';
+unitExpr: ((PATTERN)? COLOR) | ((COLOR)? PATTERN);
+
+WS: [ \t]+ -> skip;
+NEWLINE: '\r'? '\n';
 
 bendStatement:
 	'BEND' ID ('IN' | 'OUT') 'BY' numExpr (
@@ -83,22 +101,3 @@ functionDeclaration:
 	'METHOD' ID '(' (dataType ID ( ',' dataType ID)*)? ')' 'RETURNS' dataType '[' statementBlock
 		returnExpr NEWLINE? ']';
 returnExpr: 'RETURN' (ID | expression);
-
-ID: [a-zA-Z_][a-zA-Z0-9_]*;
-NUMBER: '-'? [0-9]+;
-BOOLEAN: 'TRUE' | 'FALSE';
-
-COLOR:
-	'*' (
-		'red'
-		| 'blue'
-		| 'green'
-		| 'white'
-		| 'black'
-		| 'yellow'
-		| 'lilac'
-	) '*';
-
-PATTERN: '*' ( 'striped' | 'dotted' | 'gradient') '*';
-WS: [ \t]+ -> skip;
-NEWLINE: '\r'? '\n';

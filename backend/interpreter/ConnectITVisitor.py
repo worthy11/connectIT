@@ -44,6 +44,11 @@ class ConnectITVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by ConnectITParser#arrowOperator.
+    def visitArrowOperator(self, ctx:ConnectITParser.ArrowOperatorContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by ConnectITParser#expression.
     def visitExpression(self, ctx:ConnectITParser.ExpressionContext):
         return self.visitChildren(ctx)
@@ -86,11 +91,6 @@ class ConnectITVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by ConnectITParser#unitExpr.
     def visitUnitExpr(self, ctx:ConnectITParser.UnitExprContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by ConnectITParser#arrowOperator.
-    def visitArrowOperator(self, ctx:ConnectITParser.ArrowOperatorContext):
         return self.visitChildren(ctx)
 
 

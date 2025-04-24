@@ -71,6 +71,15 @@ class ConnectITListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by ConnectITParser#arrowOperator.
+    def enterArrowOperator(self, ctx:ConnectITParser.ArrowOperatorContext):
+        pass
+
+    # Exit a parse tree produced by ConnectITParser#arrowOperator.
+    def exitArrowOperator(self, ctx:ConnectITParser.ArrowOperatorContext):
+        pass
+
+
     # Enter a parse tree produced by ConnectITParser#expression.
     def enterExpression(self, ctx:ConnectITParser.ExpressionContext):
         pass
@@ -149,15 +158,6 @@ class ConnectITListener(ParseTreeListener):
 
     # Exit a parse tree produced by ConnectITParser#unitExpr.
     def exitUnitExpr(self, ctx:ConnectITParser.UnitExprContext):
-        pass
-
-
-    # Enter a parse tree produced by ConnectITParser#arrowOperator.
-    def enterArrowOperator(self, ctx:ConnectITParser.ArrowOperatorContext):
-        pass
-
-    # Exit a parse tree produced by ConnectITParser#arrowOperator.
-    def exitArrowOperator(self, ctx:ConnectITParser.ArrowOperatorContext):
         pass
 
 
