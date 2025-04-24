@@ -39,13 +39,43 @@ class ConnectITVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by ConnectITParser#dataType.
+    def visitDataType(self, ctx:ConnectITParser.DataTypeContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by ConnectITParser#expression.
     def visitExpression(self, ctx:ConnectITParser.ExpressionContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by ConnectITParser#arrowOperator.
-    def visitArrowOperator(self, ctx:ConnectITParser.ArrowOperatorContext):
+    # Visit a parse tree produced by ConnectITParser#logicExpr.
+    def visitLogicExpr(self, ctx:ConnectITParser.LogicExprContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ConnectITParser#andExpr.
+    def visitAndExpr(self, ctx:ConnectITParser.AndExprContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ConnectITParser#compExpr.
+    def visitCompExpr(self, ctx:ConnectITParser.CompExprContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ConnectITParser#numExpr.
+    def visitNumExpr(self, ctx:ConnectITParser.NumExprContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ConnectITParser#mulExpr.
+    def visitMulExpr(self, ctx:ConnectITParser.MulExprContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ConnectITParser#baseExpr.
+    def visitBaseExpr(self, ctx:ConnectITParser.BaseExprContext):
         return self.visitChildren(ctx)
 
 
@@ -54,18 +84,8 @@ class ConnectITVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by ConnectITParser#numericExpr.
-    def visitNumericExpr(self, ctx:ConnectITParser.NumericExprContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by ConnectITParser#booleanExpr.
-    def visitBooleanExpr(self, ctx:ConnectITParser.BooleanExprContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by ConnectITParser#castExpr.
-    def visitCastExpr(self, ctx:ConnectITParser.CastExprContext):
+    # Visit a parse tree produced by ConnectITParser#arrowOperator.
+    def visitArrowOperator(self, ctx:ConnectITParser.ArrowOperatorContext):
         return self.visitChildren(ctx)
 
 
@@ -111,11 +131,6 @@ class ConnectITVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by ConnectITParser#returnExpr.
     def visitReturnExpr(self, ctx:ConnectITParser.ReturnExprContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by ConnectITParser#dataType.
-    def visitDataType(self, ctx:ConnectITParser.DataTypeContext):
         return self.visitChildren(ctx)
 
 

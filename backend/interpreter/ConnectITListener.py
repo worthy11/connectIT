@@ -62,6 +62,15 @@ class ConnectITListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by ConnectITParser#dataType.
+    def enterDataType(self, ctx:ConnectITParser.DataTypeContext):
+        pass
+
+    # Exit a parse tree produced by ConnectITParser#dataType.
+    def exitDataType(self, ctx:ConnectITParser.DataTypeContext):
+        pass
+
+
     # Enter a parse tree produced by ConnectITParser#expression.
     def enterExpression(self, ctx:ConnectITParser.ExpressionContext):
         pass
@@ -71,12 +80,57 @@ class ConnectITListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by ConnectITParser#arrowOperator.
-    def enterArrowOperator(self, ctx:ConnectITParser.ArrowOperatorContext):
+    # Enter a parse tree produced by ConnectITParser#logicExpr.
+    def enterLogicExpr(self, ctx:ConnectITParser.LogicExprContext):
         pass
 
-    # Exit a parse tree produced by ConnectITParser#arrowOperator.
-    def exitArrowOperator(self, ctx:ConnectITParser.ArrowOperatorContext):
+    # Exit a parse tree produced by ConnectITParser#logicExpr.
+    def exitLogicExpr(self, ctx:ConnectITParser.LogicExprContext):
+        pass
+
+
+    # Enter a parse tree produced by ConnectITParser#andExpr.
+    def enterAndExpr(self, ctx:ConnectITParser.AndExprContext):
+        pass
+
+    # Exit a parse tree produced by ConnectITParser#andExpr.
+    def exitAndExpr(self, ctx:ConnectITParser.AndExprContext):
+        pass
+
+
+    # Enter a parse tree produced by ConnectITParser#compExpr.
+    def enterCompExpr(self, ctx:ConnectITParser.CompExprContext):
+        pass
+
+    # Exit a parse tree produced by ConnectITParser#compExpr.
+    def exitCompExpr(self, ctx:ConnectITParser.CompExprContext):
+        pass
+
+
+    # Enter a parse tree produced by ConnectITParser#numExpr.
+    def enterNumExpr(self, ctx:ConnectITParser.NumExprContext):
+        pass
+
+    # Exit a parse tree produced by ConnectITParser#numExpr.
+    def exitNumExpr(self, ctx:ConnectITParser.NumExprContext):
+        pass
+
+
+    # Enter a parse tree produced by ConnectITParser#mulExpr.
+    def enterMulExpr(self, ctx:ConnectITParser.MulExprContext):
+        pass
+
+    # Exit a parse tree produced by ConnectITParser#mulExpr.
+    def exitMulExpr(self, ctx:ConnectITParser.MulExprContext):
+        pass
+
+
+    # Enter a parse tree produced by ConnectITParser#baseExpr.
+    def enterBaseExpr(self, ctx:ConnectITParser.BaseExprContext):
+        pass
+
+    # Exit a parse tree produced by ConnectITParser#baseExpr.
+    def exitBaseExpr(self, ctx:ConnectITParser.BaseExprContext):
         pass
 
 
@@ -89,30 +143,12 @@ class ConnectITListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by ConnectITParser#numericExpr.
-    def enterNumericExpr(self, ctx:ConnectITParser.NumericExprContext):
+    # Enter a parse tree produced by ConnectITParser#arrowOperator.
+    def enterArrowOperator(self, ctx:ConnectITParser.ArrowOperatorContext):
         pass
 
-    # Exit a parse tree produced by ConnectITParser#numericExpr.
-    def exitNumericExpr(self, ctx:ConnectITParser.NumericExprContext):
-        pass
-
-
-    # Enter a parse tree produced by ConnectITParser#booleanExpr.
-    def enterBooleanExpr(self, ctx:ConnectITParser.BooleanExprContext):
-        pass
-
-    # Exit a parse tree produced by ConnectITParser#booleanExpr.
-    def exitBooleanExpr(self, ctx:ConnectITParser.BooleanExprContext):
-        pass
-
-
-    # Enter a parse tree produced by ConnectITParser#castExpr.
-    def enterCastExpr(self, ctx:ConnectITParser.CastExprContext):
-        pass
-
-    # Exit a parse tree produced by ConnectITParser#castExpr.
-    def exitCastExpr(self, ctx:ConnectITParser.CastExprContext):
+    # Exit a parse tree produced by ConnectITParser#arrowOperator.
+    def exitArrowOperator(self, ctx:ConnectITParser.ArrowOperatorContext):
         pass
 
 
@@ -194,15 +230,6 @@ class ConnectITListener(ParseTreeListener):
 
     # Exit a parse tree produced by ConnectITParser#returnExpr.
     def exitReturnExpr(self, ctx:ConnectITParser.ReturnExprContext):
-        pass
-
-
-    # Enter a parse tree produced by ConnectITParser#dataType.
-    def enterDataType(self, ctx:ConnectITParser.DataTypeContext):
-        pass
-
-    # Exit a parse tree produced by ConnectITParser#dataType.
-    def exitDataType(self, ctx:ConnectITParser.DataTypeContext):
         pass
 
 

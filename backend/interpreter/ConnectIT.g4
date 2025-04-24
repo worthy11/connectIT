@@ -18,32 +18,46 @@ declarationList: dataType declaration (',' declaration)*;
 declaration: ID | assignment;
 assignment: ID '=' expression;
 extension: expression '-->' ID;
+dataType:
+	'UNIT'
+	| 'LAYER'
+	| 'SHAPE'
+	| 'MODEL'
+	| 'NUMBER'
+	| 'BOOLEAN';
+
 expression:
-	ID
-	| unitExpr
-	| numericExpr
-	| booleanExpr
-	| castExpr
-	| expression arrowOperator expression;
+	logicExpr (arrowOperator logicExpr)*
+	| '[' expression ']';
+logicExpr: andExpr (OR andExpr)*;
+andExpr: compExpr (AND compExpr)*;
+compExpr: numExpr (COMPARATOR numExpr)?;
+numExpr: mulExpr ((PLUS | MINUS) mulExpr)*;
+mulExpr: (NOT | MINUS)? baseExpr;
+baseExpr: ID | unitExpr | NUMBER | BOOLEAN | '(' expression ')';
+unitExpr: (PATTERN)? COLOR | (COLOR)? PATTERN;
+
+PLUS: '+';
+MINUS: '-';
+NOT: 'NOT';
+OR: 'OR';
+AND: 'AND';
+COMPARATOR: '<' | '<=' | '>' | '>=' | '==' | '!=';
 
 arrowOperator:
 	'<->'
 	| '<-'
 	| '<<-'
-	| '<-(' numericExpr ')-'
-	| '<<-(' numericExpr ')-';
-
-unitExpr: (PATTERN)? COLOR | (COLOR)? PATTERN;
-numericExpr: ID | NUMBER; // placeholder
-booleanExpr: ID | BOOLEAN; // placeholder
-castExpr: '[' expression ']';
+	| '<-(' numExpr ')-'
+	| '<<-(' numExpr ')-';
 
 bendStatement:
-	'BEND' ID ('IN' | 'OUT') 'BY' numericExpr (
-		'AT' numericExpr 'TO' numericExpr
+	'BEND' ID ('IN' | 'OUT') 'BY' numExpr (
+		'AT' numExpr 'TO' numExpr
 	);
 showStatement: 'SHOW' ID;
 
+// TODO: Update IF / ELSE, WHILE / FOR, FUNCTION
 ifStmt:
 	'IF' condition NEWLINE? '[' statementBlock NEWLINE? ']' (
 		NEWLINE? 'ELSE IF' condition NEWLINE? '[' statementBlock NEWLINE? ']'
@@ -52,8 +66,7 @@ ifStmt:
 whileStmt:
 	'REPEAT WHILE' condition NEWLINE? '[' statementBlock NEWLINE? ']';
 
-condition:
-	expression ('<' | '<=' | '>' | '>=' | '==' | '!=') expression;
+condition: expression COMPARATOR expression;
 
 statementBlock: statement (NEWLINE statement)*;
 
@@ -64,17 +77,9 @@ functionDeclaration:
 		returnExpr NEWLINE? ']';
 returnExpr: 'RETURN' (ID | expression);
 
-dataType:
-	'UNIT'
-	| 'LAYER'
-	| 'SHAPE'
-	| 'MODEL'
-	| 'NUMBER'
-	| 'BOOLEAN';
-
 ID: [a-zA-Z_][a-zA-Z0-9_]*;
 NUMBER: '-'? [0-9]+;
-BOOLEAN: 'TRUE' | 'FALSE' | '1' | '0';
+BOOLEAN: 'TRUE' | 'FALSE';
 
 COLOR:
 	'*' (
@@ -88,6 +93,5 @@ COLOR:
 	) '*';
 
 PATTERN: '*' ( 'striped' | 'dotted' | 'gradient') '*';
-
 WS: [ \t]+ -> skip;
 NEWLINE: '\r'? '\n';

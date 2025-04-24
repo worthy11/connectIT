@@ -1,4 +1,3 @@
 UNIT r = *red*, g = *green*, b = *blue*
-LAYER l = *red* <-> *green* <-> *blue*
-
-SHAPE s = l <- *red* *striped* <- l
+LAYER l = 2r <-> 2g <-> 2b
+SHAPE s = 2[r] <- *red* *striped* <- l
