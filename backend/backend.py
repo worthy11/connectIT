@@ -12,5 +12,6 @@ async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
     program = await websocket.receive_text()
     output = evaluate_expression(program)
+    # print(output)
     figure_json = json.loads(output)
     await websocket.send_text(json.dumps(figure_json))

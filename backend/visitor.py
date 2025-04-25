@@ -200,9 +200,6 @@ class CustomVisitor(ConnectITVisitor):
 
     def visitLogicExpr(self, ctx):
         value, type = self.visit(ctx.andExpr(0))
-        if type != 6:
-            raise Exception(f"Type Error: Logical operations can only be applied to BOOLEAN, not {types[type]}")
-
         for i in range(1, len(ctx.andExpr())):
             next_value, next_type = self.visit(ctx.andExpr(i))
             if next_type != 6:
@@ -213,9 +210,6 @@ class CustomVisitor(ConnectITVisitor):
 
     def visitAndExpr(self, ctx):
         value, type = self.visit(ctx.compExpr(0))
-        if type != 6:
-            raise Exception(f"Type Error: Logical operations can only be applied to BOOLEAN, not {types[type]}")
-        
         for i in range(1, len(ctx.compExpr())):
             next_value, next_type = self.visit(ctx.compExpr(i))
             if next_type != 6:
@@ -226,9 +220,6 @@ class CustomVisitor(ConnectITVisitor):
 
     def visitCompExpr(self, ctx):
         value, type = self.visit(ctx.numExpr(0))
-        if type != 5:  
-            raise Exception(f"Type Error: Comparisons can only be applied to NUMBER, not {types[type]}")
-
         if ctx.COMPARATOR():
             comparator = ctx.COMPARATOR().getText()
             next_value, next_type = self.visit(ctx.numExpr(1))
@@ -257,18 +248,37 @@ class CustomVisitor(ConnectITVisitor):
 
     def visitNumExpr(self, ctx):
         value, type = self.visit(ctx.mulExpr(0))
-        # TODO: Complete the visitor
-        # Only accept NUMBER and NUMBER
+        for i in range(1, len(ctx.mulExpr())):
+            next_value, next_type = self.visit(ctx.mulExpr(i))
+            if next_type != 5:
+                raise Exception(f"Type Error: Arithmetic operations can only be applied to NUMBER, not {types[next_type]}")
+            
+            if ctx.PLUS():
+                value += next_value
+            elif ctx.MINUS():
+                value -= next_value
+
         return value, type
 
     def visitMulExpr(self, ctx):
         value, type = self.visit(ctx.invExpr(0))
         for i in range(1, len(ctx.invExpr())):
             next_value, next_type = self.visit(ctx.invExpr(i))
-            # TODO: Get operator type
-            # TODO: For types NUMBER and NUMBER, just do normal int math
-            # TODO: For types NUMBER and UNIT (or UNIT and NUMBER) change type to MULTI_UNIT
-            # and change value to a new MultiUnit object
+            if ctx.MUL():
+                if type == 5 and next_type == 5:
+                    value *= next_value
+                elif (type == 5 and next_type == 0) or (type == 0 and next_type == 5):
+                    unit = value if type == 0 else next_value
+                    number = value if type == 5 else next_value
+                    value = MultiUnit(unit, number)
+                    type = 1
+                else:
+                    raise Exception(f"Type Error: Cannot apply '*' operator to types {types[type]} and {types[next_type]}")
+            elif ctx.DIV():
+                if type == 5 and next_type == 5:
+                    value //= next_value
+                else:
+                    raise Exception(f"Type Error: Cannot apply '/' operator to types {types[type]} and {types[next_type]}")
         return value, type
 
     def visitInvExpr(self, ctx):
