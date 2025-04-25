@@ -28,6 +28,8 @@ class CustomVisitor(ConnectITVisitor):
             return self.visit(ctx.declarationList())
         if ctx.assignment():
             return self.visit(ctx.assignment())
+        if ctx.extension():
+            return self.visit(ctx.extension())
         if ctx.showStatement():
             return self.visit(ctx.showStatement())
         else:
@@ -44,10 +46,12 @@ class CustomVisitor(ConnectITVisitor):
         line = token.line
         column = token.column
         name = token.text
+
         expected_type = self.scope.get_type(name)
         value, received_type = self.visit(ctx.expression())
         if expected_type != received_type:
             raise Exception(f"Type Error: Types {types[expected_type]} and {types[received_type]} don't match at line {line}, column {column}")
+
         self.scope.fill(name, value)
         return None
 
@@ -56,63 +60,61 @@ class CustomVisitor(ConnectITVisitor):
         line = token.line
         column = token.column
         name = token.text
-        value = self.scope.get_value(name)
-        expected_type = self.scope.get_type(name)
-        op = ctx.extensionOperator()
+
+        value, expected_type = self.scope.get_value(name), self.scope.get_type(name)
+        e, op = ctx.expression(), ctx.extensionOperator()
         if expected_type not in [2, 3, 4, 5]:
             raise Exception(f"Type Error: Cannot add new values to type {types[type]}")
 
         match expected_type:
             case 2:
-                new_value = self.extendLayer(value, ctx.expression(), op)
+                new_value = self.extendLayer(value, e, op)
             case 3:
-                new_value = self.extendShape(value, ctx.expression(), op)
+                new_value = self.extendShape(value, e, op)
             case 4:
-                new_value = self.extendModel(value, ctx.expression(), op)
+                new_value = self.extendModel(value, e, op)
             case 5:
-                new_value = self.extendNumber(value, ctx.expression(), op)
+                new_value = self.extendNumber(value, e, op)
         self.scope.fill(name, new_value)
 
         return None
 
-    def extendLayer(self, val, e, op):
+    def extendLayer(self, value, e, op):
         # TODO: Check if operator is correct
-        ext, ext_type = self.visit(e)
+        received_value, received_type = self.visit(e)
         # TODO: Check if type is correct
-        units = ext.extract_units()
-        for u in units:
-            val.add_unit(u)
-        return val
+        if received_type == 0:
+            value.add_unit(received_value)
+        elif received_type == 1:
+            value.add_multi_unit(received_value)
+        return value
     
-    def extendShape(self, val, e, op):
+    def extendShape(self, value, e, op):
         # TODO: Check if operator is correct
-        ext, ext_type = self.visit(e)
+        c = self.get_connection(op)
+        received_value, received_type = self.visit(e)
         # TODO: Check if type is correct
+        value.add_layer(received_value, c)
+        return value
+    
+    def extendModel(self, value, e, op):
+        # TODO: Check if operator is correct
+        c = self.get_connection(op)
+        received_value, received_type = self.visit(e)
+        # TODO: Check if type is correct
+        value.add_shape(received_value, c)
+        return value
+    
+    def get_connection(self, operator):
         type = 1
         shift = 0
-        if "<<" in op.getText():
+        if "<<" in operator.getText():
             type = 0
-        if op.expression():
-            shift_val, shift_type = self.visit(op.expression())
+        if operator.expression():
+            shift_val, shift_type = self.visit(operator.expression())
             # TODO: Check if type is correct
             shift = shift_val
-        val.add_layer(l=ext, c={"type": type, "shift": shift})
-        return val
-    
-    def extenModel(self, val, e, op):
-        # TODO: Check if operator is correct
-        ext, ext_type = self.visit(e)
-        # TODO: Check if type is correct
-        type = 1
-        shift = 0
-        if "<<" in op.getText():
-            type = 0
-        if op.expression():
-            shift_val, shift_type = self.visit(op.expression())
-            # TODO: Check if type is correct
-            shift = shift_val
-        val.add_shape(s=ext, c={"type": type, "shift": shift})
-        return val
+        return {"type": type, "shift": shift}
 
     def visitExpression(self, ctx):
         value, type = self.visit(ctx.logicExpr(0))
@@ -287,7 +289,7 @@ class CustomVisitor(ConnectITVisitor):
             if shape_name not in self.scope:
                 print(f"Error: '{shape_name}' is not defined.")
                 return
-
+            
             # TODO: Check if value is initialized 
             structure = self.scope.get_value(shape_name)
             if isinstance(structure, Structure):

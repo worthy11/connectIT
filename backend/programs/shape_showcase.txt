@@ -3,5 +3,9 @@ LAYER l2 = [*yellow*] <-> [*yellow*] <-> [*yellow*] <-> [*yellow*] <-> [*yellow*
 SHAPE s
 UNIT r1 = *red*, r2 = *blue*
 
-s = l1 <- l2 <- l1 <- l2 <- l1 <- l2 <- l1 <- l2 
+s = l1 <- l2 <- l1 <- l2
+
+s <+- ([*green*] <-> [*green*] <-> [*green*] <-> [*green*] <-> [*green*] CLOSED)
+s <+- l2
+
 SHOW s

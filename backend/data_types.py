@@ -171,6 +171,16 @@ class Layer(Structure):
         if self._closed:
             self._radius += 1
 
+    def add_multi_unit(self, mu: MultiUnit):
+        units = mu.extract_units()
+        for u in units:
+            self.add_unit(u)
+            
+    def add_layer(self, l):
+        units = l._units
+        for u in units:
+            self.add_unit(u)
+
     def remove_unit(self, index: int):
         self._units.pop(index)
         if self._closed:
@@ -201,8 +211,8 @@ class Layer(Structure):
             if self._closed:
                 angle = 360 / self._radius
                 arg = (idx + shift*0.5) * angle
-                x = self._radius / 5 * -np.sin(np.deg2rad(arg))
-                y = self._radius / 5 * np.cos(np.deg2rad(arg))
+                x = self._radius / 10 * -np.sin(np.deg2rad(arg))
+                y = self._radius / 10 * np.cos(np.deg2rad(arg))
             else:
                 x = idx
                 arg = 0
@@ -230,6 +240,12 @@ class Shape(Structure):
     def add_layer(self, l: Layer, c: dict):
         self.layers.append(l.__copy__())
         self.connections.append(c)
+
+    def add_shape(self, s, c: dict):
+        layers = s.layers
+        connections = [c] + s.connections
+        for l, c in zip(layers, connections):
+            self.add_layer(l, c)
 
     def remove_layer(self):
         if self.layers:
@@ -264,3 +280,14 @@ class Model(Structure):
             length = len(l.units)
             for _ in range(shift, shift+length):
                 self.free[l_i-1][_] = False
+
+    def add_shape(self, s: Shape, c: dict):
+        self.shapes.append(s.__copy__())
+        self.connections.append(c)
+        self.update_free()
+
+    def add_model(self, m, c: dict):
+        shapes = m.shapes
+        connections = [c] + m.connections
+        for s, c in zip(shapes, connections):
+            self.add_shape(s, c)
