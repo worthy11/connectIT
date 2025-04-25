@@ -200,18 +200,59 @@ class CustomVisitor(ConnectITVisitor):
 
     def visitLogicExpr(self, ctx):
         value, type = self.visit(ctx.andExpr(0))
-        # TODO: Complete the visitor
+        if type != 6:
+            raise Exception(f"Type Error: Logical operations can only be applied to BOOLEAN, not {types[type]}")
+
+        for i in range(1, len(ctx.andExpr())):
+            next_value, next_type = self.visit(ctx.andExpr(i))
+            if next_type != 6:
+                raise Exception(f"Type Error: Logical operations can only be applied to BOOLEAN, not {types[next_type]}")
+            value = value or next_value
+
         return value, type
 
     def visitAndExpr(self, ctx):
         value, type = self.visit(ctx.compExpr(0))
-        # TODO: Complete the visitor
+        if type != 6:
+            raise Exception(f"Type Error: Logical operations can only be applied to BOOLEAN, not {types[type]}")
+        
+        for i in range(1, len(ctx.compExpr())):
+            next_value, next_type = self.visit(ctx.compExpr(i))
+            if next_type != 6:
+                raise Exception(f"Type Error: Logical operations can only be applied to BOOLEAN, not {types[next_type]}")
+            value = value and next_value
+
         return value, type
 
     def visitCompExpr(self, ctx):
         value, type = self.visit(ctx.numExpr(0))
-        # TODO: Complete the visitor
-        # TODO: Only accept NUMBER 
+        if type != 5:  
+            raise Exception(f"Type Error: Comparisons can only be applied to NUMBER, not {types[type]}")
+
+        if ctx.COMPARATOR():
+            comparator = ctx.COMPARATOR().getText()
+            next_value, next_type = self.visit(ctx.numExpr(1))
+            if next_type != 5:
+                raise Exception(f"Type Error: Comparisons can only be applied to NUMBER, not {types[next_type]}")
+
+            match comparator:
+                case "<":
+                    return_value = value < next_value
+                case "<=":
+                    return_value = value <= next_value
+                case ">":
+                    return_value = value > next_value
+                case ">=":
+                    return_value = value >= next_value
+                case "==":
+                    return_value = value == next_value
+                case "!=":
+                    return_value = value != next_value
+                case _:
+                    raise Exception(f"Unknown comparator: {comparator}")
+
+            return return_value, 6
+
         return value, type
 
     def visitNumExpr(self, ctx):
