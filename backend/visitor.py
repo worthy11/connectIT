@@ -291,6 +291,8 @@ class CustomVisitor(ConnectITVisitor):
                 elif (type == 5 and next_type == 0) or (type == 0 and next_type == 5):
                     unit = value if type == 0 else next_value
                     number = value if type == 5 else next_value
+                    if number <= 0:
+                        raise Exception("Value Error: When multiplying, the number must be greater than 0.")
                     value = MultiUnit(unit, number)
                     type = 1
                 else:
