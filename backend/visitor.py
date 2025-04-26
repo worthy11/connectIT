@@ -17,8 +17,6 @@ class CustomVisitor(ConnectITVisitor):
             statement_output = self.visit(ctx.getChild(i))
             if statement_output is not None:
                 output = statement_output
-        if output is None:
-            return "No output"
         return output
     
     def visitStatement(self, ctx):
@@ -33,7 +31,10 @@ class CustomVisitor(ConnectITVisitor):
         if ctx.showStatement():
             return self.visit(ctx.showStatement())
         else:
-            raise Exception("Invalid statement")
+            return {
+                "type": "error",
+                "message": "Invalid statement"
+            }
         
     def visitDeclarationList(self, ctx):
         for dec in ctx.declaration():
@@ -46,14 +47,16 @@ class CustomVisitor(ConnectITVisitor):
         line = token.line
         column = token.column
         name = token.text
-
+            
         expected_type = self.scope.get_type(name)
         value, received_type = self.visit(ctx.expression())
         if expected_type != received_type:
-            raise Exception(f"Type Error: Types {types[expected_type]} and {types[received_type]} don't match at line {line}, column {column}")
+            raise Exception (f"Type Error: Cannot assign {types[received_type]} to {types[expected_type]} at line {line}, column {column}.")
+        
 
         self.scope.fill(name, value)
         return None
+    
 
     def visitExtension(self, ctx):
         token = ctx.ID().getSymbol()
@@ -63,8 +66,9 @@ class CustomVisitor(ConnectITVisitor):
 
         value, expected_type = self.scope.get_value(name), self.scope.get_type(name)
         e, op = ctx.expression(), ctx.extensionOperator()
-        if expected_type not in [2, 3, 4, 5]:
-            raise Exception(f"Type Error: Cannot add new values to type {types[type]}")
+        if expected_type not in [2, 3, 4, 5]:            
+            raise Exception(f"Type Error: Cannot add new values to type {types[expected_type]} at line {line}, column {column}.")
+            
 
         match expected_type:
             case 2:
@@ -80,9 +84,15 @@ class CustomVisitor(ConnectITVisitor):
         return None
 
     def extendLayer(self, value, e, op):
-        # TODO: Check if operator is correct
         received_value, received_type = self.visit(e)
-        # TODO: Check if type is correct
+
+        if op.getText() not in ['<+->']:
+            raise Exception(f"Operator '{op.getText()}' cannot be used to extend a Layer.")
+            
+        if received_type not in [0, 1]:  
+            raise Exception(f"Cannot add value of type '{types[received_type]}' to a Layer.")
+            
+        
         if received_type == 0:
             value.add_unit(received_value)
         elif received_type == 1:
@@ -90,18 +100,30 @@ class CustomVisitor(ConnectITVisitor):
         return value
     
     def extendShape(self, value, e, op):
-        # TODO: Check if operator is correct
+
+        if op.getText() in ['+=', '<+->']:
+            raise Exception(f"Operator '{op.getText()}' cannot be used to extend a Shape.")
+            
+        if received_type != 2: 
+            raise Exception(f"Cannot add value of type '{types[received_type]}' to a Shape. Only LAYER can be added.")
+            
+        
         c = self.get_connection(op)
         received_value, received_type = self.visit(e)
-        # TODO: Check if type is correct
         value.add_layer(received_value, c)
         return value
     
     def extendModel(self, value, e, op):
-        # TODO: Check if operator is correct
+
+        if op.getText() not in ['+=', '<+->']:               
+            raise Exception(f"Operator '{op.getText()}' cannot be used to extend a Model.")
+            
+        if received_type != 3: 
+            raise Exception(f"Cannot add value of type '{types[received_type]}' to a Model. Only SHAPE can be added.")
+            
+        
         c = self.get_connection(op)
         received_value, received_type = self.visit(e)
-        # TODO: Check if type is correct
         value.add_shape(received_value, c)
         return value
     
@@ -112,11 +134,14 @@ class CustomVisitor(ConnectITVisitor):
             type = 0
         if operator.expression():
             shift_val, shift_type = self.visit(operator.expression())
-            # TODO: Check if type is correct
+            if shift_type != 5: 
+                raise Exception(f"Shift value must be of type NUMBER, not '{types[shift_type]}'.")
+                
             shift = shift_val
         return {"type": type, "shift": shift}
 
     def visitExpression(self, ctx):
+
         value, type = self.visit(ctx.logicExpr(0))
         if ctx.arrowOperator():
             match type:
@@ -130,7 +155,8 @@ class CustomVisitor(ConnectITVisitor):
                     value = self.createModel(ctx)
                     type += 1
                 case _:
-                    raise Exception(f"Type Error: Cannot use connectors with type {types[type]}")
+                    raise Exception(f"Cannot use connectors with type '{types[type]}'.")
+                    
         return value, type
 
     def createLayer(self, ctx):
@@ -138,14 +164,19 @@ class CustomVisitor(ConnectITVisitor):
         first = value.extract_units()
         closed = ctx.getChildCount() % 2 == 0
         result = Layer(units=first, closed=closed)
-
+    
+       
         for i in range(1, len(ctx.logicExpr())):
             next_value, next_type = self.visit(ctx.logicExpr(i))
+            
             op = ctx.getChild(2*i-1)
             if next_type != 1:
                 raise Exception(f"Type Error: Can only apply '<->' connector to multiples of UNITs, not {types[next_type]}")
+                
             if op.getText() != "<->":
-                raise Exception(f"Type Error: Cannot use '{op.getText()}' connector when creating a LAYER")
+                
+                    raise Exception( f"Type Error: Cannot use '{op.getText()}' connector when creating a LAYER")
+                
             next_units = next_value.extract_units()
             for u in next_units:
                 result.add_unit(u)
@@ -162,16 +193,9 @@ class CustomVisitor(ConnectITVisitor):
             if next_type != 2:
                 raise Exception(f"Type Error: Cannot connect types LAYER and {types[next_type]}")
 
-            type = 1
-            shift = 0
-            if "<<" in op.getText():
-                type = 1
-            if op.expression():
-                shift_value, shift_type = self.visit(op.expression())
-                if shift_type != 5:
-                    raise Exception(f"Type Error: Shift can only be a NUMBER, not {types[shift_type]}")
-                shift = shift_value
-            result.add_layer(l=next_value, c={"type": type, "shift": shift})
+            c = self.get_connection(op)
+            
+            result.add_layer(l=next_value, c = c)
             
         return result
 
@@ -182,19 +206,16 @@ class CustomVisitor(ConnectITVisitor):
         for i in range(1, len(ctx.logicExpr())):
             next_value, next_type = self.visit(ctx.logicExpr(i))
             op = ctx.getChild(2*i-1)
+            
             if next_type != 3:
-                raise Exception(f"Type Error: Cannot connect types SHAPE and {types[next_type]}")
+                return {
+                        "type": "error",
+                        "message": f"Type Error: Cannot connect types SHAPE and {types[next_type]}"
+                    }
 
-            type = 1
-            shift = 0
-            if "<<" in op.getText():
-                type = 1
-            if op.expression():
-                shift_value, shift_type = self.visit(op.expression())
-                if shift_type != 5:
-                    raise Exception(f"Type Error: Shift can only be a NUMBER, not {types[shift_type]}")
-                shift = shift_value
-            result.add_shape(s=next_value, c={"type": type, "shift": shift})
+            c = self.get_connection(op)
+
+            result.add_shape(s=next_value, c=c)
 
         return result
 
@@ -285,18 +306,22 @@ class CustomVisitor(ConnectITVisitor):
         value, type = self.visit(ctx.baseExpr())
         if ctx.NOT():
             if type != 6:
-                raise Exception(f"Type Error: Cannot apply '{ctx.NOT().getText()}' operator to type {type}")
+                raise Exception(f"Type Error: Cannot apply '{ctx.NOT().getText()}' operator to type {types[type]}")
             value = not value
         elif ctx.MINUS():
             if type != 5:
-                raise Exception(f"Type Error: Cannot apply '{ctx.MINUS().getText()}' operator to type {type}")
+                raise Exception(f"Type Error: Cannot apply '{ctx.MINUS().getText()}' operator to type {types[type]}")
             value = -value
         return value, type
     
     def visitBaseExpr(self, ctx):
         if ctx.ID():
             name = ctx.ID().getText()
+            if not self.scope.__contains__(name):
+                raise Exception(f"Type Error: {name} not defined")
             value, type = self.scope.get_value(name), self.scope.get_type(name)
+            if value is None:
+                raise Exception(f"Type Error: {name} has no value")
         elif ctx.unitExpr():
             value, type = self.visit(ctx.unitExpr()), 0
         elif ctx.NUMBER():
@@ -331,22 +356,28 @@ class CustomVisitor(ConnectITVisitor):
 
     def visitBendStatement(self, ctx):
         shape = ctx.ID().getText()
-        # TODO: Check if shape has type SHAPE
 
     def visitShowStatement(self, ctx):
         if ctx.getChildCount() == 2:
             shape_name = ctx.ID().getText()
 
             if shape_name not in self.scope:
-                print(f"Error: '{shape_name}' is not defined.")
-                return
-            
-            # TODO: Check if value is initialized 
+                return {
+                    "type": "error",
+                    "message": f"Structure '{shape_name}' is not defined."
+                }
+
             structure = self.scope.get_value(shape_name)
+
+            if isinstance(structure, dict) and structure.get("type") == "error":
+                return structure
+            
             if isinstance(structure, Structure):
                 return show_figure(self.fig, structure)
             else:
-                print(f"SHOW only supports STRUCTUREs, not {type(structure)}.")
+                return {
+                    "type": "error",
+                    "message": f"SHOW only supports STRUCTUREs, not {type(structure)}."
+                }
 
-        else:
-            raise Exception("Invalid instruction")
+        

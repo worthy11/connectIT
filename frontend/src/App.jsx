@@ -11,6 +11,7 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [code, setCode] = useState("");
   const [showInfo, setShowInfo] = useState(false); // Nowy stan do kontrolowania widoczności okna Info
+  const [errorMessage, setErrorMessage] = useState(""); // New state for error message
 
   const fetchFigure = () => {
     setFigData([]);
@@ -22,12 +23,21 @@ export default function App() {
     };
 
     ws.onmessage = (event) => {
-      const figJson = JSON.parse(event.data);
-      setLayout(figJson.layout);
-      setFigData(figJson.data);
+      const response = JSON.parse(event.data);
+    
+      if (response.type === "error") {
+        setErrorMessage(response.message); // Set error message
+        setLoading(false);
+        setShowPlot(false);
+        return;
+      }
+    
+      setLayout(response.layout);
+      setFigData(response.data);
       setLoading(false);
       setShowPlot(true);
     };
+    
     ws.onerror = (err) => console.error("WebSocket Error:", err);
     ws.onclose = () => console.log("WebSocket closed");
   };
@@ -38,12 +48,21 @@ export default function App() {
 
   return (
     <div className="container">
+      {/* Error Banner */}
+      {errorMessage && (
+        <div className="error-banner">
+          {errorMessage}
+          <button className="close-error" onClick={() => setErrorMessage("")}>✖</button>
+        </div>
+      )}
+
       {/* Left: Scatter Plot */}
       <div className="plot-container">
         {/* Loading spinner */}
         {loading && <div className="loading-spinner"></div>}
         {showPlot && <Plot data={figData} layout={layout} className="plot" />}
       </div>
+
       {/* Right: Code Editor */}
       <div className="editor-container">
         <h3>Enter code to generate 3d origami model:</h3>
@@ -62,6 +81,7 @@ export default function App() {
           </button>
         </div>
       </div>
+
       {/* Info Window */}
       {showInfo && (
         <div className="info-window show">

@@ -139,3 +139,33 @@
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+
+.error-banner {
+  background-color: #e74c3c; /* Softer red */
+  color: white;
+  padding: 12px 20px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: auto;
+  max-width: 80%; /* Limit the width to 80% of the screen */
+  z-index: 1000;
+  text-align: center;
+  font-weight: 600;
+  border-radius: 8px; /* Rounded corners for a smoother look */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.close-error {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+  margin-left: 12px;
+}

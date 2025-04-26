@@ -43,20 +43,39 @@ def evaluate_expression(expression):
     # print(tree.toStringTree(recog=parser))
 
     if error_listener.has_error:
-        print("\n".join(error_listener.errors))
-        return None
+        return {
+            "type": "error",
+            "message": "\n".join(error_listener.errors)
+        }
 
     global_scope = GlobalScope()
     listener = CustomListener(global_scope)
     walker = ParseTreeWalker()
-    walker.walk(listener, tree)
+
+    try:
+        walker.walk(listener, tree)
+    except Exception as e:
+        return {
+            "type": "error",
+            "message": str(e)
+        }
 
     try:
         visitor = CustomVisitor(global_scope)
         result = visitor.visit(tree)
-        return result
     except Exception as e:
-        return f"Runtime Error: {str(e)}"
+        return {
+            "type": "error",
+            "message": f"{str(e)}"
+        }
+    
+    if result is None:
+        return {
+            "type": "error",
+            "message": "No output: You need to use SHOW statement to display your model."
+        }
+    
+    return result
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Process a file with a custom extension.")

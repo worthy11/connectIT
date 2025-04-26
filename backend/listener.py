@@ -43,4 +43,5 @@ class CustomListener(ConnectITListener):
             if name in self.scope:
                 line = ctx.start.line
                 raise Exception(f"Redeclaration of '{name}' at line {line}")
+            
             self.scope.declare(name=name, type=type)
