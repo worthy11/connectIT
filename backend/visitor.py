@@ -78,6 +78,7 @@ class CustomVisitor(ConnectITVisitor):
             case 4:
                 new_value = self.extendModel(value, e, op)
             case 5:
+                # TODO: Create the extendNumber method
                 new_value = self.extendNumber(value, e, op)
         self.scope.fill(name, new_value)
 
@@ -110,6 +111,9 @@ class CustomVisitor(ConnectITVisitor):
         
         c = self.get_connection(op)
         received_value, received_type = self.visit(e)
+        # TODO: If shape is closed, make sure the new layer is also closed
+        # TODO: If shape is closed, make sure the new layer is the same length as previous ones
+        # TODO: Make sure shift does not exceed the previous layer length
         value.add_layer(received_value, c)
         return value
     
@@ -192,8 +196,10 @@ class CustomVisitor(ConnectITVisitor):
             op = ctx.getChild(2*i-1)
             if next_type != 2:
                 raise Exception(f"Type Error: Cannot connect types LAYER and {types[next_type]}")
-
             c = self.get_connection(op)
+            # TODO: If shape is closed, make sure the new layer is also closed
+            # TODO: If shape is closed, make sure the new layer is the same length as previous ones
+            # TODO: Make sure shift does not exceed the previous layer length
             
             result.add_layer(l=next_value, c = c)
             
@@ -292,12 +298,13 @@ class CustomVisitor(ConnectITVisitor):
                     unit = value if type == 0 else next_value
                     number = value if type == 5 else next_value
                     if number <= 0:
-                        raise Exception("Value Error: When multiplying, the number must be greater than 0.")
+                        raise Exception("Value Error: Cannot multiply UNIT by negative number.")
                     value = MultiUnit(unit, number)
                     type = 1
                 else:
                     raise Exception(f"Type Error: Cannot apply '*' operator to types {types[type]} and {types[next_type]}")
             elif ctx.DIV():
+                # TODO: Check for division by zero
                 if type == 5 and next_type == 5:
                     value //= next_value
                 else:
@@ -320,7 +327,7 @@ class CustomVisitor(ConnectITVisitor):
         if ctx.ID():
             name = ctx.ID().getText()
             if not self.scope.__contains__(name):
-                raise Exception(f"Type Error: {name} not defined")
+                raise Exception(f"Type Error: {name} is not defined")
             value, type = self.scope.get_value(name), self.scope.get_type(name)
             if value is None:
                 raise Exception(f"Type Error: {name} has no value")
