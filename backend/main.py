@@ -19,15 +19,27 @@ class SyntaxErrorListener(ErrorListener):
         error_token = "<EOL>" if error_token == '\n' else error_token
 
         if "mismatched input" in msg:
-            self.errors.append(f"\033[91mSyntax Error:\033[0m Unexpected token '{error_token}' at line {line}, column {column}. Did you mistype one of the keywords?")
+            self.errors.append(f"Unexpected token '{error_token}' at line {line}, column {column}. Did you mistype one of the keywords?")
         elif "extraneous input" in msg:
-            self.errors.append(f"\033[91mSyntax Error:\033[0m Extraneous token '{error_token}' at line {line}, column {column}. Did some extra characters slip in by accident?")
+            self.errors.append(f"Extraneous token '{error_token}' at line {line}, column {column}. Did some extra characters slip in by accident?")
         elif "missing" in msg:
-            self.errors.append(f"\033[91mSyntax Error:\033[0m Missing token at line {line}, column {column}, near '{error_token}'. Did you forget to finish an instruction?")
+            self.errors.append(f"Missing token at line {line}, column {column}, near '{error_token}'. Did you forget to finish an instruction?")
         elif "no viable alternative" in msg:
-            self.errors.append(f"\033[91mSyntax Error:\033[0m Invalid syntax at line {line}, column {column}, near '{error_token}'. Did you get an instruction mixed up?")
+            self.errors.append(f"Invalid syntax at line {line}, column {column}, near '{error_token}'. Did you get an instruction mixed up?")
         else:
-            self.errors.append(f"\033[91mSyntax Error:\033[0m {msg} at line {line}, column {column}.")
+            self.errors.append(f"{msg} at line {line}, column {column}.")
+
+class LexerErrorListener(ErrorListener):
+    def __init__(self):
+        super().__init__()
+        self.has_error = False
+        self.errors = []
+
+    def syntaxError(self, recognizer, offendingSymbol, line, column, msg, e):
+        self.has_error = True
+        error_token = offendingSymbol.text if offendingSymbol else "<EOF>"
+        error_token = "<EOL>" if error_token == '\n' else error_token
+        self.errors.append(f"Invalid {msg} - line {line}, column {column}.")
 
 def evaluate_expression(expression):
     input_stream = InputStream(expression)
@@ -35,12 +47,22 @@ def evaluate_expression(expression):
     tokens = CommonTokenStream(lexer)
     parser = ConnectITParser(tokens)
 
+    lexer_error_listener = LexerErrorListener()
+    lexer.removeErrorListeners()  
+    lexer.addErrorListener(lexer_error_listener)
+
     error_listener = SyntaxErrorListener()
     parser.removeErrorListeners()
     parser.addErrorListener(error_listener)
 
     tree = parser.program()
     # print(tree.toStringTree(recog=parser))
+
+    if lexer_error_listener.has_error:
+        return {
+            "type": "error",
+            "message": "\n".join(lexer_error_listener.errors)
+        }
 
     if error_listener.has_error:
         return {

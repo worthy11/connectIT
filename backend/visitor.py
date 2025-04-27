@@ -103,20 +103,38 @@ class CustomVisitor(ConnectITVisitor):
     
     def extendShape(self, value, e, op):
 
+        received_value, received_type = self.visit(e)
+
         if op.getText() in ['+=', '<+->']:
             raise Exception(f"Operator '{op.getText()}' cannot be used to extend a Shape.")
             
         if received_type != 2: 
-            raise Exception(f"Cannot add value of type '{types[received_type]}' to a Shape. Only LAYER can be added.")
+            raise Exception(f"Type Error: Cannot add value of type '{types[received_type]}' to a Shape. Only LAYER can be added.")
             
         
         c = self.get_connection(op)
-        received_value, received_type = self.visit(e)
+ 
         # TODO: If shape is closed, make sure the new layer is also closed
         # TODO: If shape is closed, make sure the new layer is the same length as previous ones
         # TODO: Make sure shift does not exceed the previous layer length
+
+
+        shape_closed = any(layer.is_closed() for layer in value.layers)
+
+        if shape_closed:
+            if not received_value.is_closed():
+                raise Exception("Type Error: Cannot add an open layer to a closed shape.")
+
+            if len(received_value) != len(value.layers[0]):
+                raise Exception(f"Type Error: New layer must have {len(value.layers[0])} units (same as existing layers) because the shape is closed.")
+
+        if not shape_closed:
+            if received_value.is_closed():
+                raise Exception("Type Error: Cannot add a closed layer to an open shape.")
+
         value.add_layer(received_value, c)
         return value
+        
     
     def extendModel(self, value, e, op):
 
@@ -227,6 +245,19 @@ class CustomVisitor(ConnectITVisitor):
             # TODO: If shape is closed, make sure the new layer is also closed
             # TODO: If shape is closed, make sure the new layer is the same length as previous ones
             # TODO: Make sure shift does not exceed the previous layer length
+
+            shape_closed = any(layer.is_closed() for layer in result.layers)
+
+            if shape_closed:
+                if not next_value.is_closed():
+                    raise Exception("Type Error: Cannot add an open layer to a closed shape.")
+
+                if len(next_value) != len(result.layers[0]):
+                    raise Exception("Type Error: New layer must have the same number of units as existing layers in the shape.")
+
+            if not shape_closed:
+                if next_value.is_closed():
+                    raise Exception("Type Error: Cannot add a closed layer to an open shape.")
             
             result.add_layer(l=next_value, c = c)
             
