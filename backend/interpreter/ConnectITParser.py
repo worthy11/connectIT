@@ -10,7 +10,7 @@ else:
 
 def serializedATN():
     return [
-        4,1,62,390,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,2,5,7,5,2,6,7,
+        4,1,60,390,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,2,5,7,5,2,6,7,
         6,2,7,7,7,2,8,7,8,2,9,7,9,2,10,7,10,2,11,7,11,2,12,7,12,2,13,7,13,
         2,14,7,14,2,15,7,15,2,16,7,16,2,17,7,17,2,18,7,18,2,19,7,19,2,20,
         7,20,2,21,7,21,2,22,7,22,2,23,7,23,2,24,7,24,2,25,7,25,1,0,5,0,54,
@@ -44,20 +44,20 @@ def serializedATN():
         3,22,366,8,22,1,22,1,22,1,23,1,23,1,23,3,23,373,8,23,1,24,1,24,1,
         25,1,25,1,25,1,25,1,25,1,25,1,25,1,25,1,25,1,25,1,25,3,25,388,8,
         25,1,25,0,0,26,0,2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,32,34,
-        36,38,40,42,44,46,48,50,0,5,1,0,50,51,1,0,55,56,1,0,51,52,1,0,20,
-        21,1,0,37,42,431,0,55,1,0,0,0,2,84,1,0,0,0,4,98,1,0,0,0,6,109,1,
+        36,38,40,42,44,46,48,50,0,5,1,0,48,49,1,0,53,54,1,0,49,50,1,0,20,
+        21,1,0,35,40,431,0,55,1,0,0,0,2,84,1,0,0,0,4,98,1,0,0,0,6,109,1,
         0,0,0,8,111,1,0,0,0,10,115,1,0,0,0,12,134,1,0,0,0,14,136,1,0,0,0,
         16,148,1,0,0,0,18,156,1,0,0,0,20,164,1,0,0,0,22,169,1,0,0,0,24,177,
         1,0,0,0,26,188,1,0,0,0,28,207,1,0,0,0,30,209,1,0,0,0,32,213,1,0,
         0,0,34,223,1,0,0,0,36,226,1,0,0,0,38,312,1,0,0,0,40,331,1,0,0,0,
         42,334,1,0,0,0,44,342,1,0,0,0,46,369,1,0,0,0,48,374,1,0,0,0,50,387,
-        1,0,0,0,52,54,5,49,0,0,53,52,1,0,0,0,54,57,1,0,0,0,55,53,1,0,0,0,
+        1,0,0,0,52,54,5,47,0,0,53,52,1,0,0,0,54,57,1,0,0,0,55,53,1,0,0,0,
         55,56,1,0,0,0,56,72,1,0,0,0,57,55,1,0,0,0,58,67,3,2,1,0,59,61,5,
-        49,0,0,60,59,1,0,0,0,61,62,1,0,0,0,62,60,1,0,0,0,62,63,1,0,0,0,63,
+        47,0,0,60,59,1,0,0,0,61,62,1,0,0,0,62,60,1,0,0,0,62,63,1,0,0,0,63,
         64,1,0,0,0,64,66,3,2,1,0,65,60,1,0,0,0,66,69,1,0,0,0,67,65,1,0,0,
         0,67,68,1,0,0,0,68,71,1,0,0,0,69,67,1,0,0,0,70,58,1,0,0,0,71,74,
         1,0,0,0,72,70,1,0,0,0,72,73,1,0,0,0,73,78,1,0,0,0,74,72,1,0,0,0,
-        75,77,5,49,0,0,76,75,1,0,0,0,77,80,1,0,0,0,78,76,1,0,0,0,78,79,1,
+        75,77,5,47,0,0,76,75,1,0,0,0,77,80,1,0,0,0,78,76,1,0,0,0,78,79,1,
         0,0,0,79,81,1,0,0,0,80,78,1,0,0,0,81,82,5,0,0,1,82,1,1,0,0,0,83,
         85,5,1,0,0,84,83,1,0,0,0,84,85,1,0,0,0,85,96,1,0,0,0,86,97,3,4,2,
         0,87,97,3,8,4,0,88,97,3,10,5,0,89,97,3,34,17,0,90,97,3,32,16,0,91,
@@ -80,11 +80,11 @@ def serializedATN():
         139,3,16,8,0,139,141,1,0,0,0,140,137,1,0,0,0,141,144,1,0,0,0,142,
         140,1,0,0,0,142,143,1,0,0,0,143,146,1,0,0,0,144,142,1,0,0,0,145,
         147,5,14,0,0,146,145,1,0,0,0,146,147,1,0,0,0,147,15,1,0,0,0,148,
-        153,3,18,9,0,149,150,5,53,0,0,150,152,3,18,9,0,151,149,1,0,0,0,152,
+        153,3,18,9,0,149,150,5,51,0,0,150,152,3,18,9,0,151,149,1,0,0,0,152,
         155,1,0,0,0,153,151,1,0,0,0,153,154,1,0,0,0,154,17,1,0,0,0,155,153,
-        1,0,0,0,156,161,3,20,10,0,157,158,5,54,0,0,158,160,3,20,10,0,159,
+        1,0,0,0,156,161,3,20,10,0,157,158,5,52,0,0,158,160,3,20,10,0,159,
         157,1,0,0,0,160,163,1,0,0,0,161,159,1,0,0,0,161,162,1,0,0,0,162,
-        19,1,0,0,0,163,161,1,0,0,0,164,167,3,22,11,0,165,166,5,57,0,0,166,
+        19,1,0,0,0,163,161,1,0,0,0,164,167,3,22,11,0,165,166,5,55,0,0,166,
         168,3,22,11,0,167,165,1,0,0,0,167,168,1,0,0,0,168,21,1,0,0,0,169,
         174,3,24,12,0,170,171,7,0,0,0,171,173,3,24,12,0,172,170,1,0,0,0,
         173,176,1,0,0,0,174,172,1,0,0,0,174,175,1,0,0,0,175,23,1,0,0,0,176,
@@ -93,62 +93,62 @@ def serializedATN():
         186,1,0,0,0,184,182,1,0,0,0,184,185,1,0,0,0,185,25,1,0,0,0,186,184,
         1,0,0,0,187,189,7,2,0,0,188,187,1,0,0,0,188,189,1,0,0,0,189,190,
         1,0,0,0,190,191,3,28,14,0,191,27,1,0,0,0,192,208,5,60,0,0,193,208,
-        3,30,15,0,194,208,5,61,0,0,195,208,5,62,0,0,196,197,5,15,0,0,197,
+        3,30,15,0,194,208,5,59,0,0,195,208,5,58,0,0,196,197,5,15,0,0,197,
         198,3,14,7,0,198,199,5,16,0,0,199,208,1,0,0,0,200,201,5,17,0,0,201,
         203,3,14,7,0,202,204,5,14,0,0,203,202,1,0,0,0,203,204,1,0,0,0,204,
         205,1,0,0,0,205,206,5,18,0,0,206,208,1,0,0,0,207,192,1,0,0,0,207,
         193,1,0,0,0,207,194,1,0,0,0,207,195,1,0,0,0,207,196,1,0,0,0,207,
-        200,1,0,0,0,208,29,1,0,0,0,209,211,5,58,0,0,210,212,5,59,0,0,211,
+        200,1,0,0,0,208,29,1,0,0,0,209,211,5,56,0,0,210,212,5,57,0,0,211,
         210,1,0,0,0,211,212,1,0,0,0,212,31,1,0,0,0,213,214,5,19,0,0,214,
         215,5,60,0,0,215,216,7,3,0,0,216,217,5,22,0,0,217,218,3,22,11,0,
         218,219,5,23,0,0,219,220,3,22,11,0,220,221,5,24,0,0,221,222,3,22,
         11,0,222,33,1,0,0,0,223,224,5,25,0,0,224,225,5,60,0,0,225,35,1,0,
-        0,0,226,227,5,26,0,0,227,229,3,16,8,0,228,230,5,49,0,0,229,228,1,
-        0,0,0,229,230,1,0,0,0,230,231,1,0,0,0,231,235,5,27,0,0,232,234,5,
-        49,0,0,233,232,1,0,0,0,234,237,1,0,0,0,235,233,1,0,0,0,235,236,1,
+        0,0,226,227,5,26,0,0,227,229,3,16,8,0,228,230,5,47,0,0,229,228,1,
+        0,0,0,229,230,1,0,0,0,230,231,1,0,0,0,231,235,5,17,0,0,232,234,5,
+        47,0,0,233,232,1,0,0,0,234,237,1,0,0,0,235,233,1,0,0,0,235,236,1,
         0,0,0,236,238,1,0,0,0,237,235,1,0,0,0,238,242,3,40,20,0,239,241,
-        5,49,0,0,240,239,1,0,0,0,241,244,1,0,0,0,242,240,1,0,0,0,242,243,
-        1,0,0,0,243,245,1,0,0,0,244,242,1,0,0,0,245,278,5,28,0,0,246,248,
-        5,49,0,0,247,246,1,0,0,0,248,251,1,0,0,0,249,247,1,0,0,0,249,250,
-        1,0,0,0,250,252,1,0,0,0,251,249,1,0,0,0,252,253,5,29,0,0,253,257,
-        3,16,8,0,254,256,5,49,0,0,255,254,1,0,0,0,256,259,1,0,0,0,257,255,
+        5,47,0,0,240,239,1,0,0,0,241,244,1,0,0,0,242,240,1,0,0,0,242,243,
+        1,0,0,0,243,245,1,0,0,0,244,242,1,0,0,0,245,278,5,18,0,0,246,248,
+        5,47,0,0,247,246,1,0,0,0,248,251,1,0,0,0,249,247,1,0,0,0,249,250,
+        1,0,0,0,250,252,1,0,0,0,251,249,1,0,0,0,252,253,5,27,0,0,253,257,
+        3,16,8,0,254,256,5,47,0,0,255,254,1,0,0,0,256,259,1,0,0,0,257,255,
         1,0,0,0,257,258,1,0,0,0,258,260,1,0,0,0,259,257,1,0,0,0,260,264,
-        5,27,0,0,261,263,5,49,0,0,262,261,1,0,0,0,263,266,1,0,0,0,264,262,
+        5,17,0,0,261,263,5,47,0,0,262,261,1,0,0,0,263,266,1,0,0,0,264,262,
         1,0,0,0,264,265,1,0,0,0,265,267,1,0,0,0,266,264,1,0,0,0,267,271,
-        3,40,20,0,268,270,5,49,0,0,269,268,1,0,0,0,270,273,1,0,0,0,271,269,
+        3,40,20,0,268,270,5,47,0,0,269,268,1,0,0,0,270,273,1,0,0,0,271,269,
         1,0,0,0,271,272,1,0,0,0,272,274,1,0,0,0,273,271,1,0,0,0,274,275,
-        5,28,0,0,275,277,1,0,0,0,276,249,1,0,0,0,277,280,1,0,0,0,278,276,
+        5,18,0,0,275,277,1,0,0,0,276,249,1,0,0,0,277,280,1,0,0,0,278,276,
         1,0,0,0,278,279,1,0,0,0,279,310,1,0,0,0,280,278,1,0,0,0,281,283,
-        5,49,0,0,282,281,1,0,0,0,283,286,1,0,0,0,284,282,1,0,0,0,284,285,
-        1,0,0,0,285,287,1,0,0,0,286,284,1,0,0,0,287,291,5,30,0,0,288,290,
-        5,49,0,0,289,288,1,0,0,0,290,293,1,0,0,0,291,289,1,0,0,0,291,292,
-        1,0,0,0,292,294,1,0,0,0,293,291,1,0,0,0,294,298,5,27,0,0,295,297,
-        5,49,0,0,296,295,1,0,0,0,297,300,1,0,0,0,298,296,1,0,0,0,298,299,
+        5,47,0,0,282,281,1,0,0,0,283,286,1,0,0,0,284,282,1,0,0,0,284,285,
+        1,0,0,0,285,287,1,0,0,0,286,284,1,0,0,0,287,291,5,28,0,0,288,290,
+        5,47,0,0,289,288,1,0,0,0,290,293,1,0,0,0,291,289,1,0,0,0,291,292,
+        1,0,0,0,292,294,1,0,0,0,293,291,1,0,0,0,294,298,5,17,0,0,295,297,
+        5,47,0,0,296,295,1,0,0,0,297,300,1,0,0,0,298,296,1,0,0,0,298,299,
         1,0,0,0,299,301,1,0,0,0,300,298,1,0,0,0,301,305,3,40,20,0,302,304,
-        5,49,0,0,303,302,1,0,0,0,304,307,1,0,0,0,305,303,1,0,0,0,305,306,
-        1,0,0,0,306,308,1,0,0,0,307,305,1,0,0,0,308,309,5,28,0,0,309,311,
+        5,47,0,0,303,302,1,0,0,0,304,307,1,0,0,0,305,303,1,0,0,0,305,306,
+        1,0,0,0,306,308,1,0,0,0,307,305,1,0,0,0,308,309,5,18,0,0,309,311,
         1,0,0,0,310,284,1,0,0,0,310,311,1,0,0,0,311,37,1,0,0,0,312,313,5,
-        31,0,0,313,315,3,16,8,0,314,316,5,49,0,0,315,314,1,0,0,0,315,316,
-        1,0,0,0,316,317,1,0,0,0,317,318,5,27,0,0,318,320,3,40,20,0,319,321,
-        5,49,0,0,320,319,1,0,0,0,320,321,1,0,0,0,321,322,1,0,0,0,322,323,
-        5,28,0,0,323,39,1,0,0,0,324,330,5,49,0,0,325,327,3,2,1,0,326,328,
-        5,49,0,0,327,326,1,0,0,0,327,328,1,0,0,0,328,330,1,0,0,0,329,324,
+        29,0,0,313,315,3,16,8,0,314,316,5,47,0,0,315,314,1,0,0,0,315,316,
+        1,0,0,0,316,317,1,0,0,0,317,318,5,17,0,0,318,320,3,40,20,0,319,321,
+        5,47,0,0,320,319,1,0,0,0,320,321,1,0,0,0,321,322,1,0,0,0,322,323,
+        5,18,0,0,323,39,1,0,0,0,324,330,5,47,0,0,325,327,3,2,1,0,326,328,
+        5,47,0,0,327,326,1,0,0,0,327,328,1,0,0,0,328,330,1,0,0,0,329,324,
         1,0,0,0,329,325,1,0,0,0,330,333,1,0,0,0,331,329,1,0,0,0,331,332,
-        1,0,0,0,332,41,1,0,0,0,333,331,1,0,0,0,334,335,5,32,0,0,335,336,
-        5,61,0,0,336,338,5,33,0,0,337,339,5,49,0,0,338,337,1,0,0,0,338,339,
+        1,0,0,0,332,41,1,0,0,0,333,331,1,0,0,0,334,335,5,30,0,0,335,336,
+        5,59,0,0,336,338,5,31,0,0,337,339,5,47,0,0,338,337,1,0,0,0,338,339,
         1,0,0,0,339,340,1,0,0,0,340,341,3,40,20,0,341,43,1,0,0,0,342,343,
-        5,34,0,0,343,344,5,60,0,0,344,356,5,15,0,0,345,346,3,48,24,0,346,
+        5,32,0,0,343,344,5,60,0,0,344,356,5,15,0,0,345,346,3,48,24,0,346,
         353,5,60,0,0,347,348,5,2,0,0,348,349,3,48,24,0,349,350,5,60,0,0,
         350,352,1,0,0,0,351,347,1,0,0,0,352,355,1,0,0,0,353,351,1,0,0,0,
         353,354,1,0,0,0,354,357,1,0,0,0,355,353,1,0,0,0,356,345,1,0,0,0,
-        356,357,1,0,0,0,357,358,1,0,0,0,358,359,5,16,0,0,359,360,5,35,0,
+        356,357,1,0,0,0,357,358,1,0,0,0,358,359,5,16,0,0,359,360,5,33,0,
         0,360,361,3,48,24,0,361,362,5,17,0,0,362,363,3,40,20,0,363,365,3,
-        46,23,0,364,366,5,49,0,0,365,364,1,0,0,0,365,366,1,0,0,0,366,367,
-        1,0,0,0,367,368,5,18,0,0,368,45,1,0,0,0,369,372,5,36,0,0,370,373,
+        46,23,0,364,366,5,47,0,0,365,364,1,0,0,0,365,366,1,0,0,0,366,367,
+        1,0,0,0,367,368,5,18,0,0,368,45,1,0,0,0,369,372,5,34,0,0,370,373,
         5,60,0,0,371,373,3,14,7,0,372,370,1,0,0,0,372,371,1,0,0,0,373,47,
-        1,0,0,0,374,375,7,4,0,0,375,49,1,0,0,0,376,388,5,43,0,0,377,388,
-        5,44,0,0,378,388,5,45,0,0,379,380,5,46,0,0,380,381,3,14,7,0,381,
-        382,5,12,0,0,382,388,1,0,0,0,383,384,5,47,0,0,384,385,3,14,7,0,385,
+        1,0,0,0,374,375,7,4,0,0,375,49,1,0,0,0,376,388,5,41,0,0,377,388,
+        5,42,0,0,378,388,5,43,0,0,379,380,5,44,0,0,380,381,3,14,7,0,381,
+        382,5,12,0,0,382,388,1,0,0,0,383,384,5,45,0,0,384,385,3,14,7,0,385,
         386,5,12,0,0,386,388,1,0,0,0,387,376,1,0,0,0,387,377,1,0,0,0,387,
         378,1,0,0,0,387,379,1,0,0,0,387,383,1,0,0,0,388,51,1,0,0,0,46,55,
         62,67,72,78,84,96,104,109,134,142,146,153,161,167,174,179,184,188,
@@ -170,12 +170,12 @@ class ConnectITParser ( Parser ):
                      "'/='", "'<+->'", "'<+-'", "'<<+-'", "'<+-('", "')-'", 
                      "'<<+-('", "'CLOSED'", "'('", "')'", "'['", "']'", 
                      "'BEND'", "'IN'", "'OUT'", "'BY'", "'AT'", "'TO'", 
-                     "'SHOW'", "'IF'", "'{'", "'}'", "'ELSE IF'", "'ELSE'", 
-                     "'REPEAT WHILE'", "'REPEAT'", "'TIMES'", "'METHOD'", 
-                     "'RETURNS'", "'RETURN'", "'UNIT'", "'LAYER'", "'SHAPE'", 
-                     "'MODEL'", "'NUMBER'", "'BOOLEAN'", "'<->'", "'<-'", 
-                     "'<<-'", "'<-('", "'<<-('", "<INVALID>", "<INVALID>", 
-                     "'+'", "'-'", "'NOT'", "'OR'", "'AND'", "'*'", "'/'" ]
+                     "'SHOW'", "'IF'", "'ELSE IF'", "'ELSE'", "'REPEAT WHILE'", 
+                     "'REPEAT'", "'TIMES'", "'METHOD'", "'RETURNS'", "'RETURN'", 
+                     "'UNIT'", "'LAYER'", "'SHAPE'", "'MODEL'", "'NUMBER'", 
+                     "'BOOLEAN'", "'<->'", "'<-'", "'<<-'", "'<-('", "'<<-('", 
+                     "<INVALID>", "<INVALID>", "'+'", "'-'", "'NOT'", "'OR'", 
+                     "'AND'", "'*'", "'/'" ]
 
     symbolicNames = [ "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>", 
                       "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>", 
@@ -188,10 +188,9 @@ class ConnectITParser ( Parser ):
                       "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>", 
                       "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>", 
                       "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>", 
-                      "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>", 
-                      "WS", "NEWLINE", "PLUS", "MINUS", "NOT", "OR", "AND", 
-                      "MUL", "DIV", "COMPARATOR", "COLOR", "PATTERN", "ID", 
-                      "NUMBER", "BOOLEAN" ]
+                      "<INVALID>", "<INVALID>", "WS", "NEWLINE", "PLUS", 
+                      "MINUS", "NOT", "OR", "AND", "MUL", "DIV", "COMPARATOR", 
+                      "COLOR", "PATTERN", "BOOLEAN", "NUMBER", "ID" ]
 
     RULE_program = 0
     RULE_statement = 1
@@ -273,23 +272,21 @@ class ConnectITParser ( Parser ):
     T__42=43
     T__43=44
     T__44=45
-    T__45=46
-    T__46=47
-    WS=48
-    NEWLINE=49
-    PLUS=50
-    MINUS=51
-    NOT=52
-    OR=53
-    AND=54
-    MUL=55
-    DIV=56
-    COMPARATOR=57
-    COLOR=58
-    PATTERN=59
+    WS=46
+    NEWLINE=47
+    PLUS=48
+    MINUS=49
+    NOT=50
+    OR=51
+    AND=52
+    MUL=53
+    DIV=54
+    COMPARATOR=55
+    COLOR=56
+    PATTERN=57
+    BOOLEAN=58
+    NUMBER=59
     ID=60
-    NUMBER=61
-    BOOLEAN=62
 
     def __init__(self, input:TokenStream, output:TextIO = sys.stdout):
         super().__init__(input, output)
@@ -364,7 +361,7 @@ class ConnectITParser ( Parser ):
             self.state = 72
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            while (((_la) & ~0x3f) == 0 and ((1 << _la) & 1152930255703900162) != 0):
+            while (((_la) & ~0x3f) == 0 and ((1 << _la) & 1152923692457000962) != 0):
                 self.state = 58
                 self.statement()
                 self.state = 67
@@ -381,7 +378,7 @@ class ConnectITParser ( Parser ):
                             self.state = 62 
                             self._errHandler.sync(self)
                             _la = self._input.LA(1)
-                            if not (_la==49):
+                            if not (_la==47):
                                 break
 
                         self.state = 64
@@ -397,7 +394,7 @@ class ConnectITParser ( Parser ):
             self.state = 78
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            while _la==49:
+            while _la==47:
                 self.state = 75
                 self.match(ConnectITParser.NEWLINE)
                 self.state = 80
@@ -965,7 +962,7 @@ class ConnectITParser ( Parser ):
             self.state = 142
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            while (((_la) & ~0x3f) == 0 and ((1 << _la) & 272678883688448) != 0):
+            while (((_la) & ~0x3f) == 0 and ((1 << _la) & 68169720922112) != 0):
                 self.state = 137
                 self.arrowOperator()
                 self.state = 138
@@ -1043,7 +1040,7 @@ class ConnectITParser ( Parser ):
             self.state = 153
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            while _la==53:
+            while _la==51:
                 self.state = 149
                 self.match(ConnectITParser.OR)
                 self.state = 150
@@ -1113,7 +1110,7 @@ class ConnectITParser ( Parser ):
             self.state = 161
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            while _la==54:
+            while _la==52:
                 self.state = 157
                 self.match(ConnectITParser.AND)
                 self.state = 158
@@ -1180,7 +1177,7 @@ class ConnectITParser ( Parser ):
             self.state = 167
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            if _la==57:
+            if _la==55:
                 self.state = 165
                 self.match(ConnectITParser.COMPARATOR)
                 self.state = 166
@@ -1254,10 +1251,10 @@ class ConnectITParser ( Parser ):
             self.state = 174
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            while _la==50 or _la==51:
+            while _la==48 or _la==49:
                 self.state = 170
                 _la = self._input.LA(1)
-                if not(_la==50 or _la==51):
+                if not(_la==48 or _la==49):
                     self._errHandler.recoverInline(self)
                 else:
                     self._errHandler.reportMatch(self)
@@ -1340,10 +1337,10 @@ class ConnectITParser ( Parser ):
                     self.state = 179
                     self._errHandler.sync(self)
                     _la = self._input.LA(1)
-                    if _la==55 or _la==56:
+                    if _la==53 or _la==54:
                         self.state = 178
                         _la = self._input.LA(1)
-                        if not(_la==55 or _la==56):
+                        if not(_la==53 or _la==54):
                             self._errHandler.recoverInline(self)
                         else:
                             self._errHandler.reportMatch(self)
@@ -1412,10 +1409,10 @@ class ConnectITParser ( Parser ):
             self.state = 188
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            if _la==51 or _la==52:
+            if _la==49 or _la==50:
                 self.state = 187
                 _la = self._input.LA(1)
-                if not(_la==51 or _la==52):
+                if not(_la==49 or _la==50):
                     self._errHandler.recoverInline(self)
                 else:
                     self._errHandler.reportMatch(self)
@@ -1491,17 +1488,17 @@ class ConnectITParser ( Parser ):
                 self.state = 192
                 self.match(ConnectITParser.ID)
                 pass
-            elif token in [58]:
+            elif token in [56]:
                 self.enterOuterAlt(localctx, 2)
                 self.state = 193
                 self.unitExpr()
                 pass
-            elif token in [61]:
+            elif token in [59]:
                 self.enterOuterAlt(localctx, 3)
                 self.state = 194
                 self.match(ConnectITParser.NUMBER)
                 pass
-            elif token in [62]:
+            elif token in [58]:
                 self.enterOuterAlt(localctx, 4)
                 self.state = 195
                 self.match(ConnectITParser.BOOLEAN)
@@ -1589,7 +1586,7 @@ class ConnectITParser ( Parser ):
             self.state = 211
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            if _la==59:
+            if _la==57:
                 self.state = 210
                 self.match(ConnectITParser.PATTERN)
 
@@ -1790,13 +1787,13 @@ class ConnectITParser ( Parser ):
             self.state = 229
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            if _la==49:
+            if _la==47:
                 self.state = 228
                 self.match(ConnectITParser.NEWLINE)
 
 
             self.state = 231
-            self.match(ConnectITParser.T__26)
+            self.match(ConnectITParser.T__16)
             self.state = 235
             self._errHandler.sync(self)
             _alt = self._interp.adaptivePredict(self._input,23,self._ctx)
@@ -1813,7 +1810,7 @@ class ConnectITParser ( Parser ):
             self.state = 242
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            while _la==49:
+            while _la==47:
                 self.state = 239
                 self.match(ConnectITParser.NEWLINE)
                 self.state = 244
@@ -1821,7 +1818,7 @@ class ConnectITParser ( Parser ):
                 _la = self._input.LA(1)
 
             self.state = 245
-            self.match(ConnectITParser.T__27)
+            self.match(ConnectITParser.T__17)
             self.state = 278
             self._errHandler.sync(self)
             _alt = self._interp.adaptivePredict(self._input,29,self._ctx)
@@ -1830,7 +1827,7 @@ class ConnectITParser ( Parser ):
                     self.state = 249
                     self._errHandler.sync(self)
                     _la = self._input.LA(1)
-                    while _la==49:
+                    while _la==47:
                         self.state = 246
                         self.match(ConnectITParser.NEWLINE)
                         self.state = 251
@@ -1838,13 +1835,13 @@ class ConnectITParser ( Parser ):
                         _la = self._input.LA(1)
 
                     self.state = 252
-                    self.match(ConnectITParser.T__28)
+                    self.match(ConnectITParser.T__26)
                     self.state = 253
                     self.logicExpr()
                     self.state = 257
                     self._errHandler.sync(self)
                     _la = self._input.LA(1)
-                    while _la==49:
+                    while _la==47:
                         self.state = 254
                         self.match(ConnectITParser.NEWLINE)
                         self.state = 259
@@ -1852,7 +1849,7 @@ class ConnectITParser ( Parser ):
                         _la = self._input.LA(1)
 
                     self.state = 260
-                    self.match(ConnectITParser.T__26)
+                    self.match(ConnectITParser.T__16)
                     self.state = 264
                     self._errHandler.sync(self)
                     _alt = self._interp.adaptivePredict(self._input,27,self._ctx)
@@ -1869,7 +1866,7 @@ class ConnectITParser ( Parser ):
                     self.state = 271
                     self._errHandler.sync(self)
                     _la = self._input.LA(1)
-                    while _la==49:
+                    while _la==47:
                         self.state = 268
                         self.match(ConnectITParser.NEWLINE)
                         self.state = 273
@@ -1877,7 +1874,7 @@ class ConnectITParser ( Parser ):
                         _la = self._input.LA(1)
 
                     self.state = 274
-                    self.match(ConnectITParser.T__27) 
+                    self.match(ConnectITParser.T__17) 
                 self.state = 280
                 self._errHandler.sync(self)
                 _alt = self._interp.adaptivePredict(self._input,29,self._ctx)
@@ -1889,7 +1886,7 @@ class ConnectITParser ( Parser ):
                 self.state = 284
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
-                while _la==49:
+                while _la==47:
                     self.state = 281
                     self.match(ConnectITParser.NEWLINE)
                     self.state = 286
@@ -1897,11 +1894,11 @@ class ConnectITParser ( Parser ):
                     _la = self._input.LA(1)
 
                 self.state = 287
-                self.match(ConnectITParser.T__29)
+                self.match(ConnectITParser.T__27)
                 self.state = 291
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
-                while _la==49:
+                while _la==47:
                     self.state = 288
                     self.match(ConnectITParser.NEWLINE)
                     self.state = 293
@@ -1909,7 +1906,7 @@ class ConnectITParser ( Parser ):
                     _la = self._input.LA(1)
 
                 self.state = 294
-                self.match(ConnectITParser.T__26)
+                self.match(ConnectITParser.T__16)
                 self.state = 298
                 self._errHandler.sync(self)
                 _alt = self._interp.adaptivePredict(self._input,32,self._ctx)
@@ -1926,7 +1923,7 @@ class ConnectITParser ( Parser ):
                 self.state = 305
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
-                while _la==49:
+                while _la==47:
                     self.state = 302
                     self.match(ConnectITParser.NEWLINE)
                     self.state = 307
@@ -1934,7 +1931,7 @@ class ConnectITParser ( Parser ):
                     _la = self._input.LA(1)
 
                 self.state = 308
-                self.match(ConnectITParser.T__27)
+                self.match(ConnectITParser.T__17)
 
 
         except RecognitionException as re:
@@ -1995,31 +1992,31 @@ class ConnectITParser ( Parser ):
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 312
-            self.match(ConnectITParser.T__30)
+            self.match(ConnectITParser.T__28)
             self.state = 313
             self.logicExpr()
             self.state = 315
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            if _la==49:
+            if _la==47:
                 self.state = 314
                 self.match(ConnectITParser.NEWLINE)
 
 
             self.state = 317
-            self.match(ConnectITParser.T__26)
+            self.match(ConnectITParser.T__16)
             self.state = 318
             self.statementBlock()
             self.state = 320
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            if _la==49:
+            if _la==47:
                 self.state = 319
                 self.match(ConnectITParser.NEWLINE)
 
 
             self.state = 322
-            self.match(ConnectITParser.T__27)
+            self.match(ConnectITParser.T__17)
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -2083,11 +2080,11 @@ class ConnectITParser ( Parser ):
                     self.state = 329
                     self._errHandler.sync(self)
                     token = self._input.LA(1)
-                    if token in [49]:
+                    if token in [47]:
                         self.state = 324
                         self.match(ConnectITParser.NEWLINE)
                         pass
-                    elif token in [1, 19, 25, 26, 31, 32, 34, 36, 37, 38, 39, 40, 41, 42, 60]:
+                    elif token in [1, 19, 25, 26, 29, 30, 32, 34, 35, 36, 37, 38, 39, 40, 60]:
                         self.state = 325
                         self.statement()
                         self.state = 327
@@ -2159,11 +2156,11 @@ class ConnectITParser ( Parser ):
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 334
-            self.match(ConnectITParser.T__31)
+            self.match(ConnectITParser.T__29)
             self.state = 335
             self.match(ConnectITParser.NUMBER)
             self.state = 336
-            self.match(ConnectITParser.T__32)
+            self.match(ConnectITParser.T__30)
             self.state = 338
             self._errHandler.sync(self)
             la_ = self._interp.adaptivePredict(self._input,40,self._ctx)
@@ -2242,7 +2239,7 @@ class ConnectITParser ( Parser ):
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 342
-            self.match(ConnectITParser.T__33)
+            self.match(ConnectITParser.T__31)
             self.state = 343
             self.match(ConnectITParser.ID)
             self.state = 344
@@ -2250,7 +2247,7 @@ class ConnectITParser ( Parser ):
             self.state = 356
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            if (((_la) & ~0x3f) == 0 and ((1 << _la) & 8658654068736) != 0):
+            if (((_la) & ~0x3f) == 0 and ((1 << _la) & 2164663517184) != 0):
                 self.state = 345
                 self.dataType()
                 self.state = 346
@@ -2274,7 +2271,7 @@ class ConnectITParser ( Parser ):
             self.state = 358
             self.match(ConnectITParser.T__15)
             self.state = 359
-            self.match(ConnectITParser.T__34)
+            self.match(ConnectITParser.T__32)
             self.state = 360
             self.dataType()
             self.state = 361
@@ -2286,7 +2283,7 @@ class ConnectITParser ( Parser ):
             self.state = 365
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            if _la==49:
+            if _la==47:
                 self.state = 364
                 self.match(ConnectITParser.NEWLINE)
 
@@ -2343,7 +2340,7 @@ class ConnectITParser ( Parser ):
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 369
-            self.match(ConnectITParser.T__35)
+            self.match(ConnectITParser.T__33)
             self.state = 372
             self._errHandler.sync(self)
             la_ = self._interp.adaptivePredict(self._input,44,self._ctx)
@@ -2404,7 +2401,7 @@ class ConnectITParser ( Parser ):
             self.enterOuterAlt(localctx, 1)
             self.state = 374
             _la = self._input.LA(1)
-            if not((((_la) & ~0x3f) == 0 and ((1 << _la) & 8658654068736) != 0)):
+            if not((((_la) & ~0x3f) == 0 and ((1 << _la) & 2164663517184) != 0)):
                 self._errHandler.recoverInline(self)
             else:
                 self._errHandler.reportMatch(self)
@@ -2457,34 +2454,34 @@ class ConnectITParser ( Parser ):
             self.state = 387
             self._errHandler.sync(self)
             token = self._input.LA(1)
-            if token in [43]:
+            if token in [41]:
                 self.enterOuterAlt(localctx, 1)
                 self.state = 376
+                self.match(ConnectITParser.T__40)
+                pass
+            elif token in [42]:
+                self.enterOuterAlt(localctx, 2)
+                self.state = 377
+                self.match(ConnectITParser.T__41)
+                pass
+            elif token in [43]:
+                self.enterOuterAlt(localctx, 3)
+                self.state = 378
                 self.match(ConnectITParser.T__42)
                 pass
             elif token in [44]:
-                self.enterOuterAlt(localctx, 2)
-                self.state = 377
-                self.match(ConnectITParser.T__43)
-                pass
-            elif token in [45]:
-                self.enterOuterAlt(localctx, 3)
-                self.state = 378
-                self.match(ConnectITParser.T__44)
-                pass
-            elif token in [46]:
                 self.enterOuterAlt(localctx, 4)
                 self.state = 379
-                self.match(ConnectITParser.T__45)
+                self.match(ConnectITParser.T__43)
                 self.state = 380
                 self.expression()
                 self.state = 381
                 self.match(ConnectITParser.T__11)
                 pass
-            elif token in [47]:
+            elif token in [45]:
                 self.enterOuterAlt(localctx, 5)
                 self.state = 383
-                self.match(ConnectITParser.T__46)
+                self.match(ConnectITParser.T__44)
                 self.state = 384
                 self.expression()
                 self.state = 385

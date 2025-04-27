@@ -342,7 +342,7 @@ class CustomVisitor(ConnectITVisitor):
                 value += next_value
             elif ctx.MINUS():
                 value -= next_value
-
+                
         return value, type
 
     def visitMulExpr(self, ctx):

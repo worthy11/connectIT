@@ -58,12 +58,14 @@ showStatement: 'SHOW' ID;
 
 // TODO: WHILE / FOR, FUNCTION
 ifStmt:
-    'IF' logicExpr NEWLINE? '{' NEWLINE* statementBlock NEWLINE* '}' (
-        NEWLINE* 'ELSE IF' logicExpr NEWLINE* '{' NEWLINE* statementBlock NEWLINE* '}'
-    )* (NEWLINE* 'ELSE' NEWLINE* '{' NEWLINE* statementBlock NEWLINE* '}')?;
+	'IF' logicExpr NEWLINE? '[' NEWLINE* statementBlock NEWLINE* ']' (
+		NEWLINE* 'ELSE IF' logicExpr NEWLINE* '[' NEWLINE* statementBlock NEWLINE* ']'
+	)* (
+		NEWLINE* 'ELSE' NEWLINE* '[' NEWLINE* statementBlock NEWLINE* ']'
+	)?;
 
 whileStmt:
-	'REPEAT WHILE' logicExpr NEWLINE? '{' statementBlock NEWLINE? '}';
+	'REPEAT WHILE' logicExpr NEWLINE? '[' statementBlock NEWLINE? ']';
 
 statementBlock: (NEWLINE | statement NEWLINE?)*;
 
@@ -99,17 +101,15 @@ DIV: '/';
 COMPARATOR: '<' | '<=' | '>' | '>=' | '==' | '!=';
 
 COLOR:
-	'*' (
-		'red'
-		| 'blue'
-		| 'green'
-		| 'white'
-		| 'black'
-		| 'yellow'
-		| 'lilac'
-	) '*';
-PATTERN: '*' ( 'striped' | 'dotted' | 'gradient') '*';
+	'RED'
+	| 'BLUE'
+	| 'GREEN'
+	| 'WHITE'
+	| 'BLACK'
+	| 'YELLOW'
+	| 'LILAC';
+PATTERN: 'STRIPED' | 'DOTTED' | 'GRADIENT';
+BOOLEAN: 'TRUE' | 'FALSE';
+NUMBER: '-'? [0-9]+;
 
 ID: [a-zA-Z_][a-zA-Z0-9_]*;
-NUMBER: '-'? [0-9]+;
-BOOLEAN: 'TRUE' | 'FALSE';

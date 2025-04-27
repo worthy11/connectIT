@@ -123,14 +123,11 @@ class Unit(Structure):
         fig.add_trace(go.Mesh3d(
             x=x_vals, y=y_vals, z=z_vals,
             i=self.i_faces, j=self.j_faces, k=self.k_faces,
-            color=self.color_map[self.color],
+            color=self.color_map[self.color.lower()],
             opacity=1,
             lighting=dict(specular=0.1, diffuse=1.0, ambient=0.5, fresnel=0)
         ))
 
-        color = "black"
-        if self.color == "black":
-            color = "gray"
         for edge in self.edges:
             fig.add_trace(go.Scatter3d(
                 x=[x_vals[edge[0]], x_vals[edge[1]]],
