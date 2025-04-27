@@ -448,25 +448,69 @@ class CustomVisitor(ConnectITVisitor):
                     "message": f"SHOW only supports STRUCTUREs, not {type(structure)}."
                 }
 
+    # def visitShowStatement(self, ctx):
+    #     shape_name = ctx.ID().getText()
+    #     print(f"DEBUG: Attempting to SHOW '{shape_name}'")
+    #     if not self.scope.__contains__(shape_name):
+    #         print(f"DEBUG: '{shape_name}' not found in scope.")
+    #         return {
+    #             "type": "error",
+    #             "message": f"Structure '{shape_name}' is not defined."
+    #         }
+
+    #     structure = self.scope.get_value(shape_name)
+    #     print(f"DEBUG: Found '{shape_name}' in scope: {structure}")
+
+    #     if isinstance(structure, (Structure, Layer)):
+    #         print(f"DEBUG: Rendering '{shape_name}'")
+    #         return show_figure(self.fig, structure)
+    #     else:
+    #         print(f"DEBUG: '{shape_name}' is not a valid STRUCTURE or LAYER.")
+    #         return {
+    #             "type": "error",
+    #             "message": f"SHOW only supports STRUCTUREs or LAYERs, not {type(structure)}."
+    #         }
+
+    # def visitIfStmt(self, ctx):
+    #     condition_value, condition_type = self.visit(ctx.logicExpr(0))
+    #     if condition_type != 6:
+    #         raise Exception(f"Type Error: IF condition must be BOOLEAN, not {types[condition_type]}.")
+        
+    #     if condition_value:
+    #         return self.visit(ctx.statementBlock(0))
+        
+    #     for i in range(1, len(ctx.logicExpr())):
+    #         condition_value, condition_type = self.visit(ctx.logicExpr(i))
+    #         if condition_type != 6:
+    #             raise Exception(f"Type Error: ELSE IF condition must be BOOLEAN, not {types[condition_type]}.")      
+    #         if condition_value:
+    #             return self.visit(ctx.statementBlock(i))
+        
+    #     if len(ctx.statementBlock()) > len(ctx.logicExpr()):
+    #         return self.visit(ctx.statementBlock(len(ctx.statementBlock())))
+
     def visitIfStmt(self, ctx):
         condition_value, condition_type = self.visit(ctx.logicExpr(0))
-        if condition_type != 6:
+        if condition_type != 6: 
             raise Exception(f"Type Error: IF condition must be BOOLEAN, not {types[condition_type]}.")
-        
+
         if condition_value:
             return self.visit(ctx.statementBlock(0))
-        
-        for i in range(1, len(ctx.logicExpr())):
-            condition_value, condition_type = self.visit(ctx.logicExpr(i))
-            if condition_type != 6:
-                raise Exception(f"Type Error: ELSE IF condition must be BOOLEAN, not {types[condition_type]}.")      
-            if condition_value:
-                return self.visit(ctx.statementBlock(i))
-        
-        if len(ctx.statementBlock()) > len(ctx.logicExpr()):
-            return self.visit(ctx.statementBlock(len(ctx.statementBlock())))
+        else:
+            for i in range(1, len(ctx.logicExpr())):
+                condition_value, condition_type = self.visit(ctx.logicExpr(i))
+                if condition_type != 6:
+                    raise Exception(f"Type Error: ELSE IF condition must be BOOLEAN, not {types[condition_type]}.")
+                if condition_value:
+                    return self.visit(ctx.statementBlock(i))
+
+            if len(ctx.statementBlock()) > len(ctx.logicExpr()):
+                return self.visit(ctx.statementBlock(len(ctx.statementBlock()) - 1))
     
     def visitStatementBlock(self, ctx):
+        output = None
         for statement in ctx.statement():
-            self.visit(statement)
-        return None
+            statement_output = self.visit(statement)
+            if statement_output is not None:
+                output = statement_output
+        return output
