@@ -417,9 +417,9 @@ class CustomVisitor(ConnectITVisitor):
     def visitUnitExpr(self, ctx):
         color, pattern = None, None
         if ctx.COLOR():
-            color = ctx.COLOR().getText()[1:-1]
+            color = ctx.COLOR().getText()
         if ctx.PATTERN():
-            pattern = ctx.PATTERN().getText()[1:-1]
+            pattern = ctx.PATTERN().getText()
         return Unit(color=color, pattern=pattern)
 
     def visitBendStatement(self, ctx):

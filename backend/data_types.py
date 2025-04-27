@@ -128,6 +128,9 @@ class Unit(Structure):
             lighting=dict(specular=0.1, diffuse=1.0, ambient=0.5, fresnel=0)
         ))
 
+        color = "BLACK"
+        if self.color == "BLACK":
+            color = "gray"
         for edge in self.edges:
             fig.add_trace(go.Scatter3d(
                 x=[x_vals[edge[0]], x_vals[edge[1]]],
