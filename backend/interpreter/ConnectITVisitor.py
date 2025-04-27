@@ -109,11 +109,6 @@ class ConnectITVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by ConnectITParser#condition.
-    def visitCondition(self, ctx:ConnectITParser.ConditionContext):
-        return self.visitChildren(ctx)
-
-
     # Visit a parse tree produced by ConnectITParser#statementBlock.
     def visitStatementBlock(self, ctx:ConnectITParser.StatementBlockContext):
         return self.visitChildren(ctx)

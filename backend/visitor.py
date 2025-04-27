@@ -30,6 +30,8 @@ class CustomVisitor(ConnectITVisitor):
             return self.visit(ctx.extension())
         if ctx.showStatement():
             return self.visit(ctx.showStatement())
+        if ctx.ifStmt():
+            return self.visit(ctx.ifStmt())
         else:
             return {
                 "type": "error",
@@ -78,7 +80,6 @@ class CustomVisitor(ConnectITVisitor):
             case 4:
                 new_value = self.extendModel(value, e, op)
             case 5:
-                # TODO: Create the extendNumber method
                 new_value = self.extendNumber(value, e, op)
         self.scope.fill(name, new_value)
 
@@ -124,11 +125,37 @@ class CustomVisitor(ConnectITVisitor):
             
         if received_type != 3: 
             raise Exception(f"Cannot add value of type '{types[received_type]}' to a Model. Only SHAPE can be added.")
-            
-        
+                
         c = self.get_connection(op)
         received_value, received_type = self.visit(e)
         value.add_shape(received_value, c)
+        return value
+    
+    def extendNumber(self, value, e, op):
+        if op.getText() not in ['+=', '-=', '*=', '/=']:
+            raise Exception(f"Operator '{op.getText()}' cannot be used to extend a NUMBER.")
+            
+        received_value, received_type = self.visit(e)
+        if received_type != 5: 
+            if op.getText() == '+=':
+                raise Exception(f"Cannot add value of type '{types[received_type]}' to a NUMBER.")
+            elif op.getText() == '-=':
+                raise Exception(f"Cannot subtract value of type '{types[received_type]}' from a NUMBER.")
+            elif op.getText() == '*=':
+                raise Exception(f"Cannot multiply value of type '{types[received_type]}' to a NUMBER.")
+            elif op.getText() == '/=':
+                raise Exception(f"Cannot divide value of type '{types[received_type]}' from a NUMBER.")
+            
+        if op.getText() == '+=':
+            value += received_value
+        elif op.getText() == '-=':
+            value -= received_value
+        elif op.getText() == '*=':
+            value *= received_value
+        elif op.getText() == '/=':
+            if received_value == 0:
+                raise Exception("Value Error: Division by zero error.")
+            value //= received_value
         return value
     
     def get_connection(self, operator):
@@ -304,8 +331,9 @@ class CustomVisitor(ConnectITVisitor):
                 else:
                     raise Exception(f"Type Error: Cannot apply '*' operator to types {types[type]} and {types[next_type]}")
             elif ctx.DIV():
-                # TODO: Check for division by zero
                 if type == 5 and next_type == 5:
+                    if next_value == 0:
+                        raise Exception("Value Error: Division by zero error.")
                     value //= next_value
                 else:
                     raise Exception(f"Type Error: Cannot apply '/' operator to types {types[type]} and {types[next_type]}")
@@ -389,4 +417,25 @@ class CustomVisitor(ConnectITVisitor):
                     "message": f"SHOW only supports STRUCTUREs, not {type(structure)}."
                 }
 
+    def visitIfStmt(self, ctx):
+        condition_value, condition_type = self.visit(ctx.logicExpr(0))
+        if condition_type != 6:
+            raise Exception(f"Type Error: IF condition must be BOOLEAN, not {types[condition_type]}.")
         
+        if condition_value:
+            return self.visit(ctx.statementBlock(0))
+        
+        for i in range(1, len(ctx.logicExpr())):
+            condition_value, condition_type = self.visit(ctx.logicExpr(i))
+            if condition_type != 6:
+                raise Exception(f"Type Error: ELSE IF condition must be BOOLEAN, not {types[condition_type]}.")      
+            if condition_value:
+                return self.visit(ctx.statementBlock(i))
+        
+        if len(ctx.statementBlock()) > len(ctx.logicExpr()):
+            return self.visit(ctx.statementBlock(len(ctx.statementBlock())))
+    
+    def visitStatementBlock(self, ctx):
+        for statement in ctx.statement():
+            self.visit(statement)
+        return None

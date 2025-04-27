@@ -188,15 +188,6 @@ class ConnectITListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by ConnectITParser#condition.
-    def enterCondition(self, ctx:ConnectITParser.ConditionContext):
-        pass
-
-    # Exit a parse tree produced by ConnectITParser#condition.
-    def exitCondition(self, ctx:ConnectITParser.ConditionContext):
-        pass
-
-
     # Enter a parse tree produced by ConnectITParser#statementBlock.
     def enterStatementBlock(self, ctx:ConnectITParser.StatementBlockContext):
         pass

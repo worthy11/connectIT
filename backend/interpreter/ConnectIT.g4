@@ -22,6 +22,9 @@ assignment: ID '=' expression;
 extension: ID extensionOperator expression;
 extensionOperator:
 	'+='
+	| '-='
+	| '*='
+	| '/='
 	| '<+->'
 	| '<+-'
 	| '<<+-'
@@ -53,18 +56,16 @@ bendStatement:
 	);
 showStatement: 'SHOW' ID;
 
-// TODO: Update IF / ELSE, WHILE / FOR, FUNCTION
+// TODO: WHILE / FOR, FUNCTION
 ifStmt:
-	'IF' condition NEWLINE? '[' statementBlock NEWLINE? ']' (
-		NEWLINE? 'ELSE IF' condition NEWLINE? '[' statementBlock NEWLINE? ']'
-	)* (NEWLINE? 'ELSE' NEWLINE? '[' statementBlock NEWLINE? ']')?;
+    'IF' logicExpr NEWLINE? '{' NEWLINE* statementBlock NEWLINE* '}' (
+        NEWLINE* 'ELSE IF' logicExpr NEWLINE* '{' NEWLINE* statementBlock NEWLINE* '}'
+    )* (NEWLINE* 'ELSE' NEWLINE* '{' NEWLINE* statementBlock NEWLINE* '}')?;
 
 whileStmt:
-	'REPEAT WHILE' condition NEWLINE? '[' statementBlock NEWLINE? ']';
+	'REPEAT WHILE' logicExpr NEWLINE? '{' statementBlock NEWLINE? '}';
 
-condition: expression COMPARATOR expression;
-
-statementBlock: statement (NEWLINE statement)*;
+statementBlock: (NEWLINE | statement NEWLINE?)*;
 
 forStmt: 'REPEAT' NUMBER 'TIMES' NEWLINE? statementBlock;
 
