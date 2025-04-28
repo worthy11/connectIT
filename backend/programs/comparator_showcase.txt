@@ -1,0 +1,19 @@
+LAYER l
+
+IF 5 > 2
+[
+    l <+-> [*red*]
+] ELSE [
+    l <+-> [*blue*]
+]
+
+IF 4 == 4
+[
+    l <+-> [*green*]
+]
+
+IF 3 >= 2 AND 3 <= 4
+[
+    l <+-> [*lilac*]
+]
+SHOW l

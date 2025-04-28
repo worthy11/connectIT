@@ -125,7 +125,7 @@ class Unit(Structure):
             i=self.i_faces, j=self.j_faces, k=self.k_faces,
             color=self.color_map[self.color.lower()],
             opacity=1,
-            lighting=dict(specular=0.1, diffuse=1.0, ambient=0.5, fresnel=0)
+            lighting=dict(specular=0.1, diffuse=1.0, ambient=0.8, fresnel=0)
         ))
 
         color = "BLACK"

@@ -1,3 +1,4 @@
-UNIT r=*red*, g = (*green*), b = *blue* *striped*
-LAYER l = ([r] <-> [r] <-> [g] <-> [g] <-> [b] CLOSED)
+UNIT r=*red*, g = (*green*), b = *blue*
+LAYER l1 = (2*r <-> 2*g <-> 2*b CLOSED)
+LAYER l2 = 2*r <-> 2*g <-> 2*b
 SHOW l

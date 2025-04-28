@@ -10,8 +10,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "codemirror": "^5.65.19",
     "plotly.js-dist": "^3.0.1",
     "react": "^19.0.0",
+    "react-codemirror2": "^8.0.1",
     "react-dom": "^19.0.0",
     "react-plotly.js": "^2.6.0",
     "react-syntax-highlighter": "^15.6.1"

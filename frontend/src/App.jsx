@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Plot from "react-plotly.js";
 import "./App.css";
 
@@ -17,13 +17,33 @@ export default function App() {
   const [programFiles, setProgramFiles] = useState([]);
   const [selectedFile, setSelectedFile] = useState(null);
   const [fileContent, setFileContent] = useState("");
+  const [lineCount, setLineCount] = useState(1);
+  const textareaRef = useRef(null);
+  const lineNumbersRef = useRef(null);
 
   useEffect(() => {
-    // Fetch program files when component mounts
     if (showFileBrowser) {
       fetchProgramFiles();
     }
   }, [showFileBrowser]);
+
+  useEffect(() => {
+    const lines = code.split("\n").length;
+    setLineCount(Math.max(lines, 1));
+  }, [code]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (textareaRef.current && lineNumbersRef.current) {
+        handleScroll();
+      }
+    };
+
+    handleResize();
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [lineCount]);
 
   const fetchProgramFiles = async () => {
     try {
@@ -57,6 +77,8 @@ export default function App() {
   const loadFileToEditor = () => {
     if (fileContent) {
       setCode(fileContent);
+      const lines = fileContent.split("\n").length;
+      setLineCount(Math.max(lines, 1));
       setShowFileBrowser(false);
     }
   };
@@ -78,7 +100,7 @@ export default function App() {
       const response = JSON.parse(event.data);
 
       if (response.type === "error") {
-        setErrorMessage(response.message); // Set error message
+        setErrorMessage(response.message);
         setLoading(false);
         setShowPlot(false);
         return;
@@ -95,12 +117,84 @@ export default function App() {
   };
 
   const toggleInfo = () => {
-    setShowInfo(!showInfo); // Zmiana stanu widoczności okna z instrukcjami
+    setShowInfo(!showInfo);
+  };
+
+  const handleScroll = () => {
+    if (textareaRef.current && lineNumbersRef.current) {
+      lineNumbersRef.current.scrollTop = textareaRef.current.scrollTop;
+    }
+  };
+
+  const renderLineNumbers = () => {
+    const numbers = [];
+    for (let i = 1; i <= lineCount; i++) {
+      numbers.push(
+        <div key={i} className="line-number">
+          {i}
+        </div>
+      );
+    }
+    return numbers;
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Tab") {
+      e.preventDefault();
+
+      const start = e.target.selectionStart;
+      const end = e.target.selectionEnd;
+
+      if (start !== end) {
+        const selectedText = code.substring(start, end);
+        const selectedLines = selectedText.split("\n");
+
+        let newText;
+        if (e.shiftKey) {
+          const outdentedLines = selectedLines.map((line) =>
+            line.startsWith("\t") ? line.substring(1) : line
+          );
+          newText = outdentedLines.join("\n");
+
+          const numTabsRemoved = selectedLines.filter((line) =>
+            line.startsWith("\t")
+          ).length;
+
+          const updatedCode =
+            code.substring(0, start) + newText + code.substring(end);
+          setCode(updatedCode);
+
+          setTimeout(() => {
+            e.target.selectionStart = start;
+            e.target.selectionEnd = end - numTabsRemoved;
+          }, 0);
+        } else {
+          const indentedLines = selectedLines.map((line) => "\t" + line);
+          newText = indentedLines.join("\n");
+
+          const updatedCode =
+            code.substring(0, start) + newText + code.substring(end);
+          setCode(updatedCode);
+
+          setTimeout(() => {
+            e.target.selectionStart = start;
+            e.target.selectionEnd = end + selectedLines.length;
+          }, 0);
+        }
+      } else {
+        const newText = code.substring(0, start) + "\t" + code.substring(end);
+
+        setCode(newText);
+
+        setTimeout(() => {
+          e.target.selectionStart = e.target.selectionEnd = start + 1;
+        }, 0);
+      }
+    }
   };
 
   return (
     <div className="container">
-      {/* Error Banner */}
       {errorMessage && (
         <div className="error-banner">
           {errorMessage}
@@ -110,22 +204,27 @@ export default function App() {
         </div>
       )}
 
-      {/* Left: Scatter Plot */}
       <div className="plot-container">
-        {/* Loading spinner */}
         {loading && <div className="loading-spinner"></div>}
         {showPlot && <Plot data={figData} layout={layout} className="plot" />}
       </div>
 
-      {/* Right: Code Editor */}
       <div className="editor-container">
         <h3>Enter code to generate 3d origami model:</h3>
-        <textarea
-          value={code}
-          onChange={(e) => setCode(e.target.value)}
-          className="code-editor"
-          placeholder="Write your code here..."
-        />
+        <div className="code-editor-wrapper">
+          <div className="line-numbers" ref={lineNumbersRef}>
+            {renderLineNumbers()}
+          </div>
+          <textarea
+            ref={textareaRef}
+            value={code}
+            onChange={(e) => setCode(e.target.value)}
+            onScroll={handleScroll}
+            onKeyDown={handleKeyDown}
+            className="code-editor"
+            placeholder="Write your code here..."
+          />
+        </div>
         <div className="button-container">
           <button onClick={fetchFigure} className="button">
             Render Figure
@@ -139,7 +238,6 @@ export default function App() {
         </div>
       </div>
 
-      {/* Info Window */}
       {showInfo && (
         <div className="info-window show">
           <button className="close-info-button" onClick={toggleInfo}>
@@ -198,7 +296,6 @@ export default function App() {
         </div>
       )}
 
-      {/* File Browser Window */}
       {showFileBrowser && (
         <div className="info-window show">
           <button className="close-info-button" onClick={toggleFileBrowser}>

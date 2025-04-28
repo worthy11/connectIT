@@ -33,9 +33,11 @@ class CustomVisitor(ConnectITVisitor):
         if ctx.ifStmt():
             return self.visit(ctx.ifStmt())
         else:
+            line = ctx.start.line
+            column = ctx.start.column
             return {
                 "type": "error",
-                "message": "Invalid statement"
+                "message": f"Invalid statement at line {line}, column {column}."
             }
         
     def visitDeclarationList(self, ctx):
@@ -70,7 +72,7 @@ class CustomVisitor(ConnectITVisitor):
         expected_type = self.scope.get_type(name)
         value, received_type = self.visit(ctx.expression())
         if expected_type != received_type:
-            raise Exception (f"Type Error: Cannot assign {types[received_type]} to {types[expected_type]} at line {line}, column {column}.")
+            raise Exception(f"Type Error: Cannot assign {types[received_type]} to {types[expected_type]} at line {line}, column {column}.")
 
         self.scope.fill(name, value)
         return None
@@ -102,12 +104,14 @@ class CustomVisitor(ConnectITVisitor):
 
     def extendLayer(self, value, e, op):
         received_value, received_type = self.visit(e)
+        line = op.start.line
+        column = op.start.column
 
         if op.getText() not in ['<+->']:
-            raise Exception(f"Operator '{op.getText()}' cannot be used to extend a Layer.")
+            raise Exception(f"Operator '{op.getText()}' cannot be used to extend a Layer at line {line}, column {column}.")
             
         if received_type not in [0, 1]:  
-            raise Exception(f"Cannot add value of type '{types[received_type]}' to a Layer.")
+            raise Exception(f"Cannot add value of type '{types[received_type]}' to a Layer at line {line}, column {column}.")
             
         
         if received_type == 0:
@@ -117,14 +121,15 @@ class CustomVisitor(ConnectITVisitor):
         return value
     
     def extendShape(self, value, e, op):
-
+        line = op.start.line
+        column = op.start.column
         received_value, received_type = self.visit(e)
 
         if op.getText() in ['+=', '<+->']:
-            raise Exception(f"Operator '{op.getText()}' cannot be used to extend a Shape.")
+            raise Exception(f"Operator '{op.getText()}' cannot be used to extend a Shape at line {line}, column {column}.")
             
         if received_type != 2: 
-            raise Exception(f"Type Error: Cannot add value of type '{types[received_type]}' to a Shape. Only LAYER can be added.")
+            raise Exception(f"Type Error: Cannot add value of type '{types[received_type]}' to a Shape. Only LAYER can be added at line {line}, column {column}.")
             
         
         c = self.get_connection(op)
@@ -138,46 +143,50 @@ class CustomVisitor(ConnectITVisitor):
 
         if shape_closed:
             if not received_value.is_closed():
-                raise Exception("Type Error: Cannot add an open layer to a closed shape.")
+                raise Exception(f"Type Error: Cannot add an open layer to a closed shape at line {line}, column {column}.")
 
             if len(received_value) != len(value.layers[0]):
-                raise Exception(f"Type Error: New layer must have {len(value.layers[0])} units (same as existing layers) because the shape is closed.")
+                raise Exception(f"Type Error: New layer must have {len(value.layers[0])} units (same as existing layers) because the shape is closed at line {line}, column {column}.")
 
         if not shape_closed:
             if received_value.is_closed():
-                raise Exception("Type Error: Cannot add a closed layer to an open shape.")
+                raise Exception(f"Type Error: Cannot add a closed layer to an open shape at line {line}, column {column}.")
 
         value.add_layer(received_value, c)
         return value
         
     
     def extendModel(self, value, e, op):
+        line = op.start.line
+        column = op.start.column
+        received_value, received_type = self.visit(e)
 
         if op.getText() not in ['+=', '<+->']:               
-            raise Exception(f"Operator '{op.getText()}' cannot be used to extend a Model.")
+            raise Exception(f"Operator '{op.getText()}' cannot be used to extend a Model at line {line}, column {column}.")
             
         if received_type != 3: 
-            raise Exception(f"Cannot add value of type '{types[received_type]}' to a Model. Only SHAPE can be added.")
+            raise Exception(f"Cannot add value of type '{types[received_type]}' to a Model. Only SHAPE can be added at line {line}, column {column}.")
                 
         c = self.get_connection(op)
-        received_value, received_type = self.visit(e)
         value.add_shape(received_value, c)
         return value
     
     def extendNumber(self, value, e, op):
+        line = op.start.line
+        column = op.start.column
         if op.getText() not in ['+=', '-=', '*=', '/=']:
-            raise Exception(f"Operator '{op.getText()}' cannot be used to extend a NUMBER.")
+            raise Exception(f"Operator '{op.getText()}' cannot be used to extend a NUMBER at line {line}, column {column}.")
             
         received_value, received_type = self.visit(e)
         if received_type != 5: 
             if op.getText() == '+=':
-                raise Exception(f"Cannot add value of type '{types[received_type]}' to a NUMBER.")
+                raise Exception(f"Cannot add value of type '{types[received_type]}' to a NUMBER at line {line}, column {column}.")
             elif op.getText() == '-=':
-                raise Exception(f"Cannot subtract value of type '{types[received_type]}' from a NUMBER.")
+                raise Exception(f"Cannot subtract value of type '{types[received_type]}' from a NUMBER at line {line}, column {column}.")
             elif op.getText() == '*=':
-                raise Exception(f"Cannot multiply value of type '{types[received_type]}' to a NUMBER.")
+                raise Exception(f"Cannot multiply value of type '{types[received_type]}' to a NUMBER at line {line}, column {column}.")
             elif op.getText() == '/=':
-                raise Exception(f"Cannot divide value of type '{types[received_type]}' from a NUMBER.")
+                raise Exception(f"Cannot divide value of type '{types[received_type]}' from a NUMBER at line {line}, column {column}.")
             
         if op.getText() == '+=':
             value += received_value
@@ -187,7 +196,7 @@ class CustomVisitor(ConnectITVisitor):
             value *= received_value
         elif op.getText() == '/=':
             if received_value == 0:
-                raise Exception("Value Error: Division by zero error.")
+                raise Exception(f"Value Error: Division by zero error at line {line}, column {column}.")
             value //= received_value
         return value
     
@@ -197,9 +206,11 @@ class CustomVisitor(ConnectITVisitor):
         if "<<" in operator.getText():
             type = 0
         if operator.expression():
+            line = operator.start.line
+            column = operator.start.column
             shift_val, shift_type = self.visit(operator.expression())
             if shift_type != 5: 
-                raise Exception(f"Shift value must be of type NUMBER, not '{types[shift_type]}'.")
+                raise Exception(f"Shift value must be of type NUMBER, not '{types[shift_type]}' at line {line}, column {column}.")
                 
             shift = shift_val
         return {"type": type, "shift": shift}
@@ -210,8 +221,12 @@ class CustomVisitor(ConnectITVisitor):
             if type == 2:
                 value.set_closed(True)
             else:
-                raise Exception(f"Cannot use CLOSED keyword with type {types[type]}")
+                line = ctx.start.line
+                column = ctx.start.column
+                raise Exception(f"Cannot use CLOSED keyword with type {types[type]} at line {line}, column {column}.")
         if ctx.arrowOperator():
+            line = ctx.start.line
+            column = ctx.start.column
             match type:
                 case 1:
                     value = self.createLayer(ctx)
@@ -223,7 +238,7 @@ class CustomVisitor(ConnectITVisitor):
                     value = self.createModel(ctx)
                     type += 1
                 case _:
-                    raise Exception(f"Cannot use connectors with type '{types[type]}'.")
+                    raise Exception(f"Cannot use connectors with type '{types[type]}' at line {line}, column {column}.")
                     
         return value, type
 
@@ -237,12 +252,13 @@ class CustomVisitor(ConnectITVisitor):
             next_value, next_type = self.visit(ctx.logicExpr(i))
             
             op = ctx.getChild(2*i-1)
+            line = op.start.line
+            column = op.start.column
             if next_type != 1:
-                raise Exception(f"Type Error: Can only apply '<->' connector to multiples of UNITs, not {types[next_type]}")
+                raise Exception(f"Type Error: Can only apply '<->' connector to multiples of UNITs, not {types[next_type]} at line {line}, column {column}.")
                 
             if op.getText() != "<->":
-                
-                    raise Exception( f"Type Error: Cannot use '{op.getText()}' connector when creating a LAYER")
+                raise Exception(f"Type Error: Cannot use '{op.getText()}' connector when creating a LAYER at line {line}, column {column}.")
                 
             next_units = next_value.extract_units()
             for u in next_units:
@@ -257,8 +273,10 @@ class CustomVisitor(ConnectITVisitor):
         for i in range(1, len(ctx.logicExpr())):
             next_value, next_type = self.visit(ctx.logicExpr(i))
             op = ctx.getChild(2*i-1)
+            line = op.start.line
+            column = op.start.column
             if next_type != 2:
-                raise Exception(f"Type Error: Cannot connect types LAYER and {types[next_type]}")
+                raise Exception(f"Type Error: Cannot connect types LAYER and {types[next_type]} at line {line}, column {column}.")
             c = self.get_connection(op)
             # TODO: If shape is closed, make sure the new layer is also closed
             # TODO: If shape is closed, make sure the new layer is the same length as previous ones
@@ -268,14 +286,14 @@ class CustomVisitor(ConnectITVisitor):
 
             if shape_closed:
                 if not next_value.is_closed():
-                    raise Exception("Type Error: Cannot add an open layer to a closed shape.")
+                    raise Exception(f"Type Error: Cannot add an open layer to a closed shape at line {line}, column {column}.")
 
                 if len(next_value) != len(result.layers[0]):
-                    raise Exception("Type Error: New layer must have the same number of units as existing layers in the shape.")
+                    raise Exception(f"Type Error: New layer must have the same number of units as existing layers in the shape at line {line}, column {column}.")
 
             if not shape_closed:
                 if next_value.is_closed():
-                    raise Exception("Type Error: Cannot add a closed layer to an open shape.")
+                    raise Exception(f"Type Error: Cannot add a closed layer to an open shape at line {line}, column {column}.")
             
             result.add_layer(l=next_value, c = c)
             
@@ -288,11 +306,13 @@ class CustomVisitor(ConnectITVisitor):
         for i in range(1, len(ctx.logicExpr())):
             next_value, next_type = self.visit(ctx.logicExpr(i))
             op = ctx.getChild(2*i-1)
+            line = op.start.line
+            column = op.start.column
             
             if next_type != 3:
                 return {
                         "type": "error",
-                        "message": f"Type Error: Cannot connect types SHAPE and {types[next_type]}"
+                        "message": f"Type Error: Cannot connect types SHAPE and {types[next_type]} at line {line}, column {column}."
                     }
 
             c = self.get_connection(op)
@@ -305,8 +325,10 @@ class CustomVisitor(ConnectITVisitor):
         value, type = self.visit(ctx.andExpr(0))
         for i in range(1, len(ctx.andExpr())):
             next_value, next_type = self.visit(ctx.andExpr(i))
+            line = ctx.start.line
+            column = ctx.start.column
             if next_type != 6:
-                raise Exception(f"Type Error: Logical operations can only be applied to BOOLEAN, not {types[next_type]}")
+                raise Exception(f"Type Error: Logical operations can only be applied to BOOLEAN, not {types[next_type]} at line {line}, column {column}.")
             value = value or next_value
 
         return value, type
@@ -315,8 +337,10 @@ class CustomVisitor(ConnectITVisitor):
         value, type = self.visit(ctx.compExpr(0))
         for i in range(1, len(ctx.compExpr())):
             next_value, next_type = self.visit(ctx.compExpr(i))
+            line = ctx.start.line
+            column = ctx.start.column
             if next_type != 6:
-                raise Exception(f"Type Error: Logical operations can only be applied to BOOLEAN, not {types[next_type]}")
+                raise Exception(f"Type Error: Logical operations can only be applied to BOOLEAN, not {types[next_type]} at line {line}, column {column}.")
             value = value and next_value
 
         return value, type
@@ -326,36 +350,38 @@ class CustomVisitor(ConnectITVisitor):
         if ctx.COMPARATOR():
             comparator = ctx.COMPARATOR().getText()
             next_value, next_type = self.visit(ctx.numExpr(1))
+            line = ctx.COMPARATOR().getSymbol().line
+            column = ctx.COMPARATOR().getSymbol().column
             if type != next_type or type not in [5, 6]:
-                raise Exception(f"Type Error: Comparisons can only be applied to NUMBER or BOOLEAN, not {types[next_type]}")
+                raise Exception(f"Type Error: Comparisons can only be applied to NUMBER or BOOLEAN, not {types[next_type]} at line {line}, column {column}.")
 
             match comparator:
                 case "<":
                     if type == 5:
                         value = value < next_value
                     else:
-                        raise Exception(f"Type Error: Cannot apply '<' operator to types {types[type]} and {types[next_type]}")
+                        raise Exception(f"Type Error: Cannot apply '<' operator to types {types[type]} and {types[next_type]} at line {line}, column {column}.")
                 case "<=":
                     if type == 5:
                         value = value <= next_value
                     else:
-                        raise Exception(f"Type Error: Cannot apply '<=' operator to types {types[type]} and {types[next_type]}")
+                        raise Exception(f"Type Error: Cannot apply '<=' operator to types {types[type]} and {types[next_type]} at line {line}, column {column}.")
                 case ">":
                     if type == 5:
                         value = value > next_value
                     else:
-                        raise Exception(f"Type Error: Cannot apply '>' operator to types {types[type]} and {types[next_type]}")
+                        raise Exception(f"Type Error: Cannot apply '>' operator to types {types[type]} and {types[next_type]} at line {line}, column {column}.")
                 case ">=":
                     if type == 5:
                         value = value >= next_value
                     else:
-                        raise Exception(f"Type Error: Cannot apply '>=' operator to types {types[type]} and {types[next_type]}")
+                        raise Exception(f"Type Error: Cannot apply '>=' operator to types {types[type]} and {types[next_type]} at line {line}, column {column}.")
                 case "==":
                     value = value == next_value
                 case "!=":
                     value = value != next_value
                 case _:
-                    raise Exception(f"Unknown comparator: {comparator}")
+                    raise Exception(f"Unknown comparator: {comparator} at line {line}, column {column}.")
 
             return value, 6
 
@@ -365,8 +391,10 @@ class CustomVisitor(ConnectITVisitor):
         value, type = self.visit(ctx.mulExpr(0))
         for i in range(1, len(ctx.mulExpr())):
             next_value, next_type = self.visit(ctx.mulExpr(i))
+            line = ctx.start.line
+            column = ctx.start.column
             if next_type != 5:
-                raise Exception(f"Type Error: Arithmetic operations can only be applied to NUMBER, not {types[next_type]}")
+                raise Exception(f"Type Error: Arithmetic operations can only be applied to NUMBER, not {types[next_type]} at line {line}, column {column}.")
             
             if ctx.PLUS():
                 value += next_value
@@ -379,6 +407,8 @@ class CustomVisitor(ConnectITVisitor):
         value, type = self.visit(ctx.invExpr(0))
         for i in range(1, len(ctx.invExpr())):
             next_value, next_type = self.visit(ctx.invExpr(i))
+            line = ctx.start.line
+            column = ctx.start.column
             if ctx.MUL():
                 if type == 5 and next_type == 5:
                     value *= next_value
@@ -386,40 +416,46 @@ class CustomVisitor(ConnectITVisitor):
                     unit = value if type == 0 else next_value
                     number = value if type == 5 else next_value
                     if number <= 0:
-                        raise Exception("Value Error: Cannot multiply UNIT by non-positive number.")
+                        raise Exception(f"Value Error: Cannot multiply UNIT by non-positive number at line {line}, column {column}.")
                     value = MultiUnit(unit, number)
                     type = 1
                 else:
-                    raise Exception(f"Type Error: Cannot apply '*' operator to types {types[type]} and {types[next_type]}")
+                    raise Exception(f"Type Error: Cannot apply '*' operator to types {types[type]} and {types[next_type]} at line {line}, column {column}.")
             elif ctx.DIV():
                 if type == 5 and next_type == 5:
                     if next_value == 0:
-                        raise Exception("Value Error: Division by zero error.")
+                        raise Exception(f"Value Error: Division by zero error at line {line}, column {column}.")
                     value //= next_value
                 else:
-                    raise Exception(f"Type Error: Cannot apply '/' operator to types {types[type]} and {types[next_type]}")
+                    raise Exception(f"Type Error: Cannot apply '/' operator to types {types[type]} and {types[next_type]} at line {line}, column {column}.")
         return value, type
 
     def visitInvExpr(self, ctx):
         value, type = self.visit(ctx.baseExpr())
         if ctx.NOT():
+            line = ctx.NOT().getSymbol().line
+            column = ctx.NOT().getSymbol().column
             if type != 6:
-                raise Exception(f"Type Error: Cannot apply '{ctx.NOT().getText()}' operator to type {types[type]}")
+                raise Exception(f"Type Error: Cannot apply '{ctx.NOT().getText()}' operator to type {types[type]} at line {line}, column {column}.")
             value = not value
         elif ctx.MINUS():
+            line = ctx.MINUS().getSymbol().line
+            column = ctx.MINUS().getSymbol().column
             if type != 5:
-                raise Exception(f"Type Error: Cannot apply '{ctx.MINUS().getText()}' operator to type {types[type]}")
+                raise Exception(f"Type Error: Cannot apply '{ctx.MINUS().getText()}' operator to type {types[type]} at line {line}, column {column}.")
             value = -value
         return value, type
     
     def visitBaseExpr(self, ctx):
         if ctx.ID():
             name = ctx.ID().getText()
+            line = ctx.ID().getSymbol().line
+            column = ctx.ID().getSymbol().column
             if not self.scope.__contains__(name):
-                raise Exception(f"Type Error: {name} is not defined")
+                raise Exception(f"Type Error: {name} is not defined at line {line}, column {column}.")
             value, type = self.scope.get_value(name).__copy__(), self.scope.get_type(name)
             if value is None:
-                raise Exception(f"Type Error: {name} has no value")
+                raise Exception(f"Type Error: {name} has no value at line {line}, column {column}.")
         elif ctx.unitExpr():
             value, type = self.visit(ctx.unitExpr()), 0
         elif ctx.NUMBER():
@@ -429,8 +465,10 @@ class CustomVisitor(ConnectITVisitor):
         elif ctx.expression():
             value, type = self.visit(ctx.expression())
             if ctx.getChild(0).getText() == '[':
+                line = ctx.start.line
+                column = ctx.start.column
                 if type > 3:
-                    raise Exception(f"Type Error: Cannot cast type {types[type]} to another type")
+                    raise Exception(f"Type Error: Cannot cast type {types[type]} to another type at line {line}, column {column}.")
                 match type:
                     case 0:
                         value = MultiUnit(u=value)
@@ -457,11 +495,13 @@ class CustomVisitor(ConnectITVisitor):
     def visitShowStatement(self, ctx):
         if ctx.getChildCount() == 2:
             shape_name = ctx.ID().getText()
+            line = ctx.ID().getSymbol().line
+            column = ctx.ID().getSymbol().column
 
             if shape_name not in self.scope:
                 return {
                     "type": "error",
-                    "message": f"Structure '{shape_name}' is not defined."
+                    "message": f"Structure '{shape_name}' is not defined at line {line}, column {column}."
                 }
 
             structure = self.scope.get_value(shape_name)
@@ -474,21 +514,25 @@ class CustomVisitor(ConnectITVisitor):
             else:
                 return {
                     "type": "error",
-                    "message": f"SHOW only supports STRUCTUREs, not {type(structure)}."
+                    "message": f"SHOW only supports STRUCTUREs, not {type(structure)} at line {line}, column {column}."
                 }
 
     def visitIfStmt(self, ctx):
         condition_value, condition_type = self.visit(ctx.logicExpr(0))
+        line = ctx.start.line
+        column = ctx.start.column
         if condition_type != 6: 
-            raise Exception(f"Type Error: IF condition must be BOOLEAN, not {types[condition_type]}.")
+            raise Exception(f"Type Error: IF condition must be BOOLEAN, not {types[condition_type]} at line {line}, column {column}.")
 
         if condition_value:
             return self.visit(ctx.statementBlock(0))
         else:
             for i in range(1, len(ctx.logicExpr())):
                 condition_value, condition_type = self.visit(ctx.logicExpr(i))
+                elseLine = ctx.logicExpr(i).start.line
+                elseColumn = ctx.logicExpr(i).start.column
                 if condition_type != 6:
-                    raise Exception(f"Type Error: ELSE IF condition must be BOOLEAN, not {types[condition_type]}.")
+                    raise Exception(f"Type Error: ELSE IF condition must be BOOLEAN, not {types[condition_type]} at line {elseLine}, column {elseColumn}.")
                 if condition_value:
                     return self.visit(ctx.statementBlock(i))
 
