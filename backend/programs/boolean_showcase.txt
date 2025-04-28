@@ -1,0 +1,33 @@
+LAYER l
+
+IF TRUE
+[
+    l <+-> [*red*]
+] ELSE [
+    l <+-> [*blue*]
+]
+? SHOW l
+
+IF TRUE OR FALSE
+[
+    l <+-> [*green*]
+]
+SHOW l
+
+IF TRUE AND FALSE
+[
+    l <+-> [*yellow*]
+]
+SHOW l9
+
+IF NOT TRUE OR TRUE
+[
+    l <+-> [*black*]
+]
+SHOW l
+
+IF FALSE OR 5
+[
+    l <+-> [*white*]
+]
+SHOW l
