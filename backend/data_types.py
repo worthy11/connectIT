@@ -19,7 +19,7 @@ class Structure:
         return "Base render() method"
 
 class Unit(Structure):
-    def __init__(self, color: str, pattern: str):
+    def __init__(self, color: str="WHITE", pattern: str="NONE"):
         super().__init__()
         self.color = color
         self.pattern = pattern
@@ -39,8 +39,8 @@ class Unit(Structure):
             [+0.2, 0, -0.5],
             [0, 0.5, -0.5],
             [-0.2, 0, -0.5],
-            [+0.2, -0.5, 0.5],
-            [-0.2, -0.5, 0.5],
+            [+0.1, -0.5, 0.5],
+            [-0.1, -0.5, 0.5],
         ])
 
         faces = [
@@ -114,8 +114,8 @@ class Unit(Structure):
             (+0.25, -0.5, -0.5),
             (+0.25, 0.5, -0.5),
             (-0.25, 0.5, -0.5),
-            (-0.25, -0.5, 0.5),
-            (+0.25, -0.5, 0.5)
+            (-0.15, -0.5, 0.5),
+            (+0.15, -0.5, 0.5)
         ])
 
     def render(self, fig):
@@ -142,7 +142,7 @@ class Unit(Structure):
         self.reset_state()
 
 class MultiUnit():
-    def __init__(self, u: Unit, n: int=1):
+    def __init__(self, u: Unit=Unit(), n: int=1):
         self.unit = u.__copy__()
         self.number = n
 
@@ -150,7 +150,7 @@ class MultiUnit():
         return [self.unit] * self.number
 
 class Layer(Structure):
-    def __init__(self, units: list[Unit], closed=False):
+    def __init__(self, units: list[Unit]=[], closed=False):
         super().__init__()
         self._units = []
         self._closed = closed
@@ -197,6 +197,8 @@ class Layer(Structure):
         self.rot_z += angle[2]
 
     def set_closed(self, closed):
+        if closed:
+            self.set_length(len(self))
         self._closed = closed
 
     def set_length(self, length):
@@ -214,7 +216,7 @@ class Layer(Structure):
                 x = self._radius / 10 * -np.sin(np.deg2rad(arg))
                 y = self._radius / 10 * np.cos(np.deg2rad(arg))
             else:
-                x = idx
+                x = (idx + shift*0.5) / 2
                 arg = 0
             unit.rotate((0, 0, arg))
             unit.translate((x, y, z/2))
@@ -226,7 +228,7 @@ class Layer(Structure):
         self.rot_x = self.rot_y = self.rot_z = 0
 
 class Shape(Structure):
-    def __init__(self, layers: list[Layer], connections: list[dict]=[]):
+    def __init__(self, layers: list[Layer]=[], connections: list[dict]=[]):
         super().__init__()
         self.layers = []
         self.connections = []
@@ -264,7 +266,7 @@ class Shape(Structure):
             layer.render(fig, shift=shifts[z], z=z+stack)
     
 class Model(Structure):
-    def __init__(self, shapes: list[Shape], connections: list[dict]=[]):
+    def __init__(self, shapes: list[Shape]=[], connections: list[dict]=[]):
         self.shapes = [s.__copy__() for s in shapes]
         self.connections = [c for c in connections]
         self.free = []

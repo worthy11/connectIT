@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Plot from "react-plotly.js";
 import "./App.css";
 
 const WebSocketURL = "ws://localhost:8000/ws";
+const API_URL = "http://localhost:8000";
 
 export default function App() {
   const [figData, setFigData] = useState([]);
@@ -10,8 +11,59 @@ export default function App() {
   const [showPlot, setShowPlot] = useState(false);
   const [loading, setLoading] = useState(false);
   const [code, setCode] = useState("");
-  const [showInfo, setShowInfo] = useState(false); // Nowy stan do kontrolowania widoczności okna Info
-  const [errorMessage, setErrorMessage] = useState(""); // New state for error message
+  const [showInfo, setShowInfo] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [showFileBrowser, setShowFileBrowser] = useState(false);
+  const [programFiles, setProgramFiles] = useState([]);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [fileContent, setFileContent] = useState("");
+
+  useEffect(() => {
+    // Fetch program files when component mounts
+    if (showFileBrowser) {
+      fetchProgramFiles();
+    }
+  }, [showFileBrowser]);
+
+  const fetchProgramFiles = async () => {
+    try {
+      const response = await fetch(`${API_URL}/api/programs`);
+      const data = await response.json();
+      setProgramFiles(data.files || []);
+    } catch (error) {
+      console.error("Error fetching program files:", error);
+      setErrorMessage("Failed to fetch program files");
+    }
+  };
+
+  const fetchFileContent = async (filename) => {
+    try {
+      const response = await fetch(`${API_URL}/api/programs/${filename}`);
+      const data = await response.json();
+
+      if (data.error) {
+        setErrorMessage(data.error);
+        return;
+      }
+
+      setSelectedFile(filename);
+      setFileContent(data.content);
+    } catch (error) {
+      console.error("Error fetching file content:", error);
+      setErrorMessage("Failed to fetch file content");
+    }
+  };
+
+  const loadFileToEditor = () => {
+    if (fileContent) {
+      setCode(fileContent);
+      setShowFileBrowser(false);
+    }
+  };
+
+  const toggleFileBrowser = () => {
+    setShowFileBrowser(!showFileBrowser);
+  };
 
   const fetchFigure = () => {
     setFigData([]);
@@ -24,20 +76,20 @@ export default function App() {
 
     ws.onmessage = (event) => {
       const response = JSON.parse(event.data);
-    
+
       if (response.type === "error") {
         setErrorMessage(response.message); // Set error message
         setLoading(false);
         setShowPlot(false);
         return;
       }
-    
+
       setLayout(response.layout);
       setFigData(response.data);
       setLoading(false);
       setShowPlot(true);
     };
-    
+
     ws.onerror = (err) => console.error("WebSocket Error:", err);
     ws.onclose = () => console.log("WebSocket closed");
   };
@@ -52,7 +104,9 @@ export default function App() {
       {errorMessage && (
         <div className="error-banner">
           {errorMessage}
-          <button className="close-error" onClick={() => setErrorMessage("")}>✖</button>
+          <button className="close-error" onClick={() => setErrorMessage("")}>
+            ✖
+          </button>
         </div>
       )}
 
@@ -73,11 +127,14 @@ export default function App() {
           placeholder="Write your code here..."
         />
         <div className="button-container">
-          <button onClick={fetchFigure} className="render-button">
+          <button onClick={fetchFigure} className="button">
             Render Figure
           </button>
-          <button onClick={toggleInfo} className="info-button">
+          <button onClick={toggleInfo} className="button">
             Info
+          </button>
+          <button onClick={toggleFileBrowser} className="button">
+            Browse Examples
           </button>
         </div>
       </div>
@@ -112,7 +169,7 @@ export default function App() {
               A &lt;- B --&gt; C : assigning the result of the connection to C
               <br />
               <br />
-              <span class="Heading">Variable declaration:</span>
+              <span className="Heading">Variable declaration:</span>
               <br />
               <br />
               UNIT unit1, unit2, unit3
@@ -137,6 +194,44 @@ export default function App() {
               <br />
               first -/-&gt; flipped_pyramid
             </p>
+          </div>
+        </div>
+      )}
+
+      {/* File Browser Window */}
+      {showFileBrowser && (
+        <div className="info-window show">
+          <button className="close-info-button" onClick={toggleFileBrowser}>
+            X
+          </button>
+          <div className="info-content">
+            <h3>Example Programs</h3>
+            <div className="file-list">
+              {programFiles.length > 0 ? (
+                programFiles.map((file) => (
+                  <div
+                    key={file}
+                    className={`file-item ${
+                      selectedFile === file ? "selected" : ""
+                    }`}
+                    onClick={() => fetchFileContent(file)}
+                  >
+                    {file}
+                  </div>
+                ))
+              ) : (
+                <p>No example files found</p>
+              )}
+            </div>
+            {selectedFile && (
+              <div className="file-preview">
+                <h4>{selectedFile}</h4>
+                <pre className="info-content">{fileContent}</pre>
+                <button onClick={loadFileToEditor} className="load-file-button">
+                  Load to Editor
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}

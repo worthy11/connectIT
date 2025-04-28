@@ -13,19 +13,9 @@
   background-color: white;
 }
 
-.render-button {
+.button {
   margin-top: 5px; 
-  width: 300px;
-  background-color: #37424f;
-  border-color: #5c5b60;
-  border-radius: 10px;
-  color: rgb(248, 240, 230);
-  font-weight: bold;
-}
-
-.info-button {
-  margin-top: 5px; 
-  width: 300px;
+  width: 230px;
   background-color: #37424f;
   border-color: #5c5b60;
   border-radius: 10px;
@@ -68,7 +58,8 @@
 }
 
 .render-button:hover,
-.info-button:hover {
+.info-button:hover,
+.file-browser-button:hover {
   background-color: #747a8e;
   border-color: #5c5b60; /* Ciemniejszy zielony dla render-button */
 }
@@ -168,4 +159,128 @@
   font-size: 18px;
   cursor: pointer;
   margin-left: 12px;
+}
+
+
+.file-browser-window {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+  width: 80%;
+  max-width: 800px;
+  max-height: 80vh;
+  padding: 20px;
+  display: none;
+  z-index: 1000;
+}
+
+.file-browser-window.show {
+  display: block;
+}
+
+.close-file-browser-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  color: #666;
+}
+
+.close-file-browser-button:hover {
+  color: #333;
+}
+
+.file-browser-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  max-height: calc(80vh - 40px);
+}
+
+.file-browser-content h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.file-list {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 10px;
+  margin-bottom: 15px;
+  max-height: 200px;
+}
+
+.file-item {
+  padding: 8px 12px;
+  cursor: pointer;
+  border-radius: 4px;
+  margin-bottom: 4px;
+  transition: background-color 0.2s;
+}
+
+.file-item:hover {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+.file-item.selected {
+  background-color: #f0f0f0;
+  border-left: 3px solid #0d6efd;
+  color: #333;
+}
+
+.file-preview {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 15px;
+  overflow: hidden;
+}
+
+.file-preview h4 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  color: #f8f9fa;
+}
+
+.file-content {
+  flex: 1;
+  overflow-y: auto;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  padding: 10px;
+  font-family: monospace;
+  white-space: pre-wrap;
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 15px;
+}
+
+.load-file-button {
+  align-self: flex-end;
+  background-color: #3e648a;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s;
+}
+
+.load-file-button:hover {
+  background-color: #667dd3e2;
 }

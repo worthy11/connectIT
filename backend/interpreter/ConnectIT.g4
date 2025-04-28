@@ -31,7 +31,7 @@ extensionOperator:
 	| '<+-(' expression ')-'
 	| '<<+-(' expression ')-';
 
-expression: logicExpr (arrowOperator logicExpr)* 'CLOSED'?;
+expression: logicExpr (arrowOperator logicExpr)*? 'CLOSED'?;
 logicExpr: andExpr (OR andExpr)*;
 andExpr: compExpr (AND compExpr)*;
 compExpr: numExpr (COMPARATOR numExpr)?;
@@ -44,7 +44,7 @@ baseExpr:
 	| NUMBER
 	| BOOLEAN
 	| '(' expression ')'
-	| '[' expression 'CLOSED'? ']';
+	| '[' expression ']';
 unitExpr: COLOR (PATTERN)?;
 
 WS: [ \t]+ -> skip;
@@ -101,14 +101,16 @@ DIV: '/';
 COMPARATOR: '<' | '<=' | '>' | '>=' | '==' | '!=';
 
 COLOR:
-	'RED'
-	| 'BLUE'
-	| 'GREEN'
-	| 'WHITE'
-	| 'BLACK'
-	| 'YELLOW'
-	| 'LILAC';
-PATTERN: 'STRIPED' | 'DOTTED' | 'GRADIENT';
+	'*' (
+		'red'
+		| 'blue'
+		| 'green'
+		| 'white'
+		| 'black'
+		| 'yellow'
+		| 'lilac'
+	) '*';
+PATTERN: '*' ('striped' | 'dotted' | 'gradient') '*';
 BOOLEAN: 'TRUE' | 'FALSE';
 NUMBER: '-'? [0-9]+;
 

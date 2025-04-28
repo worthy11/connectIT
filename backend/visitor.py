@@ -39,9 +39,26 @@ class CustomVisitor(ConnectITVisitor):
             }
         
     def visitDeclarationList(self, ctx):
+        default = None
+        match ctx.dataType().getText():
+            case "UNIT":
+                default = Unit()
+            case "LAYER":
+                default = Layer()
+            case "SHAPE":
+                default = Shape()
+            case "MODEL":
+                default = Model()
+            case "NUMBER":
+                default = 0
+            case "BOOLEAN":
+                default = False
         for dec in ctx.declaration():
             if dec.assignment():
                 self.visit(dec.assignment())
+            else:
+                name = dec.ID().getText()
+                self.scope.fill(name, default)
         return None
 
     def visitAssignment(self, ctx):
@@ -54,7 +71,6 @@ class CustomVisitor(ConnectITVisitor):
         value, received_type = self.visit(ctx.expression())
         if expected_type != received_type:
             raise Exception (f"Type Error: Cannot assign {types[received_type]} to {types[expected_type]} at line {line}, column {column}.")
-        
 
         self.scope.fill(name, value)
         return None
@@ -71,7 +87,6 @@ class CustomVisitor(ConnectITVisitor):
         if expected_type not in [2, 3, 4, 5]:            
             raise Exception(f"Type Error: Cannot add new values to type {types[expected_type]} at line {line}, column {column}.")
             
-
         match expected_type:
             case 2:
                 new_value = self.extendLayer(value, e, op)
@@ -190,8 +205,12 @@ class CustomVisitor(ConnectITVisitor):
         return {"type": type, "shift": shift}
 
     def visitExpression(self, ctx):
-
         value, type = self.visit(ctx.logicExpr(0))
+        if ctx.getChildCount() % 2 == 0:
+            if type == 2:
+                value.set_closed(True)
+            else:
+                raise Exception(f"Cannot use CLOSED keyword with type {types[type]}")
         if ctx.arrowOperator():
             match type:
                 case 1:
@@ -214,7 +233,6 @@ class CustomVisitor(ConnectITVisitor):
         closed = ctx.getChildCount() % 2 == 0
         result = Layer(units=first, closed=closed)
     
-       
         for i in range(1, len(ctx.logicExpr())):
             next_value, next_type = self.visit(ctx.logicExpr(i))
             
@@ -333,13 +351,13 @@ class CustomVisitor(ConnectITVisitor):
                     else:
                         raise Exception(f"Type Error: Cannot apply '>=' operator to types {types[type]} and {types[next_type]}")
                 case "==":
-                    return_value = value == next_value
+                    value = value == next_value
                 case "!=":
-                    return_value = value != next_value
+                    value = value != next_value
                 case _:
                     raise Exception(f"Unknown comparator: {comparator}")
 
-            return return_value, 6
+            return value, 6
 
         return value, type
 
@@ -368,7 +386,7 @@ class CustomVisitor(ConnectITVisitor):
                     unit = value if type == 0 else next_value
                     number = value if type == 5 else next_value
                     if number <= 0:
-                        raise Exception("Value Error: Cannot multiply UNIT by negative number.")
+                        raise Exception("Value Error: Cannot multiply UNIT by non-positive number.")
                     value = MultiUnit(unit, number)
                     type = 1
                 else:
@@ -399,7 +417,7 @@ class CustomVisitor(ConnectITVisitor):
             name = ctx.ID().getText()
             if not self.scope.__contains__(name):
                 raise Exception(f"Type Error: {name} is not defined")
-            value, type = self.scope.get_value(name), self.scope.get_type(name)
+            value, type = self.scope.get_value(name).__copy__(), self.scope.get_type(name)
             if value is None:
                 raise Exception(f"Type Error: {name} has no value")
         elif ctx.unitExpr():
@@ -417,8 +435,7 @@ class CustomVisitor(ConnectITVisitor):
                     case 0:
                         value = MultiUnit(u=value)
                     case 1:
-                        closed = ctx.getChildCount() % 2 == 0
-                        value = Layer(units=value.extract_units(), closed=closed)
+                        value = Layer(units=value.extract_units())
                     case 2:
                         value = Shape(layers=[value])
                     case 3:
@@ -429,9 +446,9 @@ class CustomVisitor(ConnectITVisitor):
     def visitUnitExpr(self, ctx):
         color, pattern = None, None
         if ctx.COLOR():
-            color = ctx.COLOR().getText()
+            color = ctx.COLOR().getText()[1:-1]
         if ctx.PATTERN():
-            pattern = ctx.PATTERN().getText()
+            pattern = ctx.PATTERN().getText()[1:-1]
         return Unit(color=color, pattern=pattern)
 
     def visitBendStatement(self, ctx):
@@ -459,47 +476,6 @@ class CustomVisitor(ConnectITVisitor):
                     "type": "error",
                     "message": f"SHOW only supports STRUCTUREs, not {type(structure)}."
                 }
-
-    # def visitShowStatement(self, ctx):
-    #     shape_name = ctx.ID().getText()
-    #     print(f"DEBUG: Attempting to SHOW '{shape_name}'")
-    #     if not self.scope.__contains__(shape_name):
-    #         print(f"DEBUG: '{shape_name}' not found in scope.")
-    #         return {
-    #             "type": "error",
-    #             "message": f"Structure '{shape_name}' is not defined."
-    #         }
-
-    #     structure = self.scope.get_value(shape_name)
-    #     print(f"DEBUG: Found '{shape_name}' in scope: {structure}")
-
-    #     if isinstance(structure, (Structure, Layer)):
-    #         print(f"DEBUG: Rendering '{shape_name}'")
-    #         return show_figure(self.fig, structure)
-    #     else:
-    #         print(f"DEBUG: '{shape_name}' is not a valid STRUCTURE or LAYER.")
-    #         return {
-    #             "type": "error",
-    #             "message": f"SHOW only supports STRUCTUREs or LAYERs, not {type(structure)}."
-    #         }
-
-    # def visitIfStmt(self, ctx):
-    #     condition_value, condition_type = self.visit(ctx.logicExpr(0))
-    #     if condition_type != 6:
-    #         raise Exception(f"Type Error: IF condition must be BOOLEAN, not {types[condition_type]}.")
-        
-    #     if condition_value:
-    #         return self.visit(ctx.statementBlock(0))
-        
-    #     for i in range(1, len(ctx.logicExpr())):
-    #         condition_value, condition_type = self.visit(ctx.logicExpr(i))
-    #         if condition_type != 6:
-    #             raise Exception(f"Type Error: ELSE IF condition must be BOOLEAN, not {types[condition_type]}.")      
-    #         if condition_value:
-    #             return self.visit(ctx.statementBlock(i))
-        
-    #     if len(ctx.statementBlock()) > len(ctx.logicExpr()):
-    #         return self.visit(ctx.statementBlock(len(ctx.statementBlock())))
 
     def visitIfStmt(self, ctx):
         condition_value, condition_type = self.visit(ctx.logicExpr(0))

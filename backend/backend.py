@@ -3,8 +3,20 @@ import asyncio
 import json
 import plotly.graph_objects as go
 from main import evaluate_expression
+import os
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allows all origins
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all methods
+    allow_headers=["*"],  # Allows all headers
+)
+
 clients = []
 
 @app.websocket("/ws")
@@ -18,3 +30,24 @@ async def websocket_endpoint(websocket: WebSocket):
     else:
         figure_json = json.loads(output)
         await websocket.send_text(json.dumps(figure_json))
+
+@app.get("/api/programs")
+async def list_programs():
+    """List all text files in the programs directory"""
+    programs_dir = os.path.join(os.path.dirname(__file__), "programs")
+    files = [f for f in os.listdir(programs_dir) if f.endswith('.txt')]
+    return {"files": files}
+
+@app.get("/api/programs/{filename}")
+async def get_program(filename: str):
+    """Get the content of a specific text file"""
+    programs_dir = os.path.join(os.path.dirname(__file__), "programs")
+    file_path = os.path.join(programs_dir, filename)
+    
+    if not os.path.exists(file_path) or not filename.endswith('.txt'):
+        return {"error": "File not found or invalid"}
+    
+    with open(file_path, 'r') as file:
+        content = file.read()
+    
+    return {"filename": filename, "content": content}
