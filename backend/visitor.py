@@ -308,18 +308,30 @@ class CustomVisitor(ConnectITVisitor):
         if ctx.COMPARATOR():
             comparator = ctx.COMPARATOR().getText()
             next_value, next_type = self.visit(ctx.numExpr(1))
-            if next_type != 5:
-                raise Exception(f"Type Error: Comparisons can only be applied to NUMBER, not {types[next_type]}")
+            if type != next_type or type not in [5, 6]:
+                raise Exception(f"Type Error: Comparisons can only be applied to NUMBER or BOOLEAN, not {types[next_type]}")
 
             match comparator:
                 case "<":
-                    return_value = value < next_value
+                    if type == 5:
+                        value = value < next_value
+                    else:
+                        raise Exception(f"Type Error: Cannot apply '<' operator to types {types[type]} and {types[next_type]}")
                 case "<=":
-                    return_value = value <= next_value
+                    if type == 5:
+                        value = value <= next_value
+                    else:
+                        raise Exception(f"Type Error: Cannot apply '<=' operator to types {types[type]} and {types[next_type]}")
                 case ">":
-                    return_value = value > next_value
+                    if type == 5:
+                        value = value > next_value
+                    else:
+                        raise Exception(f"Type Error: Cannot apply '>' operator to types {types[type]} and {types[next_type]}")
                 case ">=":
-                    return_value = value >= next_value
+                    if type == 5:
+                        value = value >= next_value
+                    else:
+                        raise Exception(f"Type Error: Cannot apply '>=' operator to types {types[type]} and {types[next_type]}")
                 case "==":
                     return_value = value == next_value
                 case "!=":

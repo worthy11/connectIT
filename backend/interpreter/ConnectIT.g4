@@ -67,7 +67,7 @@ ifStmt:
 whileStmt:
 	'REPEAT WHILE' logicExpr NEWLINE? '[' statementBlock NEWLINE? ']';
 
-statementBlock: (NEWLINE | statement NEWLINE?)*;
+statementBlock: (NEWLINE | statement NEWLINE)*;
 
 forStmt: 'REPEAT' NUMBER 'TIMES' NEWLINE? statementBlock;
 
