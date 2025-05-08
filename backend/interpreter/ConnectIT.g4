@@ -6,9 +6,11 @@ program:
 statement: ('?')? (
 		declarationList
 		| assignment
+		| expression
 		| extension
 		| showStatement
 		| bendStatement
+		| outStatement
 		| whileStmt
 		| forStmt
 		| ifStmt
@@ -36,8 +38,9 @@ logicExpr: andExpr (OR andExpr)*;
 andExpr: compExpr (AND compExpr)*;
 compExpr: numExpr (COMPARATOR numExpr)?;
 numExpr: mulExpr ((PLUS | MINUS) mulExpr)*;
-mulExpr: invExpr ((MUL | DIV)? invExpr)*;
-invExpr: (NOT | MINUS)? baseExpr;
+mulExpr: signExpr ((MUL | DIV) signExpr)*;
+signExpr: (PLUS | MINUS)* negExpr;
+negExpr: (NOT)* baseExpr;
 baseExpr:
 	ID
 	| unitExpr
@@ -54,7 +57,8 @@ bendStatement:
 	'BEND' ID ('IN' | 'OUT') 'BY' numExpr (
 		'AT' numExpr 'TO' numExpr
 	);
-showStatement: 'SHOW' ID;
+showStatement: 'SHOW' expression;
+outStatement: 'OUTPUT' expression;
 
 // TODO: WHILE / FOR, FUNCTION
 ifStmt:
@@ -112,6 +116,6 @@ COLOR:
 	) '*';
 PATTERN: '*' ('striped' | 'dotted' | 'gradient') '*';
 BOOLEAN: 'TRUE' | 'FALSE';
-NUMBER: '-'? [0-9]+;
+NUMBER: [0-9]+;
 
 ID: [a-zA-Z_][a-zA-Z0-9_]*;

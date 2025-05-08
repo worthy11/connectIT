@@ -17,6 +17,8 @@ class CustomVisitor(ConnectITVisitor):
             statement_output = self.visit(ctx.getChild(i))
             if statement_output is not None:
                 output = statement_output
+                if output[0] != "{":
+                    print(output)
         return output
     
     def visitStatement(self, ctx):
@@ -30,6 +32,8 @@ class CustomVisitor(ConnectITVisitor):
             return self.visit(ctx.extension())
         if ctx.showStatement():
             return self.visit(ctx.showStatement())
+        if ctx.outStatement():
+            return self.visit(ctx.outStatement())
         if ctx.ifStmt():
             return self.visit(ctx.ifStmt())
         else:
@@ -404,9 +408,9 @@ class CustomVisitor(ConnectITVisitor):
         return value, type
 
     def visitMulExpr(self, ctx):
-        value, type = self.visit(ctx.invExpr(0))
-        for i in range(1, len(ctx.invExpr())):
-            next_value, next_type = self.visit(ctx.invExpr(i))
+        value, type = self.visit(ctx.signExpr(0))
+        for i in range(1, len(ctx.signExpr())):
+            next_value, next_type = self.visit(ctx.signExpr(i))
             line = ctx.start.line
             column = ctx.start.column
             if ctx.MUL():
@@ -430,20 +434,28 @@ class CustomVisitor(ConnectITVisitor):
                     raise Exception(f"Type Error: Cannot apply '/' operator to types {types[type]} and {types[next_type]} at line {line}, column {column}.")
         return value, type
 
-    def visitInvExpr(self, ctx):
-        value, type = self.visit(ctx.baseExpr())
-        if ctx.NOT():
-            line = ctx.NOT().getSymbol().line
-            column = ctx.NOT().getSymbol().column
-            if type != 6:
-                raise Exception(f"Type Error: Cannot apply '{ctx.NOT().getText()}' operator to type {types[type]} at line {line}, column {column}.")
-            value = not value
-        elif ctx.MINUS():
-            line = ctx.MINUS().getSymbol().line
-            column = ctx.MINUS().getSymbol().column
+    def visitSignExpr(self, ctx):
+        value, type = self.visit(ctx.negExpr())
+        if ctx.MINUS():
+            count_minus = sum(1 for token in ctx.getChildren() if token.getText() == '-')
+            line = ctx.start.line
+            column = ctx.start.column
             if type != 5:
                 raise Exception(f"Type Error: Cannot apply '{ctx.MINUS().getText()}' operator to type {types[type]} at line {line}, column {column}.")
-            value = -value
+            if count_minus % 2 == 1:
+                value = -value
+        return value, type
+
+    def visitNegExpr(self, ctx):
+        value, type = self.visit(ctx.baseExpr())
+        if ctx.NOT():
+            count_not = sum(1 for token in ctx.getChildren() if token.getText() == 'NOT')
+            line = ctx.start.line
+            column = ctx.start.column
+            if type != 6:
+                raise Exception(f"Type Error: Cannot apply '{ctx.NOT().getText()}' operator to type {types[type]} at line {line}, column {column}.")
+            if count_not % 2 == 1:
+                value = not value
         return value, type
     
     def visitBaseExpr(self, ctx):
@@ -453,7 +465,7 @@ class CustomVisitor(ConnectITVisitor):
             column = ctx.ID().getSymbol().column
             if not self.scope.__contains__(name):
                 raise Exception(f"Type Error: {name} is not defined at line {line}, column {column}.")
-            value, type = self.scope.get_value(name).__copy__(), self.scope.get_type(name)
+            value, type = self.scope.get_value(name), self.scope.get_type(name)
             if value is None:
                 raise Exception(f"Type Error: {name} has no value at line {line}, column {column}.")
         elif ctx.unitExpr():
@@ -493,29 +505,30 @@ class CustomVisitor(ConnectITVisitor):
         shape = ctx.ID().getText()
 
     def visitShowStatement(self, ctx):
-        if ctx.getChildCount() == 2:
-            shape_name = ctx.ID().getText()
-            line = ctx.ID().getSymbol().line
-            column = ctx.ID().getSymbol().column
+        structure, type = self.visit(ctx.expression())
+        line = ctx.start.line
+        column = ctx.start.column
 
-            if shape_name not in self.scope:
-                return {
-                    "type": "error",
-                    "message": f"Structure '{shape_name}' is not defined at line {line}, column {column}."
-                }
+        if type in [0, 1, 2, 3, 4]:
+            return show_figure(self.fig, structure)
+        else:
+            return {
+                "type": "error",
+                "message": f"SHOW only supports STRUCTUREs, not {types[type]} at line {line}, column {column}."
+            }
+        
+    def visitOutStatement(self, ctx):
+        value, type = self.visit(ctx.expression())
+        line = ctx.start.line
+        column = ctx.start.column
 
-            structure = self.scope.get_value(shape_name)
-
-            if isinstance(structure, dict) and structure.get("type") == "error":
-                return structure
-            
-            if isinstance(structure, Structure):
-                return show_figure(self.fig, structure)
-            else:
-                return {
-                    "type": "error",
-                    "message": f"SHOW only supports STRUCTUREs, not {type(structure)} at line {line}, column {column}."
-                }
+        if type in [5, 6]:
+            return str(value)
+        else:
+            return {
+                "type": "error",
+                "message": f"OUTPUT only supports NUMBERs and BOOLEANs, not {types[type]} at line {line}, column {column}."
+            }
 
     def visitIfStmt(self, ctx):
         condition_value, condition_type = self.visit(ctx.logicExpr(0))

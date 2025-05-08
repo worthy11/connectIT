@@ -1,12 +1,5 @@
 UNIT r = *red*
-
-LAYER l1 = [2*2*r]
-LAYER l2 = [2*(2*r)]
-LAYER l3 = [2*2+1*r]
-LAYER l4 = [(2*2+1)*r]
-LAYER l5 = [2*(2+1)*r]
-LAYER l6 = [2*(2-3)*r]
-LAYER l7 = [4/2-1*r]
-LAYER l8 = [2/2-1*r]
-LAYER l9 = [1/2*r]
+NUMBER x = 2--+++2
+OUTPUT x
+LAYER l1 = [x*r]
 SHOW l1

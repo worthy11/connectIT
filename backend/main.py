@@ -59,12 +59,14 @@ def evaluate_expression(expression):
     # print(tree.toStringTree(recog=parser))
 
     if lexer_error_listener.has_error:
+        print(lexer_error_listener.errors)
         return {
             "type": "error",
             "message": "\n".join(lexer_error_listener.errors)
         }
 
     if error_listener.has_error:
+        print(error_listener.errors)
         return {
             "type": "error",
             "message": "\n".join(error_listener.errors)
@@ -77,6 +79,7 @@ def evaluate_expression(expression):
     try:
         walker.walk(listener, tree)
     except Exception as e:
+        print(str(e))
         return {
             "type": "error",
             "message": str(e)
@@ -85,6 +88,7 @@ def evaluate_expression(expression):
     try:
         visitor = CustomVisitor(global_scope)
         result = visitor.visit(tree)
+
     except Exception as e:
         return {
             "type": "error",
@@ -96,7 +100,7 @@ def evaluate_expression(expression):
             "type": "error",
             "message": "No output: You need to use SHOW statement to display your model."
         }
-    
+
     return result
 
 def parse_args():
@@ -106,16 +110,13 @@ def parse_args():
 
 if __name__ == '__main__':
     args = parse_args()
-    try:
-        with open(f"programs/{args.filename}", 'r') as f:
-            program = f.read()
-        result = evaluate_expression(program)
-        if result is not None:
+
+    with open(f"programs/{args.filename}", 'r') as f:
+        program = f.read()
+    result = evaluate_expression(program)
+    if result is not None:
+        if isinstance(result, str):
             if result[0] == "{":
                 print("Generated figure successfully")
-            else:
-                print(result)
-    except Exception as e:
-        print(f"Error: {e}")
-
-
+        else:
+            print(result)

@@ -125,12 +125,21 @@ class ConnectITListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by ConnectITParser#invExpr.
-    def enterInvExpr(self, ctx:ConnectITParser.InvExprContext):
+    # Enter a parse tree produced by ConnectITParser#signExpr.
+    def enterSignExpr(self, ctx:ConnectITParser.SignExprContext):
         pass
 
-    # Exit a parse tree produced by ConnectITParser#invExpr.
-    def exitInvExpr(self, ctx:ConnectITParser.InvExprContext):
+    # Exit a parse tree produced by ConnectITParser#signExpr.
+    def exitSignExpr(self, ctx:ConnectITParser.SignExprContext):
+        pass
+
+
+    # Enter a parse tree produced by ConnectITParser#negExpr.
+    def enterNegExpr(self, ctx:ConnectITParser.NegExprContext):
+        pass
+
+    # Exit a parse tree produced by ConnectITParser#negExpr.
+    def exitNegExpr(self, ctx:ConnectITParser.NegExprContext):
         pass
 
 
@@ -167,6 +176,15 @@ class ConnectITListener(ParseTreeListener):
 
     # Exit a parse tree produced by ConnectITParser#showStatement.
     def exitShowStatement(self, ctx:ConnectITParser.ShowStatementContext):
+        pass
+
+
+    # Enter a parse tree produced by ConnectITParser#outStatement.
+    def enterOutStatement(self, ctx:ConnectITParser.OutStatementContext):
+        pass
+
+    # Exit a parse tree produced by ConnectITParser#outStatement.
+    def exitOutStatement(self, ctx:ConnectITParser.OutStatementContext):
         pass
 
 
