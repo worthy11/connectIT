@@ -60,20 +60,19 @@ bendStatement:
 showStatement: 'SHOW' expression;
 outStatement: 'OUTPUT' expression;
 
-// TODO: WHILE / FOR, FUNCTION
 ifStmt:
-	'IF' logicExpr NEWLINE? '[' NEWLINE* statementBlock NEWLINE* ']' (
+	'IF' logicExpr NEWLINE* '[' NEWLINE* statementBlock NEWLINE* ']' (
 		NEWLINE* 'ELSE IF' logicExpr NEWLINE* '[' NEWLINE* statementBlock NEWLINE* ']'
 	)* (
 		NEWLINE* 'ELSE' NEWLINE* '[' NEWLINE* statementBlock NEWLINE* ']'
 	)?;
 
 whileStmt:
-	'REPEAT WHILE' logicExpr NEWLINE? '[' statementBlock NEWLINE? ']';
+	'REPEAT WHILE' logicExpr NEWLINE* '[' NEWLINE* statementBlock NEWLINE* ']';
 
-statementBlock: (NEWLINE | statement NEWLINE)*;
+statementBlock: (NEWLINE | statement)*;
 
-forStmt: 'REPEAT' NUMBER 'TIMES' NEWLINE? statementBlock;
+forStmt: 'REPEAT' numExpr 'TIMES' NEWLINE* '[' NEWLINE* statementBlock NEWLINE* ']';
 
 functionDeclaration:
 	'METHOD' ID '(' (dataType ID ( ',' dataType ID)*)? ')' 'RETURNS' dataType '[' statementBlock

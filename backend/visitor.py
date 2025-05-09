@@ -36,6 +36,10 @@ class CustomVisitor(ConnectITVisitor):
             return self.visit(ctx.outStatement())
         if ctx.ifStmt():
             return self.visit(ctx.ifStmt())
+        if ctx.whileStmt():
+            return self.visit(ctx.whileStmt())
+        if ctx.forStmt():
+            return self.visit(ctx.forStmt())
         else:
             line = ctx.start.line
             column = ctx.start.column
@@ -551,6 +555,33 @@ class CustomVisitor(ConnectITVisitor):
 
             if len(ctx.statementBlock()) > len(ctx.logicExpr()):
                 return self.visit(ctx.statementBlock(len(ctx.statementBlock()) - 1))
+            
+    def visitWhileStmt(self, ctx):
+        condition_value, condition_type = self.visit(ctx.logicExpr())
+        line = ctx.start.line
+        column = ctx.start.column
+        if condition_type != 6: 
+            raise Exception(f"Type Error: WHILE condition must be BOOLEAN, not {types[condition_type]} at line {line}, column {column}.")
+        while condition_value:
+            self.visit(ctx.statementBlock())
+            condition_value, condition_type = self.visit(ctx.logicExpr())
+            line = ctx.start.line
+            column = ctx.start.column
+            if condition_type != 6: 
+                raise Exception(f"Type Error: WHILE condition must be BOOLEAN, not {types[condition_type]} at line {line}, column {column}.")
+            
+    def visitForStmt(self, ctx):
+        number, type = self.visit(ctx.numExpr())
+        line = ctx.start.line
+        column = ctx.start.column
+        if type != 5:
+            raise Exception(f"Type Error: FOR loop must iterate over a NUMBER, not {types[type]} at line {line}, column {column}.")
+        if number < 0:
+            raise Exception(f"Value Error: FOR loop cannot iterate a negative number of times at line {line}, column {column}.")
+        for i in range(0, number):
+            self.visit(ctx.statementBlock())
+            line = ctx.start.line
+            column = ctx.start.column
     
     def visitStatementBlock(self, ctx):
         output = None
