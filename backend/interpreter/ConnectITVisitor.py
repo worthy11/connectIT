@@ -1,4 +1,4 @@
-# Generated from ConnectIT.g4 by ANTLR 4.13.2
+# Generated from ConnectIT.G4 by ANTLR 4.13.2
 from antlr4 import *
 if "." in __name__:
     from .ConnectITParser import ConnectITParser
@@ -94,18 +94,23 @@ class ConnectITVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by ConnectITParser#bendStatement.
-    def visitBendStatement(self, ctx:ConnectITParser.BendStatementContext):
+    # Visit a parse tree produced by ConnectITParser#bendStmt.
+    def visitBendStmt(self, ctx:ConnectITParser.BendStmtContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by ConnectITParser#showStatement.
-    def visitShowStatement(self, ctx:ConnectITParser.ShowStatementContext):
+    # Visit a parse tree produced by ConnectITParser#showStmt.
+    def visitShowStmt(self, ctx:ConnectITParser.ShowStmtContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by ConnectITParser#outStatement.
-    def visitOutStatement(self, ctx:ConnectITParser.OutStatementContext):
+    # Visit a parse tree produced by ConnectITParser#outStmt.
+    def visitOutStmt(self, ctx:ConnectITParser.OutStmtContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ConnectITParser#stmtBlock.
+    def visitStmtBlock(self, ctx:ConnectITParser.StmtBlockContext):
         return self.visitChildren(ctx)
 
 
@@ -119,23 +124,33 @@ class ConnectITVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by ConnectITParser#statementBlock.
-    def visitStatementBlock(self, ctx:ConnectITParser.StatementBlockContext):
-        return self.visitChildren(ctx)
-
-
     # Visit a parse tree produced by ConnectITParser#forStmt.
     def visitForStmt(self, ctx:ConnectITParser.ForStmtContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by ConnectITParser#functionDeclaration.
-    def visitFunctionDeclaration(self, ctx:ConnectITParser.FunctionDeclarationContext):
+    # Visit a parse tree produced by ConnectITParser#funcDec.
+    def visitFuncDec(self, ctx:ConnectITParser.FuncDecContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by ConnectITParser#returnExpr.
-    def visitReturnExpr(self, ctx:ConnectITParser.ReturnExprContext):
+    # Visit a parse tree produced by ConnectITParser#paramList.
+    def visitParamList(self, ctx:ConnectITParser.ParamListContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ConnectITParser#funcCall.
+    def visitFuncCall(self, ctx:ConnectITParser.FuncCallContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ConnectITParser#argList.
+    def visitArgList(self, ctx:ConnectITParser.ArgListContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ConnectITParser#returnStmt.
+    def visitReturnStmt(self, ctx:ConnectITParser.ReturnStmtContext):
         return self.visitChildren(ctx)
 
 

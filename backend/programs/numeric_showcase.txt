@@ -1,5 +1,6 @@
 UNIT r = *red*
-NUMBER x = 2--+++2
+NUMBER x = 2--+-+-+(+(+(+(+2))))
+BOOLEAN y = NOT NOT NOT TRUE
 OUTPUT x
 LAYER l1 = [x*r]
 SHOW l1

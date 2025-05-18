@@ -1,4 +1,4 @@
-# Generated from ConnectIT.g4 by ANTLR 4.13.2
+# Generated from ConnectIT.G4 by ANTLR 4.13.2
 from antlr4 import *
 if "." in __name__:
     from .ConnectITParser import ConnectITParser
@@ -161,30 +161,39 @@ class ConnectITListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by ConnectITParser#bendStatement.
-    def enterBendStatement(self, ctx:ConnectITParser.BendStatementContext):
+    # Enter a parse tree produced by ConnectITParser#bendStmt.
+    def enterBendStmt(self, ctx:ConnectITParser.BendStmtContext):
         pass
 
-    # Exit a parse tree produced by ConnectITParser#bendStatement.
-    def exitBendStatement(self, ctx:ConnectITParser.BendStatementContext):
-        pass
-
-
-    # Enter a parse tree produced by ConnectITParser#showStatement.
-    def enterShowStatement(self, ctx:ConnectITParser.ShowStatementContext):
-        pass
-
-    # Exit a parse tree produced by ConnectITParser#showStatement.
-    def exitShowStatement(self, ctx:ConnectITParser.ShowStatementContext):
+    # Exit a parse tree produced by ConnectITParser#bendStmt.
+    def exitBendStmt(self, ctx:ConnectITParser.BendStmtContext):
         pass
 
 
-    # Enter a parse tree produced by ConnectITParser#outStatement.
-    def enterOutStatement(self, ctx:ConnectITParser.OutStatementContext):
+    # Enter a parse tree produced by ConnectITParser#showStmt.
+    def enterShowStmt(self, ctx:ConnectITParser.ShowStmtContext):
         pass
 
-    # Exit a parse tree produced by ConnectITParser#outStatement.
-    def exitOutStatement(self, ctx:ConnectITParser.OutStatementContext):
+    # Exit a parse tree produced by ConnectITParser#showStmt.
+    def exitShowStmt(self, ctx:ConnectITParser.ShowStmtContext):
+        pass
+
+
+    # Enter a parse tree produced by ConnectITParser#outStmt.
+    def enterOutStmt(self, ctx:ConnectITParser.OutStmtContext):
+        pass
+
+    # Exit a parse tree produced by ConnectITParser#outStmt.
+    def exitOutStmt(self, ctx:ConnectITParser.OutStmtContext):
+        pass
+
+
+    # Enter a parse tree produced by ConnectITParser#stmtBlock.
+    def enterStmtBlock(self, ctx:ConnectITParser.StmtBlockContext):
+        pass
+
+    # Exit a parse tree produced by ConnectITParser#stmtBlock.
+    def exitStmtBlock(self, ctx:ConnectITParser.StmtBlockContext):
         pass
 
 
@@ -206,15 +215,6 @@ class ConnectITListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by ConnectITParser#statementBlock.
-    def enterStatementBlock(self, ctx:ConnectITParser.StatementBlockContext):
-        pass
-
-    # Exit a parse tree produced by ConnectITParser#statementBlock.
-    def exitStatementBlock(self, ctx:ConnectITParser.StatementBlockContext):
-        pass
-
-
     # Enter a parse tree produced by ConnectITParser#forStmt.
     def enterForStmt(self, ctx:ConnectITParser.ForStmtContext):
         pass
@@ -224,21 +224,48 @@ class ConnectITListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by ConnectITParser#functionDeclaration.
-    def enterFunctionDeclaration(self, ctx:ConnectITParser.FunctionDeclarationContext):
+    # Enter a parse tree produced by ConnectITParser#funcDec.
+    def enterFuncDec(self, ctx:ConnectITParser.FuncDecContext):
         pass
 
-    # Exit a parse tree produced by ConnectITParser#functionDeclaration.
-    def exitFunctionDeclaration(self, ctx:ConnectITParser.FunctionDeclarationContext):
+    # Exit a parse tree produced by ConnectITParser#funcDec.
+    def exitFuncDec(self, ctx:ConnectITParser.FuncDecContext):
         pass
 
 
-    # Enter a parse tree produced by ConnectITParser#returnExpr.
-    def enterReturnExpr(self, ctx:ConnectITParser.ReturnExprContext):
+    # Enter a parse tree produced by ConnectITParser#paramList.
+    def enterParamList(self, ctx:ConnectITParser.ParamListContext):
         pass
 
-    # Exit a parse tree produced by ConnectITParser#returnExpr.
-    def exitReturnExpr(self, ctx:ConnectITParser.ReturnExprContext):
+    # Exit a parse tree produced by ConnectITParser#paramList.
+    def exitParamList(self, ctx:ConnectITParser.ParamListContext):
+        pass
+
+
+    # Enter a parse tree produced by ConnectITParser#funcCall.
+    def enterFuncCall(self, ctx:ConnectITParser.FuncCallContext):
+        pass
+
+    # Exit a parse tree produced by ConnectITParser#funcCall.
+    def exitFuncCall(self, ctx:ConnectITParser.FuncCallContext):
+        pass
+
+
+    # Enter a parse tree produced by ConnectITParser#argList.
+    def enterArgList(self, ctx:ConnectITParser.ArgListContext):
+        pass
+
+    # Exit a parse tree produced by ConnectITParser#argList.
+    def exitArgList(self, ctx:ConnectITParser.ArgListContext):
+        pass
+
+
+    # Enter a parse tree produced by ConnectITParser#returnStmt.
+    def enterReturnStmt(self, ctx:ConnectITParser.ReturnStmtContext):
+        pass
+
+    # Exit a parse tree produced by ConnectITParser#returnStmt.
+    def exitReturnStmt(self, ctx:ConnectITParser.ReturnStmtContext):
         pass
 
 

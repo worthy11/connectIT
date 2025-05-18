@@ -4,7 +4,7 @@ from visitor import CustomVisitor
 from antlr4.error.ErrorListener import ErrorListener
 from interpreter.ConnectITLexer import ConnectITLexer
 from interpreter.ConnectITParser import ConnectITParser
-from listener import GlobalScope, CustomListener
+from listener import *
 import argparse
 
 class SyntaxErrorListener(ErrorListener):
@@ -71,9 +71,9 @@ def evaluate_expression(expression):
             "type": "error",
             "message": "\n".join(error_listener.errors)
         }
+    
 
-    global_scope = GlobalScope()
-    listener = CustomListener(global_scope)
+    listener = CustomListener()
     walker = ParseTreeWalker()
 
     try:
@@ -86,7 +86,7 @@ def evaluate_expression(expression):
         }
 
     try:
-        visitor = CustomVisitor(global_scope)
+        visitor = CustomVisitor(listener.scopes)
         result = visitor.visit(tree)
 
     except Exception as e:

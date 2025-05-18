@@ -1,0 +1,20 @@
+UNIT r = *red*
+
+IF FALSE
+[
+    OUTPUT 5
+]
+ELSE
+[
+    UNIT r = *blue*
+    IF TRUE AND FALSE
+    [
+        ^r = *green*
+    ]
+    ELSE
+    [
+        ^r = *black* 
+    ]
+    SHOW ^r
+    OUTPUT 4
+]

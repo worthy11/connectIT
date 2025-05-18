@@ -1,16 +1,6 @@
 import numpy as np
 import plotly.graph_objects as go
 
-types = {
-    0: "UNIT", # *red* *striped*
-    1: "MULTI_UNIT", # 2 * (*red* *striped*), u * 2, [u]
-    2: "LAYER", # 2*u <-> b*5 <-> g, [2*u]
-    3: "SHAPE", # l1 <- ([g] <-> [b]) <<- [2*u] <-(5)- l4
-    4: "MODEL",
-    5: "NUMBER",
-    6: "BOOLEAN"
-}
-
 class Structure:
     def render(self):
         print(self)

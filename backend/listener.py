@@ -1,47 +1,47 @@
 from interpreter.ConnectITListener import ConnectITListener
-types = {
-    "UNIT": 0,
-    "LAYER": 2,
-    "SHAPE": 3,
-    "MODEL": 4,
-    "NUMBER": 5,
-    "BOOLEAN": 6
-}
-
-class GlobalScope:
-    def __init__(self):
-        self.variables = {}
-
-    def declare(self, name, type):
-        self.variables[name] = {}
-        self.variables[name]["type"] = type
-        self.variables[name]["value"] = None
-
-    def get_type(self, name):
-        return self.variables[name]["type"]
-
-    def get_value(self, name):
-        return self.variables[name]["value"]
-
-    def fill(self, name, value):
-        self.variables[name]["value"] = value
-
-    def __contains__(self, name):
-        return name in self.variables
+from utils import *
 
 class CustomListener(ConnectITListener):
-    def __init__(self, scope: GlobalScope):
-        self.scope = scope
+    def __init__(self):
+        self.global_scope = Scope("global")
+        self.current_scope = self.global_scope
+        self.scopes = {}
+
+    def enterProgram(self, ctx):
+        self.scopes[ctx] = self.current_scope
 
     def enterDeclarationList(self, ctx):
-        type = types[ctx.dataType().getText()]
+        type = ctx.dataType().getText()
+        line = ctx.start.line
         for dec in ctx.declaration():
             if dec.assignment():
-                name = dec.assignment().ID().getText()
+                name = dec.assignment().getChild(0).getText()
             else:
                 name = dec.ID().getText()
-            if name in self.scope:
-                line = ctx.start.line
-                raise Exception(f"Redeclaration of '{name}' at line {line}")
+            if name in self.current_scope.variables:
+                declared_in = self.current_scope.get_line(name)
+                raise Exception(f"Redeclaration of '{name}' at line {line} (first declared in line {declared_in})")
             
-            self.scope.declare(name=name, type=type)
+            self.current_scope.declare(name=name, type=type, line=line)
+
+    def enterFunctionDec(self, ctx):
+        name = ctx.ID().getText()
+        line = ctx.start.line
+        scope = Scope(name, parent=self.current_scope)
+        self.current_scope.declare(name, "FUNCTION", line)
+        self.current_scope.children.append(scope)
+
+        self.scopes[ctx] = scope
+        self.current_scope = scope
+
+    def exitFunctionDec(self, ctx):
+        self.current_scope = self.current_scope.parent
+
+    def enterStmtBlock(self, ctx):
+        scope = Scope("block", parent=self.current_scope)
+        self.current_scope.children.append(scope)
+        self.scopes[ctx] = scope
+        self.current_scope = scope
+
+    def exitStmtBlock(self, ctx):
+        self.current_scope = self.current_scope.parent

@@ -11,6 +11,70 @@ color_map = {
     "black": "rgb(0, 0, 0)"
 }
 
+type_map = {
+    "UNIT": ["MULTI_UNIT", "LAYER", "SHAPE", "MODEL"],
+    "MULTI_UNIT": ["LAYER", "SHAPE", "MODEL"],
+    "LAYER": ["SHAPE", "MODEL"],
+    "SHAPE": ["MODEL"],
+    "MODEL": [],
+    "NUMBER": [],
+    "BOOLEAN": [],
+    "FUNCTION": []
+}
+
+class Scope:
+    def __init__(self, name, parent=None):
+        self.name = name
+        self.variables = {}
+        self.parent = parent
+        self.children = []
+
+    def declare(self, name, type, line):
+        self.variables[name] = {}
+        self.variables[name]["name"] = name
+        self.variables[name]["type"] = type
+        self.variables[name]["line"] = line
+
+    def get_type(self, name):
+        if name in self.variables:
+            return self.variables[name]["type"]
+        elif self.parent:
+            return self.parent.get_type(name)
+        else:
+            return None
+        
+    def get_line(self, name):
+        return self.variables[name]["line"]
+    
+class ActivationRecord:
+    def __init__(self, name, type_, nesting_level):
+        self.name = name
+        self.type = type_
+        self.nesting_level = nesting_level
+        self.members = {}
+
+    def set(self, name, value):
+        self.members[name] = value
+
+    def get(self, name):
+        return self.members.get(name)
+
+class CallStack:
+    def __init__(self):
+        self.records = []
+
+    def push(self, ar):
+        self.records.append(ar)
+
+    def pop(self):
+        return self.records.pop()
+
+    def peek(self, up=0):
+        if up >= len(self.records):
+            up = len(self.records)-1
+        print(f"Scope num: {-1-up}")
+        return self.records[-1-up]
+
 def render_model(fig, model: Model | list):
     for idx, shape in enumerate(model):
         shape.render(fig)

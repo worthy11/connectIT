@@ -8,20 +8,21 @@ statement: ('?')? (
 		| assignment
 		| expression
 		| extension
-		| showStatement
-		| bendStatement
-		| outStatement
+		| showStmt
+		| bendStmt
+		| outStmt
 		| whileStmt
 		| forStmt
 		| ifStmt
-		| functionDeclaration
-		| returnExpr
+		| funcDec
+		| funcCall
+		| returnStmt
 	);
 
 declarationList: dataType declaration (',' declaration)*;
 declaration: ID | assignment;
-assignment: ID '=' expression;
-extension: ID extensionOperator expression;
+assignment: expression '=' expression;
+extension: expression extensionOperator expression;
 extensionOperator:
 	'+='
 	| '-='
@@ -42,7 +43,7 @@ mulExpr: signExpr ((MUL | DIV) signExpr)*;
 signExpr: (PLUS | MINUS)* negExpr;
 negExpr: (NOT)* baseExpr;
 baseExpr:
-	ID
+	('^')* ID
 	| unitExpr
 	| NUMBER
 	| BOOLEAN
@@ -53,31 +54,28 @@ unitExpr: COLOR (PATTERN)?;
 WS: [ \t]+ -> skip;
 NEWLINE: '\r'? '\n';
 
-bendStatement:
+bendStmt:
 	'BEND' ID ('IN' | 'OUT') 'BY' numExpr (
 		'AT' numExpr 'TO' numExpr
 	);
-showStatement: 'SHOW' expression;
-outStatement: 'OUTPUT' expression;
+showStmt: 'SHOW' expression;
+outStmt: 'OUTPUT' expression;
 
+stmtBlock: '[' NEWLINE* (statement NEWLINE+)* NEWLINE* ']';
 ifStmt:
-	'IF' logicExpr NEWLINE* '[' NEWLINE* statementBlock NEWLINE* ']' (
-		NEWLINE* 'ELSE IF' logicExpr NEWLINE* '[' NEWLINE* statementBlock NEWLINE* ']'
-	)* (
-		NEWLINE* 'ELSE' NEWLINE* '[' NEWLINE* statementBlock NEWLINE* ']'
-	)?;
+	'IF' logicExpr NEWLINE* stmtBlock (
+		NEWLINE* 'ELSE IF' logicExpr NEWLINE* stmtBlock
+	)* (NEWLINE* 'ELSE' NEWLINE* stmtBlock)?;
 
-whileStmt:
-	'REPEAT WHILE' logicExpr NEWLINE* '[' NEWLINE* statementBlock NEWLINE* ']';
+whileStmt: 'REPEAT WHILE' logicExpr NEWLINE* stmtBlock;
+forStmt: 'REPEAT' numExpr 'TIMES' NEWLINE* stmtBlock;
 
-statementBlock: (NEWLINE | statement)*;
-
-forStmt: 'REPEAT' numExpr 'TIMES' NEWLINE* '[' NEWLINE* statementBlock NEWLINE* ']';
-
-functionDeclaration:
-	'METHOD' ID '(' (dataType ID ( ',' dataType ID)*)? ')' 'RETURNS' dataType '[' statementBlock
-		returnExpr NEWLINE? ']';
-returnExpr: 'RETURN' (ID | expression);
+funcDec:
+	'METHOD' ID '(' paramList? ')' 'RETURNS' dataType stmtBlock;
+paramList: dataType ID (',' dataType ID)*;
+funcCall: 'PERFORM' ID '(' argList ')';
+argList: expression (',' expression)*;
+returnStmt: 'RETURN' (ID | expression);
 
 dataType:
 	'UNIT'
