@@ -72,7 +72,6 @@ class CallStack:
     def peek(self, up=0):
         if up >= len(self.records):
             up = len(self.records)-1
-        print(f"Scope num: {-1-up}")
         return self.records[-1-up]
 
 def render_model(fig, model: Model | list):

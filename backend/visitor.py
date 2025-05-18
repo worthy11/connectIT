@@ -95,31 +95,30 @@ class CustomVisitor(ConnectITVisitor):
         line = ctx.start.line
         column = ctx.start.column
 
-        lvalue, ltype = self.visit(ctx.expression(0))
-        if ltype != "ID":
-            raise Exception(f"Error: Cannot extend non-ID at line {line}, column {column}.")
-
-        value, expected_type = self.call_stack.peek().get(lvalue), scope.get_type(lvalue)
+        self.assigning = True
+        name, expected_type = self.visit(ctx.expression(0))
+        self.assigning = False
         e, op = ctx.expression(1), ctx.extensionOperator()
         if expected_type not in ["LAYER", "SHAPE", "MODEL", "NUMBER"]:            
             raise Exception(f"Type Error: Cannot add new values to type {expected_type} at line {line}, column {column}.")
             
         # TODO: Do zmiany
-        match expected_type:
-            case "LAYER":
-                new_value = self.extendLayer(value, e, op)
-            case "SHAPE":
-                new_value = self.extendShape(value, e, op)
-            case "MODEL":
-                new_value = self.extendModel(value, e, op)
-            case "NUMBER":
-                new_value = self.extendNumber(value, e, op)
 
         for ar in reversed(self.call_stack.records):
-            if lvalue in ar.members:
-                ar.set(lvalue, new_value)
+            if name in ar.members:
+                value = ar.get(name)
+                match expected_type:
+                    case "LAYER":
+                        new_value = self.extendLayer(value, e, op)
+                    case "SHAPE":
+                        new_value = self.extendShape(value, e, op)
+                    case "MODEL":
+                        new_value = self.extendModel(value, e, op)
+                    case "NUMBER":
+                        new_value = self.extendNumber(value, e, op)
+                ar.set(name, new_value)
                 return None
-        raise Exception(f"Error: Cannot apply {op} operator to undeclared variable {lvalue} at line {line}, column {column}")
+        raise Exception(f"Error: Cannot apply {op} operator to undeclared variable {name} at line {line}, column {column}")
 
     def extendLayer(self, value, e, op):
         received_value, received_type = self.visit(e)
@@ -512,11 +511,8 @@ class CustomVisitor(ConnectITVisitor):
                 if scope.parent:
                     scope = scope.parent
 
-            print(f"Up scopes: {up_scopes}")
             for i, ar in enumerate(reversed(self.call_stack.records)):
                 if name in ar.members:
-                    print(f"Updating scope: {i+up_scopes}")
-                    print(f"Members: {ar.members}")
                     value, type = self.call_stack.peek(i+up_scopes).get(name), scope.get_type(name)
                     break
 
