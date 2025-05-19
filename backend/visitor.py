@@ -10,6 +10,7 @@ class CustomVisitor(ConnectITVisitor):
         self.scopes = scopes
         self.call_stack = CallStack()
         self.call_stack.push(ActivationRecord("global", "program", 1))
+        self.current_scope = Scope('global')
         self.assigning = False
         self.declaring = False
         self.render = []
@@ -50,6 +51,12 @@ class CustomVisitor(ConnectITVisitor):
             return self.visit(ctx.whileStmt())
         if ctx.forStmt():
             return self.visit(ctx.forStmt())
+        if ctx.funcDec():
+            return self.visit(ctx.funcDec())
+        if ctx.funcCall():
+            return self.visit(ctx.funcCall())
+        if ctx.returnStmt():
+            return self.visit(ctx.returnStmt())
         else:
             line = ctx.start.line
             column = ctx.start.column
@@ -245,6 +252,8 @@ class CustomVisitor(ConnectITVisitor):
                 column = ctx.start.column
                 raise Exception(f"Cannot use CLOSED keyword with type {type} at line {line}, column {column}.")
         if ctx.arrowOperator():
+            print(f"ctx: {ctx.getText()}")
+            print(f"Result value={value}, type={type}")
             if self.assigning:
                 raise Exception(f"Error: Cannot connect elements in a non-evaluating context at line {line}, column {column}.")
             line = ctx.start.line
@@ -260,6 +269,7 @@ class CustomVisitor(ConnectITVisitor):
                     value = self.createModel(ctx)
                     type = "MODEL"
                 case _:
+                    print(f"Current_scope: {self.current_scope.name}")
                     raise Exception(f"Cannot use connectors with type '{type}' at line {line}, column {column}.")
                     
         return value, type
@@ -648,3 +658,83 @@ class CustomVisitor(ConnectITVisitor):
                     output = statement_output
         self.call_stack.pop()
         return output
+    
+    def visitFuncDec(self, ctx: ConnectITParser.FuncDecContext):
+        func_name = ctx.ID().getText()
+        return_type = ctx.dataType().getText()
+        params = []
+
+        if ctx.paramList():
+            for i in range(0, len(ctx.paramList().ID())):
+                param_name = ctx.paramList().ID(i).getText()
+                param_type = ctx.paramList().dataType(i).getText()
+                params.append((param_type, param_name))
+
+        self.current_scope.declare(func_name, "FUNCTION", ctx.start.line)
+        self.call_stack.peek().set(func_name, {
+            "params": params,
+            "return_type": return_type,
+            "body": ctx.stmtBlock()
+        })
+        return None
+    
+    def visitFuncCall(self, ctx: ConnectITParser.FuncCallContext):
+        func_name = ctx.ID().getText()
+        func_def = self.call_stack.peek().get(func_name)
+
+        if func_def is None:
+            raise Exception(f"Unknown function: {func_name}")
+
+        params = func_def["params"]
+        return_type = func_def["return_type"]
+        body = func_def["body"]
+        args = ctx.argList().expression()
+
+        if len(args) != len(params):
+            raise Exception(f"Function {func_name} expects {len(params)} arguments, {len(args)} were given")
+
+        new_scope = Scope(func_name, self.current_scope)
+        self.current_scope.children.append(new_scope)
+        self.current_scope = new_scope
+
+        ar = ActivationRecord(func_name, "FUNCTION", self.call_stack.peek().nesting_level + 1)
+
+        for i, (param_type, param_name) in enumerate(params):
+            value, val_type = self.visit(args[i])
+            self.current_scope.declare(param_name, param_type, ctx.start.line)  
+            ar.set(param_name, value)
+
+        self.call_stack.push(ar)
+
+        try:
+            print(f"Scope: {self.current_scope.name}")
+            print(f"Variables: {self.current_scope.variables}")
+            self.visit(body)
+        except Exception as e:
+            if isinstance(e.args, tuple) and e.args[0] == "return":
+                value, _type = e.args[1]
+                self.call_stack.pop()
+                self.current_scope = self.current_scope.parent
+                return value, _type
+            else:
+                raise e
+
+        self.call_stack.pop()
+        self.current_scope = self.current_scope.parent
+        return None, None
+
+
+    def visitReturnStmt(self, ctx):
+        if ctx.expression():
+            value, _type = self.visit(ctx.expression())
+        elif ctx.ID():
+            var_name = ctx.ID().getText()
+            value = self.call_stack.peek().get(var_name)
+            _type = self.current_scope.get_type(var_name)
+        else:
+            value = None
+            _type = None
+
+        raise Exception(("return", (value, _type)))
+
+
