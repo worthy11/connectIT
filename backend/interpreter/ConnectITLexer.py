@@ -1,4 +1,4 @@
-# Generated from ConnectIT.G4 by ANTLR 4.13.2
+# Generated from ConnectIT.g4 by ANTLR 4.13.2
 from antlr4 import *
 from io import StringIO
 import sys
@@ -282,7 +282,7 @@ class ConnectITLexer(Lexer):
                   "MINUS", "NOT", "OR", "AND", "MUL", "DIV", "COMPARATOR", 
                   "COLOR", "PATTERN", "BOOLEAN", "NUMBER", "ID" ]
 
-    grammarFileName = "ConnectIT.G4"
+    grammarFileName = "ConnectIT.g4"
 
     def __init__(self, input=None, output:TextIO = sys.stdout):
         super().__init__(input, output)

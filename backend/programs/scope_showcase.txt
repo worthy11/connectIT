@@ -1,20 +1,15 @@
-UNIT r = *red*
+METHOD block2(LAYER r) RETURNS LAYER [
+    r <+-> *blue*
+    RETURN r
+]
 
-IF FALSE
-[
-    OUTPUT 5
+METHOD block1(LAYER r) RETURNS LAYER [
+    UNIT u
+    r <+-> *red*
+    r = PERFORM block2(r)
+    RETURN r
 ]
-ELSE
-[
-    UNIT r = *blue*
-    IF TRUE AND FALSE
-    [
-        ^r = *green*
-    ]
-    ELSE
-    [
-        ^r = *black* 
-    ]
-    SHOW ^r
-    OUTPUT 4
-]
+
+LAYER a = [[*green*]]
+a = PERFORM block1(a, a)
+SHOW a

@@ -8,13 +8,21 @@ from utils import *
 class CustomVisitor(ConnectITVisitor):
     def __init__(self, scopes):
         self.scopes = scopes
+        self.current_scope = None
         self.call_stack = CallStack()
         self.call_stack.push(ActivationRecord("global", "program", 1))
-        self.current_scope = Scope('global')
         self.assigning = False
         self.declaring = False
         self.render = []
         self.fig = go.Figure()
+
+    def format_scopes(self, scopes):
+        output = []
+        for ctx, scope in scopes.items():
+            ctx_type = type(ctx).__name__
+            scope_str = str(scope)
+            output.append(f"{ctx_type}:\n{scope_str}\n")
+        return "\n".join(output)
 
     def get_scope_for_ctx(self, ctx):
         while ctx is not None:
@@ -23,6 +31,7 @@ class CustomVisitor(ConnectITVisitor):
             ctx = ctx.parentCtx
 
     def visitProgram(self, ctx):
+        self.current_scope = self.get_scope_for_ctx(ctx)
         output = None
         for i in range(ctx.getChildCount()):
             statement_output = self.visit(ctx.getChild(i))
@@ -80,14 +89,16 @@ class CustomVisitor(ConnectITVisitor):
         scope = self.get_scope_for_ctx(ctx)
         line = ctx.start.line
         column = ctx.start.column
-            
+
         self.assigning = True
         lvalue, _ = self.visit(ctx.expression(0))
         self.assigning = False
+
         if self.declaring:
             self.call_stack.peek().set(lvalue, None)
 
         expected_type = scope.get_type(lvalue)
+
         rvalue, rtype = self.visit(ctx.expression(1))
         if rtype != expected_type:
             raise Exception(f"Type Error: Cannot assign {rtype} to {expected_type} at line {line}, column {column}.")
@@ -98,7 +109,6 @@ class CustomVisitor(ConnectITVisitor):
         raise Exception(f"Error: Cannot assign value to undeclared variable {lvalue} at line {line}, column {column}")
     
     def visitExtension(self, ctx):
-        scope = self.get_scope_for_ctx(ctx)
         line = ctx.start.line
         column = ctx.start.column
 
@@ -537,6 +547,8 @@ class CustomVisitor(ConnectITVisitor):
             value, type = int(ctx.NUMBER().getText()), "NUMBER"
         elif ctx.BOOLEAN():
             value, type = ctx.BOOLEAN().getText() == "TRUE", "BOOLEAN"
+        elif ctx.funcCall():
+            value, type = self.visit(ctx.funcCall())
         elif ctx.expression():
             value, type = self.visit(ctx.expression())
             if ctx.getChild(0).getText() == '[':
@@ -659,7 +671,7 @@ class CustomVisitor(ConnectITVisitor):
         self.call_stack.pop()
         return output
     
-    def visitFuncDec(self, ctx: ConnectITParser.FuncDecContext):
+    def visitFuncDec(self, ctx):
         func_name = ctx.ID().getText()
         return_type = ctx.dataType().getText()
         params = []
@@ -670,7 +682,6 @@ class CustomVisitor(ConnectITVisitor):
                 param_type = ctx.paramList().dataType(i).getText()
                 params.append((param_type, param_name))
 
-        self.current_scope.declare(func_name, "FUNCTION", ctx.start.line)
         self.call_stack.peek().set(func_name, {
             "params": params,
             "return_type": return_type,
@@ -678,12 +689,19 @@ class CustomVisitor(ConnectITVisitor):
         })
         return None
     
-    def visitFuncCall(self, ctx: ConnectITParser.FuncCallContext):
+    def visitFuncCall(self, ctx):
+        line = ctx.start.line
+        column = ctx.start.column
         func_name = ctx.ID().getText()
-        func_def = self.call_stack.peek().get(func_name)
+        func_def = None
+        for i, ar in enumerate(reversed(self.call_stack.records)):
+            if func_name in ar.members:
+                func_def = self.call_stack.peek(i).get(func_name)
 
         if func_def is None:
             raise Exception(f"Unknown function: {func_name}")
+
+        scope = self.current_scope.get_child(func_name).get_child("block")
 
         params = func_def["params"]
         return_type = func_def["return_type"]
@@ -691,50 +709,35 @@ class CustomVisitor(ConnectITVisitor):
         args = ctx.argList().expression()
 
         if len(args) != len(params):
-            raise Exception(f"Function {func_name} expects {len(params)} arguments, {len(args)} were given")
-
-        new_scope = Scope(func_name, self.current_scope)
-        self.current_scope.children.append(new_scope)
-        self.current_scope = new_scope
+            raise Exception(f"Function {func_name} expects {len(params)} arguments, {len(args)} were given at line {line}, column {column}")
 
         ar = ActivationRecord(func_name, "FUNCTION", self.call_stack.peek().nesting_level + 1)
 
         for i, (param_type, param_name) in enumerate(params):
             value, val_type = self.visit(args[i])
-            self.current_scope.declare(param_name, param_type, ctx.start.line)  
+            # TODO: Check for redeclaration
+            scope.declare(param_name, param_type, body.start.line)  
+            # TODO: Check if types match
             ar.set(param_name, value)
 
         self.call_stack.push(ar)
 
         try:
-            print(f"Scope: {self.current_scope.name}")
-            print(f"Variables: {self.current_scope.variables}")
+            self.current_scope = scope
             self.visit(body)
+            self.current_scope = scope.parent.parent
         except Exception as e:
             if isinstance(e.args, tuple) and e.args[0] == "return":
                 value, _type = e.args[1]
                 self.call_stack.pop()
-                self.current_scope = self.current_scope.parent
                 return value, _type
             else:
                 raise e
 
         self.call_stack.pop()
-        self.current_scope = self.current_scope.parent
         return None, None
 
 
     def visitReturnStmt(self, ctx):
-        if ctx.expression():
-            value, _type = self.visit(ctx.expression())
-        elif ctx.ID():
-            var_name = ctx.ID().getText()
-            value = self.call_stack.peek().get(var_name)
-            _type = self.current_scope.get_type(var_name)
-        else:
-            value = None
-            _type = None
-
-        raise Exception(("return", (value, _type)))
-
-
+        value, type = self.visit(ctx.expression())
+        raise Exception("return", (value, type))

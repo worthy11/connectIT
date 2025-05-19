@@ -29,6 +29,11 @@ class Scope:
         self.parent = parent
         self.children = []
 
+    def __str__(self):
+        children_names = [child.name for child in self.children]
+        return f"Name: {self.name}\nVars: {self.variables}\nChildren: {children_names}"
+
+
     def declare(self, name, type, line):
         self.variables[name] = {}
         self.variables[name]["name"] = name
@@ -45,6 +50,15 @@ class Scope:
         
     def get_line(self, name):
         return self.variables[name]["line"]
+    
+    def get_child(self, name):
+        scope = self
+        while scope is not None:
+            for c in scope.children:
+                if c.name == name:
+                    return c
+            scope = scope.parent
+        return None
     
 class ActivationRecord:
     def __init__(self, name, type_, nesting_level):

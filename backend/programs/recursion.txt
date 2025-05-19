@@ -1,0 +1,19 @@
+NUMBER x = 999
+
+METHOD add(NUMBER x) RETURNS NUMBER [
+    IF x == 1 [
+        OUTPUT ^^^^^x
+        RETURN x
+    ]
+    RETURN x * PERFORM add(x-1)
+]
+
+OUTPUT PERFORM add(3)
+NUMBER y = 1
+REPEAT WHILE x < 4 [
+    y *= x
+    x += 1
+]
+OUTPUT y
+
+SHOW *red*

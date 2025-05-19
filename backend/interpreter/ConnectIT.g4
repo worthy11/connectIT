@@ -47,9 +47,10 @@ baseExpr:
 	| unitExpr
 	| NUMBER
 	| BOOLEAN
+	| funcCall
 	| '(' expression ')'
 	| '[' expression ']';
-unitExpr: COLOR (PATTERN)?; 
+unitExpr: COLOR (PATTERN)?;
 
 WS: [ \t]+ -> skip;
 NEWLINE: '\r'? '\n';
@@ -75,7 +76,7 @@ funcDec:
 paramList: dataType ID (',' dataType ID)*;
 funcCall: 'PERFORM' ID '(' argList ')';
 argList: expression (',' expression)*;
-returnStmt: 'RETURN' (ID | expression);
+returnStmt: 'RETURN' expression;
 
 dataType:
 	'UNIT'
