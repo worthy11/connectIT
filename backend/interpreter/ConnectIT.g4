@@ -74,7 +74,7 @@ forStmt: 'REPEAT' numExpr 'TIMES' NEWLINE* stmtBlock;
 funcDec:
 	'METHOD' ID '(' paramList? ')' 'RETURNS' dataType stmtBlock;
 paramList: dataType ID (',' dataType ID)*;
-funcCall: 'PERFORM' ID '(' argList ')';
+funcCall: 'PERFORM' ID '(' argList? ')';
 argList: expression (',' expression)*;
 returnStmt: 'RETURN' expression;
 

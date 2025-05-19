@@ -706,7 +706,7 @@ class CustomVisitor(ConnectITVisitor):
         params = func_def["params"]
         return_type = func_def["return_type"]
         body = func_def["body"]
-        args = ctx.argList().expression()
+        args = ctx.argList().expression() if ctx.argList() else []
 
         if len(args) != len(params):
             raise Exception(f"Function {func_name} expects {len(params)} arguments, {len(args)} were given at line {line}, column {column}")
