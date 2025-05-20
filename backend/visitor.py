@@ -541,7 +541,7 @@ class CustomVisitor(ConnectITVisitor):
             elif self.assigning:
                 value = name
 
-        elif ctx.unitExpr():
+        elif ctx.unitExpr(): 
             value, type = self.visit(ctx.unitExpr()), "UNIT"
         elif ctx.NUMBER():
             value, type = int(ctx.NUMBER().getText()), "NUMBER"
@@ -549,6 +549,8 @@ class CustomVisitor(ConnectITVisitor):
             value, type = ctx.BOOLEAN().getText() == "TRUE", "BOOLEAN"
         elif ctx.funcCall():
             value, type = self.visit(ctx.funcCall())
+            if type == "NOTHING":
+                value = None 
         elif ctx.expression():
             value, type = self.visit(ctx.expression())
             if ctx.getChild(0).getText() == '[':
@@ -699,7 +701,7 @@ class CustomVisitor(ConnectITVisitor):
                 func_def = self.call_stack.peek(i).get(func_name)
 
         if func_def is None:
-            raise Exception(f"Unknown function: {func_name}")
+            raise Exception(f"Unknown function: {func_name} at line {line}, column {column}")
 
         scope = self.current_scope.get_child(func_name).get_child("block")
 
@@ -714,10 +716,8 @@ class CustomVisitor(ConnectITVisitor):
         ar = ActivationRecord(func_name, "FUNCTION", self.call_stack.peek().nesting_level + 1)
 
         for i, (param_type, param_name) in enumerate(params):
-            value, val_type = self.visit(args[i])
-            # TODO: Check for redeclaration
+            value, val_type = self.visit(args[i])  
             scope.declare(param_name, param_type, body.start.line)  
-            # TODO: Check if types match
             ar.set(param_name, value)
 
         self.call_stack.push(ar)
@@ -729,6 +729,10 @@ class CustomVisitor(ConnectITVisitor):
         except Exception as e:
             if isinstance(e.args, tuple) and e.args[0] == "return":
                 value, _type = e.args[1]
+                if return_type == 'NOTHING' and _type is not None:
+                    raise Exception(f"Void functions cannot return values. Did you mean to create function that returns {_type} at line {line}, column {column}")
+                if _type != return_type:
+                    raise Exception(f"Return type mismatch in function '{func_name}': expected {return_type}, got {_type} at line {line}, column {column}")             
                 self.call_stack.pop()
                 return value, _type
             else:
@@ -738,6 +742,6 @@ class CustomVisitor(ConnectITVisitor):
         return None, None
 
 
-    def visitReturnStmt(self, ctx):
+    def visitReturnStmt(self, ctx):  
         value, type = self.visit(ctx.expression())
         raise Exception("return", (value, type))

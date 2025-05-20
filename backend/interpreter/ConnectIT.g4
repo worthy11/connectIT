@@ -13,7 +13,6 @@ statement: ('?')? (
 		| outStmt
 		| whileStmt
 		| forStmt
-		| forIdStmt
 		| ifStmt
 		| funcDec
 		| funcCall
@@ -70,12 +69,12 @@ ifStmt:
 	)* (NEWLINE* 'ELSE' NEWLINE* stmtBlock)?;
 
 whileStmt: 'REPEAT WHILE' logicExpr NEWLINE* stmtBlock;
-forStmt: 'REPEAT' numExpr 'TIMES' NEWLINE* stmtBlock;
-forIdStmt: 
+forStmt: 
 	'REPEAT' numExpr 'TIMES WITH COUNTER' ID ('START' numExpr)? ('STEP' numExpr)? NEWLINE* stmtBlock;
 
 funcDec:
 	'METHOD' ID '(' paramList? ')' 'RETURNS' dataType stmtBlock;
+
 paramList: dataType ID (',' dataType ID)*;
 funcCall: 'PERFORM' ID '(' argList? ')';
 argList: expression (',' expression)*;
@@ -87,6 +86,7 @@ dataType:
 	| 'SHAPE'
 	| 'MODEL'
 	| 'NUMBER'
+	| 'NOTHING'
 	| 'BOOLEAN';
 
 arrowOperator:

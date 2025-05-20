@@ -224,15 +224,6 @@ class ConnectITListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by ConnectITParser#forIdStmt.
-    def enterForIdStmt(self, ctx:ConnectITParser.ForIdStmtContext):
-        pass
-
-    # Exit a parse tree produced by ConnectITParser#forIdStmt.
-    def exitForIdStmt(self, ctx:ConnectITParser.ForIdStmtContext):
-        pass
-
-
     # Enter a parse tree produced by ConnectITParser#funcDec.
     def enterFuncDec(self, ctx:ConnectITParser.FuncDecContext):
         pass
