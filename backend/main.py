@@ -56,7 +56,7 @@ def evaluate_expression(expression):
     parser.addErrorListener(error_listener)
 
     tree = parser.program()
-    print(tree.toStringTree(recog=parser))
+    # print(tree.toStringTree(recog=parser))
 
     if lexer_error_listener.has_error:
         print(lexer_error_listener.errors)

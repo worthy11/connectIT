@@ -1,4 +1,12 @@
-NUMBER x = 10
+NUMBER x = 7
+
+METHOD add() RETURNS NOTHING [
+    METHOD add2(NUMBER x) RETURNS NOTHING [
+        OUTPUT x + 1
+    ]
+    PERFORM add2(3)
+    OUTPUT x + 2
+]
 
 METHOD factorial(NUMBER x) RETURNS NUMBER [
     OUTPUT x
@@ -10,11 +18,18 @@ METHOD factorial(NUMBER x) RETURNS NUMBER [
     RETURN x
 ]
 
-NUMBER y = 8
-IF y < 5 [
-    OUTPUT PERFORM factorial(3)
-    OUTPUT y
-] ELSE [
-    OUTPUT PERFORM factorial(4)
-    OUTPUT GLOBAL y
+IF TRUE [
+    NUMBER x = 5
+    IF TRUE [
+        OUTPUT x
+        NUMBER x = 3
+        OUTPUT x
+        UP x = 9
+    ]
+    OUTPUT x
+    x = 10
+    OUTPUT x
 ]
+OUTPUT x
+
+PERFORM add()

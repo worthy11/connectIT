@@ -90,7 +90,12 @@ class CustomVisitor(ConnectITVisitor):
                 self.visit(dec.assignment())
             else:
                 name = dec.ID().getText()
-                path = name + ":" + self.get_scope_path(ctx)
+                path = []
+                scope = self.get_scope_for_ctx(ctx)
+                while scope is not None:
+                    path.append(scope.name)
+                    scope = scope.parent
+                path = name + ":" + ":".join(path)
                 self.call_stack.peek().set(path, None)
         self.declaring = False
         return None
@@ -100,25 +105,27 @@ class CustomVisitor(ConnectITVisitor):
         column = ctx.start.column
 
         self.assigning = True
-        lvalue, ltype = self.visit(ctx.expression(0))
+        name, _ = self.visit(ctx.expression(0))
         self.assigning = False
 
-        path = lvalue + ":" + self.get_scope_path(ctx)
         if self.declaring:
-            self.call_stack.peek().set(path, None)
+            self.call_stack.peek().set(name, None)
+        self.declaring = False
 
         self.assigning = True
-        lvalue, ltype = self.visit(ctx.expression(0))
+        name, expected_type = self.visit(ctx.expression(0))
         self.assigning = False
-        rvalue, rtype = self.visit(ctx.expression(1))
-        if rtype != ltype:
-            raise Exception(f"Type Error: Cannot assign {rtype} to {ltype} at line {line}, column {column}.")
+
+        value, received_type = self.visit(ctx.expression(1))
+        if received_type != expected_type:
+            raise Exception(f"Type Error: Cannot assign {received_type} to {expected_type} at line {line}, column {column}.")
 
         for ar in reversed(self.call_stack.records):
-            if path in ar.members:
-                ar.set(path, rvalue)
+            if name in ar.members:
+                ar.set(name, value)
                 return None
-        raise Exception(f"Error: Cannot assign value to undeclared variable {lvalue} at line {line}, column {column}")
+        name = name.split(":")[0]
+        raise Exception(f"Error: Cannot assign value to undeclared variable {name} at line {line}, column {column}")
     
     def visitExtension(self, ctx):
         line = ctx.start.line
@@ -127,31 +134,26 @@ class CustomVisitor(ConnectITVisitor):
         self.assigning = True
         name, expected_type = self.visit(ctx.expression(0))
         self.assigning = False
+
         e, op = ctx.expression(1), ctx.extensionOperator()
         if expected_type not in ["LAYER", "SHAPE", "MODEL", "NUMBER"]:            
             raise Exception(f"Type Error: Cannot add new values to type {expected_type} at line {line}, column {column}.")
             
         # TODO: Do zmiany
-
-        path = name + ":" + self.get_scope_path(ctx)
-        scopes = path.split(':')
-        while len(scopes) > 0:
-            path = ":".join(scopes)
-            for ar in reversed(self.call_stack.records):
-                if path in ar.members:
-                    value = ar.get(path)
-                    match expected_type:
-                        case "LAYER":
-                            new_value = self.extendLayer(value, e, op)
-                        case "SHAPE":
-                            new_value = self.extendShape(value, e, op)
-                        case "MODEL":
-                            new_value = self.extendModel(value, e, op)
-                        case "NUMBER":
-                            new_value = self.extendNumber(value, e, op)
-                    ar.set(path, new_value)
-                    return None
-            scopes.pop(1)
+        for ar in reversed(self.call_stack.records):
+            if name in ar.members:
+                value = ar.get(name)
+                match expected_type:
+                    case "LAYER":
+                        new_value = self.extendLayer(value, e, op)
+                    case "SHAPE":
+                        new_value = self.extendShape(value, e, op)
+                    case "MODEL":
+                        new_value = self.extendModel(value, e, op)
+                    case "NUMBER":
+                        new_value = self.extendNumber(value, e, op)
+                ar.set(name, new_value)
+                return None
         raise Exception(f"Error: Cannot apply {op.getText()} operator to undeclared variable {name} at line {line}, column {column}")
 
     def extendLayer(self, value, e, op):
@@ -549,9 +551,9 @@ class CustomVisitor(ConnectITVisitor):
                         scope = scope.parent
 
             if is_global:
-                for key, val in self.scopes.items():
-                    if val.name == "global":
-                        scope = val
+                for _, s in self.scopes.items():
+                    if s.name == "global":
+                        scope = s
                         break
 
             scopes = []
@@ -562,16 +564,25 @@ class CustomVisitor(ConnectITVisitor):
             scope = curr_scope
 
             value, type = None, None
-            while len(scopes) > 0:
+            found = False
+            while len(scopes) > 0 and not found:
                 lookup_path = name + ":" + ":".join(scopes)
+
+                if self.declaring:
+                    return lookup_path, None
+
                 for i, ar in enumerate(reversed(self.call_stack.records)):
                     if lookup_path in ar.members:
                         value, type = self.call_stack.peek(i).get(lookup_path), scope.get_type(name)
                         if not self.assigning:
                             return value, type
-                scopes.pop(0)
+                        found = True
+                        break
+                if not found:
+                    scopes.pop(0)
+
             if self.assigning:
-                return name, type
+                return lookup_path, type
 
             if value is None:
                 raise Exception(f"Type Error: {name} has no value at line {line}, column {column}.")
@@ -786,6 +797,7 @@ class CustomVisitor(ConnectITVisitor):
                 value, val_type = self.visit(args[i])
                 if val_type != param_type:
                     raise Exception(f"Type Error: Function {func_name} expects {param_type}, got {val_type} at line {line}, column {column}")
+
                 var_path = param_name + ":" + ":".join(path)
                 ar.set(var_path, value)
                 found = True
