@@ -77,11 +77,12 @@ class CustomListener(ConnectITListener):
             declared_in = self.current_scope.get_line(name)
             raise Exception(f"Redeclaration of function '{name}' at line {line} (first declared in line {declared_in})")
 
-        for (type, id) in zip(ctx.paramList().dataType(), ctx.paramList().ID()):
-            if id in self.current_scope.variables:
-                declared_in = self.current_scope.get_line(id)
-                raise Exception(f"Redeclaration of parameter '{id}' at line {line} (first declared in line {declared_in})")
-            self.current_scope.declare(id, type, line)
+        if ctx.paramList() is not None:
+            for (type, id) in zip(ctx.paramList().dataType(), ctx.paramList().ID()):
+                if id in self.current_scope.variables:
+                    declared_in = self.current_scope.get_line(id)
+                    raise Exception(f"Redeclaration of parameter '{id}' at line {line} (first declared in line {declared_in})")
+                self.current_scope.declare(id, type, line)
 
         self.current_scope.declare(name, "FUNCTION", line)
         self.current_scope.children.append(scope)
