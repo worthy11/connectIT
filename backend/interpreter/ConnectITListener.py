@@ -206,6 +206,24 @@ class ConnectITListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by ConnectITParser#elifStmt.
+    def enterElifStmt(self, ctx:ConnectITParser.ElifStmtContext):
+        pass
+
+    # Exit a parse tree produced by ConnectITParser#elifStmt.
+    def exitElifStmt(self, ctx:ConnectITParser.ElifStmtContext):
+        pass
+
+
+    # Enter a parse tree produced by ConnectITParser#elseStmt.
+    def enterElseStmt(self, ctx:ConnectITParser.ElseStmtContext):
+        pass
+
+    # Exit a parse tree produced by ConnectITParser#elseStmt.
+    def exitElseStmt(self, ctx:ConnectITParser.ElseStmtContext):
+        pass
+
+
     # Enter a parse tree produced by ConnectITParser#whileStmt.
     def enterWhileStmt(self, ctx:ConnectITParser.WhileStmtContext):
         pass

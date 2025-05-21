@@ -3,10 +3,18 @@ NUMBER x = 10
 METHOD factorial(NUMBER x) RETURNS NUMBER [
     OUTPUT x
     IF x == 1 [
+        GLOBAL x = 20
         RETURN x
     ]
-    PERFORM factorial(x-1)
+    x *= PERFORM factorial(x-1)
     RETURN x
 ]
 
-OUTPUT PERFORM factorial(3)
+NUMBER y = 8
+IF y < 5 [
+    OUTPUT PERFORM factorial(3)
+    OUTPUT y
+] ELSE [
+    OUTPUT PERFORM factorial(4)
+    OUTPUT GLOBAL y
+]

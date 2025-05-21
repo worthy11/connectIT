@@ -34,11 +34,12 @@ class Scope:
         return f"Name: {self.name}\nVars: {self.variables}\nChildren: {children_names}"
 
 
-    def declare(self, name, type, line):
+    def declare(self, name, type, line, value=None):
         self.variables[name] = {}
         self.variables[name]["name"] = name
         self.variables[name]["type"] = type
         self.variables[name]["line"] = line
+        self.variables[name]["value"] = value
 
     def get_type(self, name):
         if name in self.variables:

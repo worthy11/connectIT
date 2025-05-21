@@ -29,6 +29,15 @@ class CustomVisitor(ConnectITVisitor):
             if ctx in self.scopes:
                 return self.scopes[ctx]
             ctx = ctx.parentCtx
+        return None
+
+    def get_scope_path(self, ctx):
+        path = []
+        scope = self.get_scope_for_ctx(ctx)
+        while scope is not None:
+            path.append(scope.name)
+            scope = scope.parent
+        return ":".join(path)
 
     def visitProgram(self, ctx):
         self.current_scope = self.get_scope_for_ctx(ctx)
@@ -81,30 +90,33 @@ class CustomVisitor(ConnectITVisitor):
                 self.visit(dec.assignment())
             else:
                 name = dec.ID().getText()
-                self.call_stack.peek().set(name, None)
+                path = name + ":" + self.get_scope_path(ctx)
+                self.call_stack.peek().set(path, None)
         self.declaring = False
         return None
 
     def visitAssignment(self, ctx):
-        scope = self.get_scope_for_ctx(ctx)
         line = ctx.start.line
         column = ctx.start.column
 
         self.assigning = True
-        lvalue, _ = self.visit(ctx.expression(0))
+        lvalue, ltype = self.visit(ctx.expression(0))
         self.assigning = False
 
+        path = lvalue + ":" + self.get_scope_path(ctx)
         if self.declaring:
-            self.call_stack.peek().set(lvalue, None)
+            self.call_stack.peek().set(path, None)
 
-        expected_type = scope.get_type(lvalue)
-
+        self.assigning = True
+        lvalue, ltype = self.visit(ctx.expression(0))
+        self.assigning = False
         rvalue, rtype = self.visit(ctx.expression(1))
-        if rtype != expected_type:
-            raise Exception(f"Type Error: Cannot assign {rtype} to {expected_type} at line {line}, column {column}.")
+        if rtype != ltype:
+            raise Exception(f"Type Error: Cannot assign {rtype} to {ltype} at line {line}, column {column}.")
+
         for ar in reversed(self.call_stack.records):
-            if lvalue in ar.members:
-                ar.set(lvalue, rvalue)
+            if path in ar.members:
+                ar.set(path, rvalue)
                 return None
         raise Exception(f"Error: Cannot assign value to undeclared variable {lvalue} at line {line}, column {column}")
     
@@ -121,21 +133,26 @@ class CustomVisitor(ConnectITVisitor):
             
         # TODO: Do zmiany
 
-        for ar in reversed(self.call_stack.records):
-            if name in ar.members:
-                value = ar.get(name)
-                match expected_type:
-                    case "LAYER":
-                        new_value = self.extendLayer(value, e, op)
-                    case "SHAPE":
-                        new_value = self.extendShape(value, e, op)
-                    case "MODEL":
-                        new_value = self.extendModel(value, e, op)
-                    case "NUMBER":
-                        new_value = self.extendNumber(value, e, op)
-                ar.set(name, new_value)
-                return None
-        raise Exception(f"Error: Cannot apply {op} operator to undeclared variable {name} at line {line}, column {column}")
+        path = name + ":" + self.get_scope_path(ctx)
+        scopes = path.split(':')
+        while len(scopes) > 0:
+            path = ":".join(scopes)
+            for ar in reversed(self.call_stack.records):
+                if path in ar.members:
+                    value = ar.get(path)
+                    match expected_type:
+                        case "LAYER":
+                            new_value = self.extendLayer(value, e, op)
+                        case "SHAPE":
+                            new_value = self.extendShape(value, e, op)
+                        case "MODEL":
+                            new_value = self.extendModel(value, e, op)
+                        case "NUMBER":
+                            new_value = self.extendNumber(value, e, op)
+                    ar.set(path, new_value)
+                    return None
+            scopes.pop(1)
+        raise Exception(f"Error: Cannot apply {op.getText()} operator to undeclared variable {name} at line {line}, column {column}")
 
     def extendLayer(self, value, e, op):
         received_value, received_type = self.visit(e)
@@ -262,8 +279,6 @@ class CustomVisitor(ConnectITVisitor):
                 column = ctx.start.column
                 raise Exception(f"Cannot use CLOSED keyword with type {type} at line {line}, column {column}.")
         if ctx.arrowOperator():
-            print(f"ctx: {ctx.getText()}")
-            print(f"Result value={value}, type={type}")
             if self.assigning:
                 raise Exception(f"Error: Cannot connect elements in a non-evaluating context at line {line}, column {column}.")
             line = ctx.start.line
@@ -279,7 +294,6 @@ class CustomVisitor(ConnectITVisitor):
                     value = self.createModel(ctx)
                     type = "MODEL"
                 case _:
-                    print(f"Current_scope: {self.current_scope.name}")
                     raise Exception(f"Cannot use connectors with type '{type}' at line {line}, column {column}.")
                     
         return value, type
@@ -524,25 +538,43 @@ class CustomVisitor(ConnectITVisitor):
         
         if ctx.ID():
             name = ctx.ID().getText()
-            is_global = ctx.getChild(0).getText() == "GLOBAL"
-            up_scopes = sum(1 for token in ctx.getChildren() if token.getText() == "UP")
-            value, type = None, None
 
+            up_scopes = sum(1 for token in ctx.getChildren() if token.getText() == "UP")
+            is_global = ctx.getChild(0).getText() == "GLOBAL"
             for _ in range(up_scopes):
                 if scope.parent:
-                    scope = scope.parent
+                    if scope.parent.name not in ["block", "global"]:
+                        scope = scope.parent.parent
+                    else:
+                        scope = scope.parent
 
-            for i, ar in enumerate(reversed(self.call_stack.records)):
-                if name in ar.members:
-                    while value is None and up_scopes <= len(self.call_stack.records):
-                        value, type = self.call_stack.peek(i+up_scopes).get(name), scope.get_type(name)
-                        up_scopes += 1
-                    break
+            if is_global:
+                for key, val in self.scopes.items():
+                    if val.name == "global":
+                        scope = val
+                        break
 
-            if not self.assigning and value is None:
+            scopes = []
+            curr_scope = scope
+            while scope is not None:
+                scopes.append(scope.name)
+                scope = scope.parent
+            scope = curr_scope
+
+            value, type = None, None
+            while len(scopes) > 0:
+                lookup_path = name + ":" + ":".join(scopes)
+                for i, ar in enumerate(reversed(self.call_stack.records)):
+                    if lookup_path in ar.members:
+                        value, type = self.call_stack.peek(i).get(lookup_path), scope.get_type(name)
+                        if not self.assigning:
+                            return value, type
+                scopes.pop(0)
+            if self.assigning:
+                return name, type
+
+            if value is None:
                 raise Exception(f"Type Error: {name} has no value at line {line}, column {column}.")
-            elif self.assigning:
-                value = name
 
         elif ctx.unitExpr(): 
             value, type = self.visit(ctx.unitExpr()), "UNIT"
@@ -554,6 +586,7 @@ class CustomVisitor(ConnectITVisitor):
             value, type = self.visit(ctx.funcCall())
             if type == "NOTHING":
                 value = None 
+
         elif ctx.expression():
             value, type = self.visit(ctx.expression())
             if ctx.getChild(0).getText() == '[':
@@ -614,34 +647,42 @@ class CustomVisitor(ConnectITVisitor):
             }
 
     def visitIfStmt(self, ctx):
-        condition_value, condition_type = self.visit(ctx.logicExpr(0))
-        line = ctx.start.line
-        column = ctx.start.column
+        condition_value, condition_type = self.visit(ctx.logicExpr())
         if condition_type != "BOOLEAN": 
             raise Exception(f"Type Error: IF condition must be BOOLEAN, not {condition_type} at line {line}, column {column}.")
 
         if condition_value:
-            return self.visit(ctx.stmtBlock(0))
-            
+            self.visit(ctx.stmtBlock())
+        elif ctx.elifStmt():
+            for elseif in ctx.elifStmt():
+                self.visit(elseif)
+        elif ctx.elseStmt():
+            self.visit(ctx.elseStmt())
         else:
-            for i in range(1, len(ctx.logicExpr())):
-                condition_value, condition_type = self.visit(ctx.logicExpr(i))
-                elseLine = ctx.logicExpr(i).start.line
-                elseColumn = ctx.logicExpr(i).start.column
-                if condition_type != "BOOLEAN":
-                    raise Exception(f"Type Error: ELSE IF condition must be BOOLEAN, not {condition_type} at line {elseLine}, column {elseColumn}.")
-                if condition_value:
-                    return self.visit(ctx.stmtBlock(i))
+            return
+        
+    def visitElifStmt(self, ctx):
+        condition_value, condition_type = self.visit(ctx.logicExpr())
+        if condition_type != "BOOLEAN": 
+            raise Exception(f"Type Error: ELSE IF condition must be BOOLEAN, not {condition_type} at line {line}, column {column}.")
 
-            if len(ctx.stmtBlock()) > len(ctx.logicExpr()):
-                return self.visit(ctx.stmtBlock(len(ctx.stmtBlock()) - 1))
+        if condition_value:
+            self.visit(ctx.stmtBlock())
+        else:
+            return
+
+    def visitElseStmt(self, ctx):
+        self.visit(ctx.stmtBlock())
+        return
             
     def visitWhileStmt(self, ctx):
         condition_value, condition_type = self.visit(ctx.logicExpr())
         line = ctx.start.line
         column = ctx.start.column
+
         if condition_type != "BOOLEAN": 
             raise Exception(f"Type Error: WHILE condition must be BOOLEAN, not {condition_type} at line {line}, column {column}.")
+
         while condition_value:
             self.visit(ctx.stmtBlock())
             condition_value, condition_type = self.visit(ctx.logicExpr())
@@ -651,29 +692,41 @@ class CustomVisitor(ConnectITVisitor):
                 raise Exception(f"Type Error: WHILE condition must be BOOLEAN, not {condition_type} at line {line}, column {column}.")
             
     def visitForStmt(self, ctx):
-        number, type = self.visit(ctx.numExpr())
+        self.current_scope = self.scopes[ctx]
+
+        counter = ctx.ID().getText()
+        if len(ctx.expression()) > 1:
+            times, type = self.visit(ctx.expression(0))
+            start = self.visit(ctx.expression(1))
+            step = self.visit(ctx.expression(2))
+        else:
+            times, type = self.visit(ctx.expression())
+            start = 1
+            step = 1
+
         line = ctx.start.line
         column = ctx.start.column
 
         if type != "NUMBER":
             raise Exception(f"Type Error: FOR loop must iterate over a NUMBER, not {type} at line {line}, column {column}.")
 
-        if number < 0:
+        if times < 0:
             raise Exception(f"Value Error: FOR loop cannot iterate a negative number of times at line {line}, column {column}.")
 
-        for i in range(number):
-            self.visit(ctx.stmtBlock())
-            line = ctx.start.line
-            column = ctx.start.column
+        for i in range(times):
+            self.current_scope.variables[counter]["value"] = start + i*step
+            try:
+                self.visit(ctx.stmtBlock())
+            finally:
+                self.current_scope = self.current_scope.parent
     
     def visitStmtBlock(self, ctx):
-        output = None
-        for statement in ctx.statement():
-            statement_output = self.visit(statement)
-            if isinstance(statement_output, str):
-                if statement_output[0] == "{":
-                    output = statement_output
-        return output
+        self.current_scope = self.scopes[ctx]
+        try:
+            for statement in ctx.statement():
+                self.visit(statement)
+        finally:
+            self.current_scope = self.current_scope.parent
     
     def visitFuncDec(self, ctx):
         func_name = ctx.ID().getText()
@@ -698,6 +751,7 @@ class CustomVisitor(ConnectITVisitor):
         column = ctx.start.column
         func_name = ctx.ID().getText()
         func_def = None
+
         for i, ar in enumerate(reversed(self.call_stack.records)):
             if func_name in ar.members:
                 func_def = self.call_stack.peek(i).get(func_name)
@@ -706,6 +760,12 @@ class CustomVisitor(ConnectITVisitor):
             raise Exception(f"Unknown function: {func_name} at line {line}, column {column}")
 
         scope = self.current_scope.get_child(func_name)
+        curr_scope = scope
+        path = []
+        while scope is not None:
+            path.append(scope.name)
+            scope = scope.parent
+        scope = curr_scope
 
         params = func_def["params"]
         return_type = func_def["return_type"]
@@ -715,23 +775,25 @@ class CustomVisitor(ConnectITVisitor):
         if len(args) != len(params):
             raise Exception(f"Function {func_name} expects {len(params)} arguments, {len(args)} were given at line {line}, column {column}")
 
+        if self.call_stack.peek().nesting_level + 1 > 20:
+            raise Exception(f"Error: Maximum function call depth reached at line {line}, column {column}")
+        
         ar = ActivationRecord(func_name, "FUNCTION", self.call_stack.peek().nesting_level + 1)
-
-        for i, (param_type, param_name) in enumerate(params):
-            value, val_type = self.visit(args[i])
-            if param_name not in scope.variables:
-                scope.declare(param_name, param_type, body.start.line)  
-            value, val_type = self.visit(args[i])  
-            scope.declare(param_name, param_type, body.start.line)  
-            ar.set(param_name, value)
-
+        found = False
+        while len(path) > 0 and not found:
+            for i, (param_type, param_name) in enumerate(params):
+                value, val_type = self.visit(args[i])
+                if val_type != param_type:
+                    raise Exception(f"Type Error: Function {func_name} expects {param_type}, got {val_type} at line {line}, column {column}")
+                var_path = param_name + ":" + ":".join(path)
+                ar.set(var_path, value)
+                found = True
+            path.pop(0)
         self.call_stack.push(ar)
 
         try:
             self.current_scope = scope
-            print(f"Before: {[r.members for r in self.call_stack.records]}")
             self.visit(body)
-            self.current_scope = scope.parent
         except Exception as e:
             if isinstance(e.args, tuple) and e.args[0] == "return":
                 value, _type = e.args[1]
@@ -742,15 +804,15 @@ class CustomVisitor(ConnectITVisitor):
                     raise Exception(f"Return type mismatch in function '{func_name}': expected {return_type}, got {_type} at line {line}, column {column}")             
 
                 self.current_scope = scope.parent
-                print(f"After: {[r.members for r in self.call_stack.records]}")
                 return value, _type
             else:
                 raise e
+        finally:
+            self.current_scope = scope.parent
+            self.call_stack.pop()
 
         return None, None
 
-
     def visitReturnStmt(self, ctx):  
         value, type = self.visit(ctx.expression())
-        self.call_stack.pop()
         raise Exception("return", (value, type))

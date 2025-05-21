@@ -119,6 +119,16 @@ class ConnectITVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by ConnectITParser#elifStmt.
+    def visitElifStmt(self, ctx:ConnectITParser.ElifStmtContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ConnectITParser#elseStmt.
+    def visitElseStmt(self, ctx:ConnectITParser.ElseStmtContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by ConnectITParser#whileStmt.
     def visitWhileStmt(self, ctx:ConnectITParser.WhileStmtContext):
         return self.visitChildren(ctx)
