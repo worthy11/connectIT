@@ -1,0 +1,16 @@
+NUMBER x = 1
+
+IF TRUE [
+    NUMBER x = 5
+    IF TRUE [
+        OUTPUT x
+        NUMBER x = 3
+        OUTPUT x
+        UP x = 9
+    ]
+    OUTPUT x
+    x = 10
+    OUTPUT x
+]
+
+OUTPUT x

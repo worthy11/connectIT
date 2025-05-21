@@ -1,0 +1,6 @@
+METHOD bad_recursion() RETURNS NOTHING [
+    OUTPUT 1
+    PERFORM bad_recursion()
+]
+
+PERFORM bad_recursion()

@@ -1,0 +1,14 @@
+NUMBER x = 10
+
+REPEAT 5 TIMES WITH COUNTER i
+[
+    NUMBER x = 5
+    IF i >= 3 [
+        x += i
+    ] ELSE [
+        GLOBAL x += i
+    ]
+    OUTPUT x
+]
+OUTPUT x
+

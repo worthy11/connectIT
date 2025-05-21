@@ -736,7 +736,6 @@ class CustomVisitor(ConnectITVisitor):
         count, count_type = self.visit(ctx.numExpr(0))
         line = ctx.start.line
         column = ctx.start.column
-        print(f"count: {count}, count_type: {count_type}")
 
         if count_type != "NUMBER":
             raise Exception(f"Type Error: FOR loop must iterate over a NUMBER, not {count_type} at line {line}, column {column}.")
@@ -744,11 +743,15 @@ class CustomVisitor(ConnectITVisitor):
         counter_name = ctx.ID().getText()
         start = 0
         step = 1
-        print(f"counter_name: {counter_name}, start: {start}, step: {step}")
+        path = []
+        scope = self.scopes[ctx]
+        while scope is not None:
+            path.append(scope.name)
+            scope = scope.parent
+        path = counter_name + ":" + ":".join(path)
 
-        if ctx.getChildCount() > 6:
-            print(f"ctx.getChildCount(): {ctx.getChildCount()}")
-            for i in range(6, ctx.getChildCount()):
+        if ctx.getChildCount() > 4:
+            for i in range(4, ctx.getChildCount()):
                 if ctx.getChild(i).getText() == "START":
                     start_val, start_type = self.visit(ctx.numExpr(1))
                     if start_type != "NUMBER":
@@ -761,13 +764,10 @@ class CustomVisitor(ConnectITVisitor):
                         raise Exception(f"Type Error: STEP value must be NUMBER at line {line}, column {column}.")
                     step = step_val
 
-        print(f"self.call_stack.peek().nesting_level: {self.call_stack.peek().nesting_level}")
-        print(f"self.call_stack.peek().name: {self.call_stack.peek().name}")
-        print(f"self.current_scope.variables: {self.current_scope.variables}")
-        for i in range(start, count, step):
-            print(f"i: {i}")
-            self.current_scope.variables[counter_name]["value"] = i
-            print(f"self.current_scope.variables: {self.current_scope.variables}")
+        self.call_stack.peek().set(path, start)
+
+        for i in range(count):
+            self.call_stack.peek().set(path, start + i * step)
             try:
                 self.visit(ctx.stmtBlock())
             finally:

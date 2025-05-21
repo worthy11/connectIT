@@ -1,35 +1,9 @@
-NUMBER x = 7
-
-METHOD add() RETURNS NOTHING [
-    METHOD add2(NUMBER x) RETURNS NOTHING [
-        OUTPUT x + 1
-    ]
-    PERFORM add2(3)
-    OUTPUT x + 2
-]
-
 METHOD factorial(NUMBER x) RETURNS NUMBER [
-    OUTPUT x
     IF x == 1 [
-        GLOBAL x = 20
         RETURN x
     ]
-    x *= PERFORM factorial(x-1)
-    RETURN x
+    RETURN x * PERFORM factorial(x-1)
 ]
 
-IF TRUE [
-    NUMBER x = 5
-    IF TRUE [
-        OUTPUT x
-        NUMBER x = 3
-        OUTPUT x
-        UP x = 9
-    ]
-    OUTPUT x
-    x = 10
-    OUTPUT x
-]
+NUMBER x = PERFORM factorial(5)
 OUTPUT x
-
-PERFORM add()
