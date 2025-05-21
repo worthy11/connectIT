@@ -45,10 +45,14 @@ class CustomListener(ConnectITListener):
         self.current_scope = self.current_scope.parent
 
     def enterStmtBlock(self, ctx):
-        scope = Scope("block", parent=self.current_scope)
-        self.current_scope.children.append(scope)
-        self.scopes[ctx] = scope
-        self.current_scope = scope
+        if self.current_scope.name in ["global", "block"]:
+            scope = Scope("block", parent=self.current_scope)
+            self.current_scope.children.append(scope)
+            self.scopes[ctx] = scope
+            self.current_scope = scope
+        else:
+            self.scopes[ctx] = self.current_scope
 
     def exitStmtBlock(self, ctx):
-        self.current_scope = self.current_scope.parent
+        if self.current_scope.name in ["global", "block"]:
+            self.current_scope = self.current_scope.parent

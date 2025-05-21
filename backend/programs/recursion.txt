@@ -1,19 +1,12 @@
-NUMBER x = 999
+NUMBER x = 10
 
-METHOD add(NUMBER x) RETURNS NUMBER [
+METHOD factorial(NUMBER x) RETURNS NUMBER [
+    OUTPUT x
     IF x == 1 [
-        OUTPUT ^^^^^x
         RETURN x
     ]
-    RETURN x * PERFORM add(x-1)
+    PERFORM factorial(x-1)
+    RETURN x
 ]
 
-OUTPUT PERFORM add(3)
-NUMBER y = 1
-REPEAT WHILE x < 4 [
-    y *= x
-    x += 1
-]
-OUTPUT y
-
-SHOW *red*
+OUTPUT PERFORM factorial(3)

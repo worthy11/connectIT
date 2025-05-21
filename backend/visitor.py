@@ -48,6 +48,8 @@ class CustomVisitor(ConnectITVisitor):
             return self.visit(ctx.declarationList())
         if ctx.assignment():
             return self.visit(ctx.assignment())
+        if ctx.expression():
+            return self.visit(ctx.expression())
         if ctx.extension():
             return self.visit(ctx.extension())
         if ctx.showStmt():
@@ -62,8 +64,6 @@ class CustomVisitor(ConnectITVisitor):
             return self.visit(ctx.forStmt())
         if ctx.funcDec():
             return self.visit(ctx.funcDec())
-        if ctx.funcCall():
-            return self.visit(ctx.funcCall())
         if ctx.returnStmt():
             return self.visit(ctx.returnStmt())
         else:
@@ -524,7 +524,8 @@ class CustomVisitor(ConnectITVisitor):
         
         if ctx.ID():
             name = ctx.ID().getText()
-            up_scopes = sum(1 for token in ctx.getChildren() if token.getText() == '^')
+            is_global = ctx.getChild(0).getText() == "GLOBAL"
+            up_scopes = sum(1 for token in ctx.getChildren() if token.getText() == "UP")
             value, type = None, None
 
             for _ in range(up_scopes):
@@ -533,7 +534,9 @@ class CustomVisitor(ConnectITVisitor):
 
             for i, ar in enumerate(reversed(self.call_stack.records)):
                 if name in ar.members:
-                    value, type = self.call_stack.peek(i+up_scopes).get(name), scope.get_type(name)
+                    while value is None and up_scopes <= len(self.call_stack.records):
+                        value, type = self.call_stack.peek(i+up_scopes).get(name), scope.get_type(name)
+                        up_scopes += 1
                     break
 
             if not self.assigning and value is None:
@@ -619,6 +622,7 @@ class CustomVisitor(ConnectITVisitor):
 
         if condition_value:
             return self.visit(ctx.stmtBlock(0))
+            
         else:
             for i in range(1, len(ctx.logicExpr())):
                 condition_value, condition_type = self.visit(ctx.logicExpr(i))
@@ -663,14 +667,12 @@ class CustomVisitor(ConnectITVisitor):
             column = ctx.start.column
     
     def visitStmtBlock(self, ctx):
-        self.call_stack.push(ActivationRecord("block", "block", 2))
         output = None
         for statement in ctx.statement():
             statement_output = self.visit(statement)
             if isinstance(statement_output, str):
                 if statement_output[0] == "{":
                     output = statement_output
-        self.call_stack.pop()
         return output
     
     def visitFuncDec(self, ctx):
@@ -703,7 +705,7 @@ class CustomVisitor(ConnectITVisitor):
         if func_def is None:
             raise Exception(f"Unknown function: {func_name} at line {line}, column {column}")
 
-        scope = self.current_scope.get_child(func_name).get_child("block")
+        scope = self.current_scope.get_child(func_name)
 
         params = func_def["params"]
         return_type = func_def["return_type"]
@@ -716,6 +718,9 @@ class CustomVisitor(ConnectITVisitor):
         ar = ActivationRecord(func_name, "FUNCTION", self.call_stack.peek().nesting_level + 1)
 
         for i, (param_type, param_name) in enumerate(params):
+            value, val_type = self.visit(args[i])
+            if param_name not in scope.variables:
+                scope.declare(param_name, param_type, body.start.line)  
             value, val_type = self.visit(args[i])  
             scope.declare(param_name, param_type, body.start.line)  
             ar.set(param_name, value)
@@ -724,24 +729,28 @@ class CustomVisitor(ConnectITVisitor):
 
         try:
             self.current_scope = scope
+            print(f"Before: {[r.members for r in self.call_stack.records]}")
             self.visit(body)
-            self.current_scope = scope.parent.parent
+            self.current_scope = scope.parent
         except Exception as e:
             if isinstance(e.args, tuple) and e.args[0] == "return":
                 value, _type = e.args[1]
+
                 if return_type == 'NOTHING' and _type is not None:
-                    raise Exception(f"Void functions cannot return values. Did you mean to create function that returns {_type} at line {line}, column {column}")
+                    raise Exception(f"Void functions cannot return values. Did you mean to create function that returns {_type} at line {line}, column {column}?")
                 if _type != return_type:
                     raise Exception(f"Return type mismatch in function '{func_name}': expected {return_type}, got {_type} at line {line}, column {column}")             
-                self.call_stack.pop()
+
+                self.current_scope = scope.parent
+                print(f"After: {[r.members for r in self.call_stack.records]}")
                 return value, _type
             else:
                 raise e
 
-        self.call_stack.pop()
         return None, None
 
 
     def visitReturnStmt(self, ctx):  
         value, type = self.visit(ctx.expression())
+        self.call_stack.pop()
         raise Exception("return", (value, type))

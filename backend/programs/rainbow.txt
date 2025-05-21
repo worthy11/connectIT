@@ -1,0 +1,10 @@
+METHOD rainbow() RETURNS LAYER [
+	LAYER l = [*red*] <-> [*yellow*]
+	l <+-> *green*
+	l <+-> *blue*
+	l <+-> *lilac*
+	RETURN l
+]
+
+LAYER l = PERFORM rainbow()
+SHOW l

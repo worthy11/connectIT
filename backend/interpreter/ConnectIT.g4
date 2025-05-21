@@ -15,7 +15,6 @@ statement: ('?')? (
 		| forStmt
 		| ifStmt
 		| funcDec
-		| funcCall
 		| returnStmt
 	);
 
@@ -43,7 +42,7 @@ mulExpr: signExpr ((MUL | DIV) signExpr)*;
 signExpr: (PLUS | MINUS)* negExpr;
 negExpr: (NOT)* baseExpr;
 baseExpr:
-	('^')* ID
+	(('UP')* | 'GLOBAL') ID
 	| unitExpr
 	| NUMBER
 	| BOOLEAN
@@ -69,8 +68,10 @@ ifStmt:
 	)* (NEWLINE* 'ELSE' NEWLINE* stmtBlock)?;
 
 whileStmt: 'REPEAT WHILE' logicExpr NEWLINE* stmtBlock;
-forStmt: 
-	'REPEAT' numExpr 'TIMES WITH COUNTER' ID ('START' numExpr)? ('STEP' numExpr)? NEWLINE* stmtBlock;
+forStmt:
+	'REPEAT' numExpr 'TIMES WITH COUNTER' ID ('START' numExpr)? (
+		'STEP' numExpr
+	)? NEWLINE* stmtBlock;
 
 funcDec:
 	'METHOD' ID '(' paramList? ')' 'RETURNS' dataType stmtBlock;
