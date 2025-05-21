@@ -1,0 +1,4 @@
+REPEAT 5 TIMES WITH COUNTER i
+[
+    OUTPUT i
+]

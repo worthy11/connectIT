@@ -702,30 +702,72 @@ class CustomVisitor(ConnectITVisitor):
             if condition_type != "BOOLEAN": 
                 raise Exception(f"Type Error: WHILE condition must be BOOLEAN, not {condition_type} at line {line}, column {column}.")
             
+    # def visitForStmt(self, ctx):
+    #     self.current_scope = self.scopes[ctx]
+
+    #     counter = ctx.ID().getText()
+    #     if len(ctx.expression()) > 1:
+    #         times, type = self.visit(ctx.expression(0))
+    #         start = self.visit(ctx.expression(1))
+    #         step = self.visit(ctx.expression(2))
+    #     else:
+    #         times, type = self.visit(ctx.expression())
+    #         start = 1
+    #         step = 1
+
+    #     line = ctx.start.line
+    #     column = ctx.start.column
+
+    #     if type != "NUMBER":
+    #         raise Exception(f"Type Error: FOR loop must iterate over a NUMBER, not {type} at line {line}, column {column}.")
+
+    #     if times < 0:
+    #         raise Exception(f"Value Error: FOR loop cannot iterate a negative number of times at line {line}, column {column}.")
+
+    #     for i in range(times):
+    #         self.current_scope.variables[counter]["value"] = start + i*step
+    #         try:
+    #             self.visit(ctx.stmtBlock())
+    #         finally:
+    #             self.current_scope = self.current_scope.parent
+
     def visitForStmt(self, ctx):
         self.current_scope = self.scopes[ctx]
-
-        counter = ctx.ID().getText()
-        if len(ctx.expression()) > 1:
-            times, type = self.visit(ctx.expression(0))
-            start = self.visit(ctx.expression(1))
-            step = self.visit(ctx.expression(2))
-        else:
-            times, type = self.visit(ctx.expression())
-            start = 1
-            step = 1
-
+        count, count_type = self.visit(ctx.numExpr(0))
         line = ctx.start.line
         column = ctx.start.column
+        print(f"count: {count}, count_type: {count_type}")
 
-        if type != "NUMBER":
-            raise Exception(f"Type Error: FOR loop must iterate over a NUMBER, not {type} at line {line}, column {column}.")
+        if count_type != "NUMBER":
+            raise Exception(f"Type Error: FOR loop must iterate over a NUMBER, not {count_type} at line {line}, column {column}.")
 
-        if times < 0:
-            raise Exception(f"Value Error: FOR loop cannot iterate a negative number of times at line {line}, column {column}.")
+        counter_name = ctx.ID().getText()
+        start = 0
+        step = 1
+        print(f"counter_name: {counter_name}, start: {start}, step: {step}")
 
-        for i in range(times):
-            self.current_scope.variables[counter]["value"] = start + i*step
+        if ctx.getChildCount() > 6:
+            print(f"ctx.getChildCount(): {ctx.getChildCount()}")
+            for i in range(6, ctx.getChildCount()):
+                if ctx.getChild(i).getText() == "START":
+                    start_val, start_type = self.visit(ctx.numExpr(1))
+                    if start_type != "NUMBER":
+                        raise Exception(f"Type Error: START value must be NUMBER at line {line}, column {column}.")
+                    start = start_val
+                if ctx.getChild(i).getText() == "STEP":
+                    idx = 2 if ctx.getText().count("START") and ctx.getText().count("STEP") else 1
+                    step_val, step_type = self.visit(ctx.numExpr(idx))
+                    if step_type != "NUMBER":
+                        raise Exception(f"Type Error: STEP value must be NUMBER at line {line}, column {column}.")
+                    step = step_val
+
+        print(f"self.call_stack.peek().nesting_level: {self.call_stack.peek().nesting_level}")
+        print(f"self.call_stack.peek().name: {self.call_stack.peek().name}")
+        print(f"self.current_scope.variables: {self.current_scope.variables}")
+        for i in range(start, count, step):
+            print(f"i: {i}")
+            self.current_scope.variables[counter_name]["value"] = i
+            print(f"self.current_scope.variables: {self.current_scope.variables}")
             try:
                 self.visit(ctx.stmtBlock())
             finally:

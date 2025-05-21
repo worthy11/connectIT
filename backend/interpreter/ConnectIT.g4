@@ -68,9 +68,9 @@ elifStmt: 'ELSE IF' logicExpr NEWLINE* stmtBlock elifStmt?;
 elseStmt: 'ELSE' NEWLINE* stmtBlock;
 whileStmt: 'REPEAT WHILE' logicExpr NEWLINE* stmtBlock;
 forStmt:
-	'REPEAT' numExpr 'TIMES WITH COUNTER' ID (
-		('START' numExpr 'STEP' numExpr)
-	)? NEWLINE* stmtBlock;
+	'REPEAT' numExpr 'TIMES WITH COUNTER' ID 
+	('START' numExpr)? ('STEP' numExpr)?
+	NEWLINE* stmtBlock;
 
 funcDec:
 	'METHOD' ID '(' paramList? ')' 'RETURNS' dataType stmtBlock;
