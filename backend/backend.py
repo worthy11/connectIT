@@ -28,8 +28,20 @@ async def websocket_endpoint(websocket: WebSocket):
     if isinstance(output, dict):
         await websocket.send_text(json.dumps(output))
     else:
-        figure_json = json.loads(output)
-        await websocket.send_text(json.dumps(figure_json))
+        text, render = output
+        if text and len(text) > 0:
+            await websocket.send_text(json.dumps({
+                "type": "text",
+                "content": "\n".join(text)
+            }))
+        
+        if render and render.strip():
+            figure_json = json.loads(render)
+            await websocket.send_text(json.dumps({
+                "type": "figure",
+                "data": figure_json["data"],
+                "layout": figure_json["layout"]
+            }))
 
 @app.get("/api/programs")
 async def list_programs():

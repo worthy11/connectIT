@@ -87,7 +87,7 @@ def evaluate_expression(expression):
 
     try:
         visitor = CustomVisitor(listener.scopes)
-        result = visitor.visit(tree)
+        text, render = visitor.visit(tree)
 
     except Exception as e:
         return {
@@ -95,13 +95,7 @@ def evaluate_expression(expression):
             "message": f"{str(e)}"
         }
     
-    if result is None:
-        return {
-            "type": "error",
-            "message": "No output: You need to use SHOW statement to display your model."
-        }
-
-    return result
+    return text, render
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Process a file with a custom extension.")

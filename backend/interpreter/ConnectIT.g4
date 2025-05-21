@@ -14,6 +14,8 @@ statement: ('?')? (
 		| whileStmt
 		| forStmt
 		| ifStmt
+		| elifStmt
+		| elseStmt
 		| funcDec
 		| returnStmt
 	);
@@ -64,13 +66,13 @@ outStmt: 'OUTPUT' expression;
 stmtBlock: '[' NEWLINE* (statement NEWLINE+)* NEWLINE* ']';
 
 ifStmt: 'IF' logicExpr NEWLINE* stmtBlock elifStmt* elseStmt?;
-elifStmt: 'ELSE IF' logicExpr NEWLINE* stmtBlock elifStmt?;
+elifStmt: 'ELSE IF' logicExpr NEWLINE* stmtBlock;
 elseStmt: 'ELSE' NEWLINE* stmtBlock;
 whileStmt: 'REPEAT WHILE' logicExpr NEWLINE* stmtBlock;
 forStmt:
-	'REPEAT' numExpr 'TIMES WITH COUNTER' ID 
-	('START' numExpr)? ('STEP' numExpr)?
-	NEWLINE* stmtBlock;
+	'REPEAT' numExpr 'TIMES WITH COUNTER' ID ('START' numExpr)? (
+		'STEP' numExpr
+	)? NEWLINE* stmtBlock;
 
 funcDec:
 	'METHOD' ID '(' paramList? ')' 'RETURNS' dataType stmtBlock;

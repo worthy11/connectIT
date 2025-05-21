@@ -12,3 +12,8 @@ REPEAT 5 TIMES WITH COUNTER i
 ]
 OUTPUT x
 
+REPEAT WHILE x > 10 [
+    OUTPUT x-1
+    x -=1
+]
+OUTPUT x

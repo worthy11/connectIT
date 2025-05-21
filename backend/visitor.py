@@ -14,7 +14,8 @@ class CustomVisitor(ConnectITVisitor):
         self.assigning = False
         self.declaring = False
         self.render = []
-        self.fig = go.Figure()
+        self.text = []
+        self.show = False
 
     def format_scopes(self, scopes):
         output = []
@@ -41,16 +42,13 @@ class CustomVisitor(ConnectITVisitor):
 
     def visitProgram(self, ctx):
         self.current_scope = self.get_scope_for_ctx(ctx)
-        output = None
         for i in range(ctx.getChildCount()):
-            statement_output = self.visit(ctx.getChild(i))
-            if isinstance(statement_output, str):
-                if statement_output[0] == "{":
-                    print(output)
-                    output = statement_output
-        return output
+            self.visit(ctx.getChild(i))
+        return self.text, self.render
     
     def visitStatement(self, ctx):
+        line = ctx.start.line
+        column = ctx.start.column
         if ctx.getChildCount() > 1 and ctx.getChild(0).getText() == "?":
             return None
         if ctx.declarationList():
@@ -67,6 +65,10 @@ class CustomVisitor(ConnectITVisitor):
             return self.visit(ctx.outStmt())
         if ctx.ifStmt():
             return self.visit(ctx.ifStmt())
+        if ctx.elifStmt():
+            raise Exception(f"Syntax Error: ELSE IF statement without previous IF at line {line}, column {column}")
+        if ctx.elseStmt():
+            raise Exception(f"Syntax Error: ELSE statement without previous IF at line {line}, column {column}")
         if ctx.whileStmt():
             return self.visit(ctx.whileStmt())
         if ctx.forStmt():
@@ -637,7 +639,8 @@ class CustomVisitor(ConnectITVisitor):
         column = ctx.start.column
 
         if type in ["UNIT", "MULTI_UNIT", "LAYER", "SHAPE", "MODEL"]:
-            return show_figure(self.fig, structure)
+            self.render = show_figure(go.Figure(), structure)
+            self.show = True
         else:
             return {
                 "type": "error",
@@ -650,6 +653,7 @@ class CustomVisitor(ConnectITVisitor):
         column = ctx.start.column
         if type in ["NUMBER", "BOOLEAN"]:
             print(str(value))
+            self.text.append(str(value))
             return None
         else:
             return {
@@ -658,6 +662,8 @@ class CustomVisitor(ConnectITVisitor):
             }
 
     def visitIfStmt(self, ctx):
+        line = ctx.start.line
+        column = ctx.start.column
         condition_value, condition_type = self.visit(ctx.logicExpr())
         if condition_type != "BOOLEAN": 
             raise Exception(f"Type Error: IF condition must be BOOLEAN, not {condition_type} at line {line}, column {column}.")
@@ -673,6 +679,8 @@ class CustomVisitor(ConnectITVisitor):
             return
         
     def visitElifStmt(self, ctx):
+        line = ctx.start.line
+        column = ctx.start.column
         condition_value, condition_type = self.visit(ctx.logicExpr())
         if condition_type != "BOOLEAN": 
             raise Exception(f"Type Error: ELSE IF condition must be BOOLEAN, not {condition_type} at line {line}, column {column}.")
@@ -694,6 +702,7 @@ class CustomVisitor(ConnectITVisitor):
         if condition_type != "BOOLEAN": 
             raise Exception(f"Type Error: WHILE condition must be BOOLEAN, not {condition_type} at line {line}, column {column}.")
 
+        counter = 0
         while condition_value:
             self.visit(ctx.stmtBlock())
             condition_value, condition_type = self.visit(ctx.logicExpr())
@@ -701,36 +710,10 @@ class CustomVisitor(ConnectITVisitor):
             column = ctx.start.column
             if condition_type != "BOOLEAN": 
                 raise Exception(f"Type Error: WHILE condition must be BOOLEAN, not {condition_type} at line {line}, column {column}.")
+            counter += 1
+            if counter > 500:
+                raise Exception(f"Error: Infinite loop detected at line {line}, column {column}.")
             
-    # def visitForStmt(self, ctx):
-    #     self.current_scope = self.scopes[ctx]
-
-    #     counter = ctx.ID().getText()
-    #     if len(ctx.expression()) > 1:
-    #         times, type = self.visit(ctx.expression(0))
-    #         start = self.visit(ctx.expression(1))
-    #         step = self.visit(ctx.expression(2))
-    #     else:
-    #         times, type = self.visit(ctx.expression())
-    #         start = 1
-    #         step = 1
-
-    #     line = ctx.start.line
-    #     column = ctx.start.column
-
-    #     if type != "NUMBER":
-    #         raise Exception(f"Type Error: FOR loop must iterate over a NUMBER, not {type} at line {line}, column {column}.")
-
-    #     if times < 0:
-    #         raise Exception(f"Value Error: FOR loop cannot iterate a negative number of times at line {line}, column {column}.")
-
-    #     for i in range(times):
-    #         self.current_scope.variables[counter]["value"] = start + i*step
-    #         try:
-    #             self.visit(ctx.stmtBlock())
-    #         finally:
-    #             self.current_scope = self.current_scope.parent
-
     def visitForStmt(self, ctx):
         self.current_scope = self.scopes[ctx]
         count, count_type = self.visit(ctx.numExpr(0))

@@ -109,5 +109,3 @@ def show_figure(fig, structure: Structure):
     print("Generating figure...")
     fig.write_html("out.html")
     return fig.to_json()
-    with open("fig.json", "w") as f:
-        f.write(fig.to_json())

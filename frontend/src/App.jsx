@@ -18,6 +18,7 @@ export default function App() {
   const [selectedFile, setSelectedFile] = useState(null);
   const [fileContent, setFileContent] = useState("");
   const [lineCount, setLineCount] = useState(1);
+  const [textOutput, setTextOutput] = useState("");
   const textareaRef = useRef(null);
   const lineNumbersRef = useRef(null);
 
@@ -88,7 +89,6 @@ export default function App() {
   };
 
   const fetchFigure = () => {
-    setFigData([]);
     const ws = new WebSocket(WebSocketURL);
 
     ws.onopen = () => {
@@ -102,14 +102,18 @@ export default function App() {
       if (response.type === "error") {
         setErrorMessage(response.message);
         setLoading(false);
-        setShowPlot(false);
         return;
       }
 
-      setLayout(response.layout);
-      setFigData(response.data);
+      if (response.type === "figure") {
+        setLayout(response.layout);
+        setFigData(response.data);
+        setShowPlot(true);
+      } else if (response.type === "text") {
+        setTextOutput((prev) => prev + response.content + "\n");
+      }
+
       setLoading(false);
-      setShowPlot(true);
     };
 
     ws.onerror = (err) => console.error("WebSocket Error:", err);
@@ -207,6 +211,18 @@ export default function App() {
       <div className="plot-container">
         {loading && <div className="loading-spinner"></div>}
         {showPlot && <Plot data={figData} layout={layout} className="plot" />}
+        {textOutput && (
+          <div className="output-container">
+            <h3>Output:</h3>
+            <pre className="text-output">{textOutput}</pre>
+            <button
+              className="clear-output-button"
+              onClick={() => setTextOutput("")}
+            >
+              Clear Output
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="editor-container">
