@@ -13,16 +13,29 @@ class CustomListener(ConnectITListener):
     def enterDeclarationList(self, ctx):
         type = ctx.dataType().getText()
         line = ctx.start.line
+
         for dec in ctx.declaration():
             if dec.assignment():
                 name = dec.assignment().getChild(0).getText()
             else:
                 name = dec.ID().getText()
-            if name in self.current_scope.variables:
-                declared_in = self.current_scope.get_line(name)
+                
+            if dec.getChild(0).getText() == "GLOBAL":
+                target_scope = self.global_scope
+            elif dec.getChild(0).getText() == "UP":
+                up_scopes = sum(1 for token in dec.getChildren() if token.getText() == "UP")
+                target_scope = self.current_scope
+                for _ in range(up_scopes):
+                    if target_scope.parent:
+                        target_scope = target_scope.parent
+            else:
+                target_scope = self.current_scope
+
+            if name in target_scope.variables:
+                declared_in = target_scope.get_line(name)
                 raise Exception(f"Redeclaration of '{name}' at line {line} (first declared in line {declared_in})")
-            
-            self.current_scope.declare(name=name, type=type, line=line)
+
+            target_scope.declare(name=name, type=type, line=line)
 
     def enterStmtBlock(self, ctx):
         scope = Scope(f"block", parent=self.current_scope)
@@ -32,24 +45,6 @@ class CustomListener(ConnectITListener):
 
     def exitStmtBlock(self, ctx):
         self.current_scope = self.current_scope.parent
-
-    # def enterIfStmt(self, ctx):
-    #     scope = Scope("if", parent=self.current_scope)
-    #     self.current_scope.children.append(scope)
-    #     self.scopes[ctx] = scope
-    #     self.current_scope = scope
-
-    # def exitIfStmt(self, ctx):
-    #     self.current_scope = self.current_scope.parent
-
-    # def enterWhileStmt(self, ctx):
-    #     scope = Scope("while", parent=self.current_scope)
-    #     self.current_scope.children.append(scope)
-    #     self.scopes[ctx] = scope
-    #     self.current_scope = scope
-
-    # def exitWhileStmt(self, ctx):
-    #     self.current_scope = self.current_scope.parent
 
     def enterForStmt(self, ctx):
         scope = Scope("for", parent=self.current_scope)
@@ -79,10 +74,12 @@ class CustomListener(ConnectITListener):
 
         if ctx.paramList() is not None:
             for (type, id) in zip(ctx.paramList().dataType(), ctx.paramList().ID()):
-                if id in self.current_scope.variables:
-                    declared_in = self.current_scope.get_line(id)
+                type = type.getText()
+                id = id.getText()
+                if id in scope.variables:
+                    declared_in = scope.get_line(id)
                     raise Exception(f"Redeclaration of parameter '{id}' at line {line} (first declared in line {declared_in})")
-                self.current_scope.declare(id, type, line)
+                scope.declare(id, type, line)
 
         self.current_scope.declare(name, "FUNCTION", line)
         self.current_scope.children.append(scope)

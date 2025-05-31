@@ -1,0 +1,7 @@
+NUMBER x = 1
+[
+    NUMBER x = 3
+    GLOBAL x = 9
+    OUTPUT x
+]
+OUTPUT x

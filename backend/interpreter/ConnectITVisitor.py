@@ -89,6 +89,11 @@ class ConnectITVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by ConnectITParser#identifier.
+    def visitIdentifier(self, ctx:ConnectITParser.IdentifierContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by ConnectITParser#unitExpr.
     def visitUnitExpr(self, ctx:ConnectITParser.UnitExprContext):
         return self.visitChildren(ctx)

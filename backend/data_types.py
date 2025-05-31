@@ -1,6 +1,53 @@
 import numpy as np
 import plotly.graph_objects as go
 
+
+def unit_to_multiunit(u):
+    return MultiUnit(u, 1)
+
+def unit_to_layer(u):
+    return Layer([u], False)
+
+def unit_to_shape(u):
+    return Shape(Layer([u], False), [])
+
+def unit_to_model(u):
+    return Model([Shape(Layer([u], False), [])], [])
+
+def multiunit_to_layer(mu):
+    return Layer(mu.extract_units(), False)
+
+def multiunit_to_shape(mu):
+    return Shape(Layer(mu.extract_units(), False), [])
+
+def multiunit_to_model(mu):
+    return Model([Shape([Layer(mu.extract_units(), False)], [])], [])
+
+def layer_to_shape(l):
+    return Shape([l], [])
+
+def layer_to_model(l):
+    return Model(Shape([l], []), [])
+
+def shape_to_model(s):
+    return Model([s], [])
+
+type_map = {
+    "UNIT": {
+        "MULTI_UNIT": unit_to_multiunit,
+        "LAYER": unit_to_layer,
+        "SHAPE": unit_to_shape,
+        "MODEL": unit_to_model
+        },
+    "MULTI_UNIT": {"LAYER": multiunit_to_layer, "SHAPE": multiunit_to_shape, "MODEL": multiunit_to_model},
+    "LAYER": {"SHAPE": layer_to_shape, "MODEL": layer_to_model},
+    "SHAPE": {"MODEL": shape_to_model},
+    "MODEL": {},
+    "NUMBER": {},
+    "BOOLEAN": {},
+    "FUNCTION": {}
+}
+
 class Structure:
     def render(self):
         print(self)

@@ -11,17 +11,6 @@ color_map = {
     "black": "rgb(0, 0, 0)"
 }
 
-type_map = {
-    "UNIT": ["MULTI_UNIT", "LAYER", "SHAPE", "MODEL"],
-    "MULTI_UNIT": ["LAYER", "SHAPE", "MODEL"],
-    "LAYER": ["SHAPE", "MODEL"],
-    "SHAPE": ["MODEL"],
-    "MODEL": [],
-    "NUMBER": [],
-    "BOOLEAN": [],
-    "FUNCTION": []
-}
-
 class Scope:
     def __init__(self, name, parent=None):
         self.name = name
@@ -42,7 +31,7 @@ class Scope:
         self.variables[name]["value"] = value
 
     def get_type(self, name):
-        if name in self.variables:
+        if name in self.variables.keys():
             return self.variables[name]["type"]
         elif self.parent:
             return self.parent.get_type(name)
@@ -62,11 +51,12 @@ class Scope:
         return None
     
 class ActivationRecord:
-    def __init__(self, name, type_, nesting_level):
+    def __init__(self, name, type, nesting_level, scope):
         self.name = name
-        self.type = type_
+        self.type = type
         self.nesting_level = nesting_level
         self.members = {}
+        self.scope = scope
 
     def set(self, name, value):
         self.members[name] = value

@@ -1,0 +1,55 @@
+NUMBER x = 1
+[
+    NUMBER x = 2
+    OUTPUT x
+    OUTPUT UP x
+    [
+        NUMBER x = 3
+        OUTPUT x
+        OUTPUT UP UP x
+        [
+            NUMBER x = 4
+            OUTPUT x
+            OUTPUT UP UP UP x
+            [
+                NUMBER x = 5
+                OUTPUT x
+                OUTPUT UP UP UP UP x
+                [
+                    NUMBER x = 6
+                    OUTPUT x
+                    OUTPUT UP UP UP UP UP x
+                ]
+            ]
+        ]
+    ]
+]
+
+OUTPUT 10000
+
+x = 1
+[
+    NUMBER x = 2
+    OUTPUT x
+    OUTPUT UP x
+    [
+        NUMBER x = 3
+        OUTPUT x
+        OUTPUT UP x
+        [
+            NUMBER x = 4
+            OUTPUT x
+            OUTPUT UP x
+            [
+                NUMBER x = 5
+                OUTPUT x
+                OUTPUT UP x
+                [
+                    NUMBER x = 6
+                    OUTPUT x
+                    OUTPUT UP x
+                ]
+            ]
+        ]
+    ]
+]

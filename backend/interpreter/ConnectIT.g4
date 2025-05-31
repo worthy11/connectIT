@@ -18,12 +18,13 @@ statement: ('?')? (
 		| elseStmt
 		| funcDec
 		| returnStmt
+		| stmtBlock
 	);
 
 declarationList: dataType declaration (',' declaration)*;
-declaration: ID | assignment;
-assignment: expression '=' expression;
-extension: expression extensionOperator expression;
+declaration: ('GLOBAL' | ('UP')+)? (ID | assignment);
+assignment: identifier '=' expression;
+extension: identifier extensionOperator expression;
 extensionOperator:
 	'+='
 	| '-='
@@ -44,13 +45,15 @@ mulExpr: signExpr ((MUL | DIV) signExpr)*;
 signExpr: (PLUS | MINUS)* negExpr;
 negExpr: (NOT)* baseExpr;
 baseExpr:
-	(('UP')* | 'GLOBAL') ID
+	identifier
 	| unitExpr
 	| NUMBER
 	| BOOLEAN
 	| funcCall
 	| '(' expression ')'
-	| '[' expression ']';
+	| '[' expression ']'
+	| dataType '[' expression ']';
+identifier: (('UP')* | 'GLOBAL') ID;
 unitExpr: COLOR (PATTERN)?;
 
 WS: [ \t]+ -> skip;
@@ -78,7 +81,7 @@ funcDec:
 	'METHOD' ID '(' paramList? ')' 'RETURNS' dataType stmtBlock;
 
 paramList: dataType ID (',' dataType ID)*;
-funcCall: 'PERFORM' ID '(' argList? ')';
+funcCall: 'PERFORM' identifier '(' argList? ')';
 argList: expression (',' expression)*;
 returnStmt: 'RETURN' expression;
 

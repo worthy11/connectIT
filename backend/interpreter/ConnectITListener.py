@@ -152,6 +152,15 @@ class ConnectITListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by ConnectITParser#identifier.
+    def enterIdentifier(self, ctx:ConnectITParser.IdentifierContext):
+        pass
+
+    # Exit a parse tree produced by ConnectITParser#identifier.
+    def exitIdentifier(self, ctx:ConnectITParser.IdentifierContext):
+        pass
+
+
     # Enter a parse tree produced by ConnectITParser#unitExpr.
     def enterUnitExpr(self, ctx:ConnectITParser.UnitExprContext):
         pass
