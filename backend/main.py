@@ -58,18 +58,24 @@ def evaluate_expression(expression):
     tree = parser.program()
     # print(tree.toStringTree(recog=parser))
 
+    diagnostic_logs = []  # Create diagnostic logs list at the start
+
     if lexer_error_listener.has_error:
         print(lexer_error_listener.errors)
+        diagnostic_logs.extend(["ERROR: " + error for error in lexer_error_listener.errors])
         return {
             "type": "error",
-            "message": "\n".join(lexer_error_listener.errors)
+            "message": "\n".join(lexer_error_listener.errors),
+            "diagnostic_logs": diagnostic_logs
         }
 
     if error_listener.has_error:
         print(error_listener.errors)
+        diagnostic_logs.extend(["ERROR: " + error for error in error_listener.errors])
         return {
             "type": "error",
-            "message": "\n".join(error_listener.errors)
+            "message": "\n".join(error_listener.errors),
+            "diagnostic_logs": diagnostic_logs
         }
     
 
@@ -80,22 +86,27 @@ def evaluate_expression(expression):
         walker.walk(listener, tree)
     except Exception as e:
         print(str(e))
+        diagnostic_logs.append("ERROR: " + str(e))
         return {
             "type": "error",
-            "message": str(e)
+            "message": str(e),
+            "diagnostic_logs": diagnostic_logs
         }
 
     try:
         visitor = CustomVisitor(listener.scopes)
-        text, render = visitor.visit(tree)
+        text, render, visitor_logs = visitor.visit(tree)
+        diagnostic_logs.extend(visitor_logs)  # Add visitor logs to our diagnostic logs
 
     except Exception as e:
+        diagnostic_logs.append("ERROR: " + str(e))
         return {
             "type": "error",
-            "message": f"{str(e)}"
+            "message": f"{str(e)}",
+            "diagnostic_logs": diagnostic_logs
         }
     
-    return text, render
+    return text, render, diagnostic_logs
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Process a file with a custom extension.")

@@ -28,13 +28,23 @@ async def websocket_endpoint(websocket: WebSocket):
     if isinstance(output, dict):
         await websocket.send_text(json.dumps(output))
     else:
-        text, render = output
+        text, render, diagnostic_logs = output  # Modified to receive diagnostic logs
+        
+        # Send diagnostic logs first
+        for log in diagnostic_logs:
+            await websocket.send_text(json.dumps({
+                "type": "diagnostic",
+                "content": log
+            }))
+        
+        # Send text output if any
         if text and len(text) > 0:
             await websocket.send_text(json.dumps({
                 "type": "text",
                 "content": "\n".join(text)
             }))
         
+        # Send render output if any
         if render and render.strip():
             figure_json = json.loads(render)
             await websocket.send_text(json.dumps({

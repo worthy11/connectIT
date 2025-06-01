@@ -19,6 +19,8 @@ export default function App() {
   const [fileContent, setFileContent] = useState("");
   const [lineCount, setLineCount] = useState(1);
   const [textOutput, setTextOutput] = useState("");
+  const [diagnosticLogs, setDiagnosticLogs] = useState([]);
+  const [showDiagnostics, setShowDiagnostics] = useState(false);
   const textareaRef = useRef(null);
   const lineNumbersRef = useRef(null);
 
@@ -93,6 +95,7 @@ export default function App() {
 
     ws.onopen = () => {
       setLoading(true);
+      setDiagnosticLogs([]);
       ws.send(code);
     };
 
@@ -101,6 +104,9 @@ export default function App() {
 
       if (response.type === "error") {
         setErrorMessage(response.message);
+        if (response.diagnostic_logs) {
+          setDiagnosticLogs(response.diagnostic_logs);
+        }
         setLoading(false);
         return;
       }
@@ -111,6 +117,8 @@ export default function App() {
         setShowPlot(true);
       } else if (response.type === "text") {
         setTextOutput((prev) => prev + response.content + "\n");
+      } else if (response.type === "diagnostic") {
+        setDiagnosticLogs((prev) => [...prev, response.content]);
       }
 
       setLoading(false);
@@ -122,6 +130,10 @@ export default function App() {
 
   const toggleInfo = () => {
     setShowInfo(!showInfo);
+  };
+
+  const toggleDiagnostics = () => {
+    setShowDiagnostics(!showDiagnostics);
   };
 
   const handleScroll = () => {
@@ -251,8 +263,41 @@ export default function App() {
           <button onClick={toggleFileBrowser} className="button">
             Browse Examples
           </button>
+          <button onClick={toggleDiagnostics} className="button">
+            {showDiagnostics ? "Hide Diagnostics" : "Show Diagnostics"}
+          </button>
         </div>
       </div>
+
+      {showDiagnostics && (
+        <div className="info-window show">
+          <button className="close-info-button" onClick={toggleDiagnostics}>
+            X
+          </button>
+          <div className="info-content">
+            <h3>Diagnostic Logs</h3>
+            <div className="diagnostic-logs">
+              {diagnosticLogs.length > 0 ? (
+                diagnosticLogs.map((log, index) => (
+                  <div key={index} className="diagnostic-log">
+                    {log}
+                  </div>
+                ))
+              ) : (
+                <div className="diagnostic-log">No diagnostic logs available.</div>
+              )}
+            </div>
+            {diagnosticLogs.length > 0 && (
+              <button
+                className="clear-output-button"
+                onClick={() => setDiagnosticLogs([])}
+              >
+                Clear Logs
+              </button>
+            )}
+          </div>
+        </div>
+      )}
 
       {showInfo && (
         <div className="info-window show">

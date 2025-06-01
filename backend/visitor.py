@@ -15,6 +15,10 @@ class CustomVisitor(ConnectITVisitor):
         self.render = []
         self.text = []
         self.show = False
+        self.diagnostic_logs = []
+
+    def add_diagnostic_log(self, message):
+        self.diagnostic_logs.append(message)
 
     def format_scopes(self, scopes):
         output = []
@@ -42,9 +46,10 @@ class CustomVisitor(ConnectITVisitor):
     def visitProgram(self, ctx):
         self.current_scope = self.get_scope_for_ctx(ctx)
         self.call_stack.push(ActivationRecord("global", "program", 1, self.current_scope))
+        self.add_diagnostic_log(f"Starting program execution in global scope")
         for i in range(ctx.getChildCount()):
             self.visit(ctx.getChild(i))
-        return self.text, self.render
+        return self.text, self.render, self.diagnostic_logs
     
     def visitStatement(self, ctx):
         line = ctx.start.line
@@ -52,10 +57,13 @@ class CustomVisitor(ConnectITVisitor):
         if ctx.getChildCount() > 1 and ctx.getChild(0).getText() == "?":
             return None
         if ctx.declarationList():
+            self.add_diagnostic_log(f"Line {line}: Processing declaration list")
             return self.visit(ctx.declarationList())
         if ctx.assignment():
+            self.add_diagnostic_log(f"Line {line}: Processing assignment")
             return self.visit(ctx.assignment())
         if ctx.expression():
+            self.add_diagnostic_log(f"Line {line}: Processing expression")
             return self.visit(ctx.expression())
         if ctx.extension():
             return self.visit(ctx.extension())
@@ -134,10 +142,12 @@ class CustomVisitor(ConnectITVisitor):
         column = ctx.start.column
 
         name = ctx.identifier().ID().getText()
+        self.add_diagnostic_log(f"Line {line}: Processing assignment to variable '{name}'")
         scope = self.current_scope
         if ctx.identifier().getChild(0).getText() == "GLOBAL":
             while scope.parent:
                 scope = scope.parent
+            self.add_diagnostic_log(f"Line {line}: Using global scope for variable '{name}'")
         elif ctx.identifier().getChild(0).getText() == "UP":
             up_scopes = sum(1 for token in ctx.identifier().getChildren() if token.getText() == "UP")
             for _ in range(up_scopes):
@@ -177,6 +187,7 @@ class CustomVisitor(ConnectITVisitor):
         column = ctx.start.column
         name = ctx.ID().getText()
 
+        self.add_diagnostic_log(f"Line {line}: Accessing identifier '{name}'")
         scope = self.current_scope
         if ctx.getChild(0).getText() == "GLOBAL":
             while scope.parent:
@@ -827,6 +838,7 @@ class CustomVisitor(ConnectITVisitor):
     def visitFuncDec(self, ctx):
         func_name = ctx.ID().getText()
         return_type = ctx.dataType().getText()
+        self.add_diagnostic_log(f"Line {ctx.start.line}: Declaring function '{func_name}' with return type '{return_type}'")
         params = []
 
         if ctx.paramList():
@@ -845,7 +857,9 @@ class CustomVisitor(ConnectITVisitor):
     def visitFuncCall(self, ctx):
         line = ctx.start.line
         column = ctx.start.column
-        func_name = ctx.identifier().ID().getText()
+        func_name = ctx.ID().getText()
+        
+        self.add_diagnostic_log(f"Line {line}: Calling function '{func_name}'")
         func_def = None
 
         for i, ar in enumerate(reversed(self.call_stack.records)):
