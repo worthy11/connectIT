@@ -1,8 +1,9 @@
 NUMBER x = 1
 [
     NUMBER x = 3
+    NUMBER y = UP x
     OUTPUT x
+    OUTPUT y
     GLOBAL x = 2
-    OUTPUT GLOBAL x
 ]
 OUTPUT x

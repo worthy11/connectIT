@@ -9,16 +9,16 @@ def unit_to_layer(u):
     return Layer([u], False)
 
 def unit_to_shape(u):
-    return Shape(Layer([u], False), [])
+    return Shape([Layer([u], False)], [])
 
 def unit_to_model(u):
-    return Model([Shape(Layer([u], False), [])], [])
+    return Model([Shape([Layer([u], False)], [])], [])
 
 def multiunit_to_layer(mu):
     return Layer(mu.extract_units(), False)
 
 def multiunit_to_shape(mu):
-    return Shape(Layer(mu.extract_units(), False), [])
+    return Shape([Layer(mu.extract_units(), False)], [])
 
 def multiunit_to_model(mu):
     return Model([Shape([Layer(mu.extract_units(), False)], [])], [])

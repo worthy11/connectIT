@@ -1,9 +1,8 @@
-NUMBER x = 5
 METHOD add() RETURNS NOTHING [
-    METHOD add2(NUMBER x) RETURNS NOTHING [
-        OUTPUT x + 1
+    METHOD add2() RETURNS NOTHING [
+        OUTPUT 5
     ]
-    PERFORM add2(3)
-    OUTPUT x + 2
+    PERFORM add2()
+    OUTPUT 3
 ]
 PERFORM add()

@@ -175,12 +175,13 @@ class CustomVisitor(ConnectITVisitor):
             if type_map[received_type].get(expected_type) is not None:
                 value = type_map[received_type][expected_type](value)
             else:
+                if received_type is None:
+                    raise Exception(f"Error: Cannot assign value to undeclared variable {name} at line {line}, column {column}")
                 raise Exception(f"Type Error: Cannot assign {received_type} to {expected_type} at line {line}, column {column}.")
 
         if name+":"+path in ar.members:
             ar.set(name+":"+path, value)
             return None
-        raise Exception(f"Error: Cannot assign value to undeclared variable {name} at line {line}, column {column}")
 
     def visitIdentifier(self, ctx):
         line = ctx.start.line

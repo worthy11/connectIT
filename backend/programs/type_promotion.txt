@@ -1,0 +1,12 @@
+UNIT u = *blue*
+LAYER l
+SHAPE s
+
+l = u
+l = 2*u
+l = 2*u <-> u <-> 2*u
+
+s = u
+s = 2*u
+s = 2*u <-> u <-> 2*u
+SHOW s
