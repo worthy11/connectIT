@@ -105,9 +105,9 @@ class CustomVisitor(ConnectITVisitor):
         if ctx.ifStmt():
             return self.visit(ctx.ifStmt())
         if ctx.elifStmt():
-            raise Exception(f"Syntax Error: ELSE IF statement without previous IF at line {line}, column {column}")
+            raise Exception(f"Syntax Error: ELSE IF statement without previous IF at line {line}, column {column}. Please ensure it follows an IF statement.")
         if ctx.elseStmt():
-            raise Exception(f"Syntax Error: ELSE statement without previous IF at line {line}, column {column}")
+            raise Exception(f"Syntax Error: ELSE statement without previous IF at line {line}, column {column}. Please ensure it follows an IF statement.")
         if ctx.whileStmt():
             return self.visit(ctx.whileStmt())
         if ctx.forStmt():
@@ -208,10 +208,10 @@ class CustomVisitor(ConnectITVisitor):
                 value = type_map[received_type][expected_type](value)
             else:
                 if received_type is None:
-                    raise Exception(f"Error: Cannot assign undeclared variable value to {name} at line {line}, column {column}")
+                    raise Exception(f"Error: Cannot assign undeclared variable value to {name} at line {line}, column {column}. Please ensure the variable is declared before assignment.")
                 if expected_type is None:
-                    raise Exception(f"Error: Cannot assign to undeclared variable {name} at line {line}, column {column}")
-                raise Exception(f"Type Error: Cannot assign {received_type} to {expected_type} at line {line}, column {column}.")
+                    raise Exception(f"Error: Cannot assign to undeclared variable {name} at line {line}, column {column}. Please ensure the variable is declared before assignment.")
+                raise Exception(f"Type Error: Cannot assign {received_type} to {expected_type} at line {line}, column {column}. Did you mean to type {name} {expected_type}?")
 
         if name+":"+path in ar.members:
             ar.set(name+":"+path, value)
@@ -242,7 +242,7 @@ class CustomVisitor(ConnectITVisitor):
 
         type = scope.get_type(name)
         if type is None:
-            raise Exception(f"Error: Use of undeclared variable {name} at line {line}, column {column}")
+            raise Exception(f"Error: Use of undeclared variable {name} at line {line}, column {column}. Please ensure the variable is declared before use.")
 
         ar = self.get_ar_for_scope(scope)
 
@@ -278,7 +278,7 @@ class CustomVisitor(ConnectITVisitor):
 
         e, op = ctx.expression(1), ctx.extensionOperator()
         if expected_type not in ["LAYER", "SHAPE", "MODEL", "NUMBER"]:            
-            raise Exception(f"Type Error: Cannot add new values to type {expected_type} at line {line}, column {column}.")
+            raise Exception(f"Type Error: Cannot add new values to type {expected_type} at line {line}, column {column}. Only LAYER, SHAPE, MODEL, and NUMBER can be extended.")
 
         path = []
         while scope is not None:
@@ -295,7 +295,7 @@ class CustomVisitor(ConnectITVisitor):
             if type_map[received_type].get(expected_type) is not None:
                 value = type_map[received_type][expected_type](value)
             else:
-                raise Exception(f"Type Error: Cannot assign {received_type} to {expected_type} at line {line}, column {column}.")
+                raise Exception(f"Type Error: Cannot assign {received_type} to {expected_type} at line {line}, column {column}. Did you mean to type {expected_type} {name}?")
 
         if name+":"+path in ar.members:
             match expected_type:
@@ -316,10 +316,10 @@ class CustomVisitor(ConnectITVisitor):
         column = op.start.column
 
         if op.getText() not in ['<+->']:
-            raise Exception(f"Operator '{op.getText()}' cannot be used to extend a Layer at line {line}, column {column}.")
+            raise Exception(f"Operator '{op.getText()}' cannot be used to extend a Layer at line {line}, column {column}. Only '<+->' is allowed for extending a Layer.")
             
         if received_type not in ["UNIT", "MULTI_UNIT"]:
-            raise Exception(f"Cannot add value of type '{received_type}' to a Layer at line {line}, column {column}.")
+            raise Exception(f"Cannot add value of type '{received_type}' to a Layer at line {line}, column {column}. Only UNIT or MULTI_UNIT can be added to a Layer.")
         
         if received_type == "UNIT":
             value.add_unit(received_value)
@@ -333,20 +333,20 @@ class CustomVisitor(ConnectITVisitor):
         received_value, received_type = self.visit(e)
 
         if op.getText() in ['+=', '<+->']:
-            raise Exception(f"Operator '{op.getText()}' cannot be used to extend a Shape at line {line}, column {column}.")
+            raise Exception(f"Operator '{op.getText()}' cannot be used to extend a Shape at line {line}, column {column}. Only '<+-' is allowed for extending a Shape.")
             
         if received_type != "LAYER":
             if type_map[received_type].get("LAYER") is not None:
                 value = type_map[received_type]["LAYER"](value)
             else:
-                raise Exception(f"Type Error: Cannot add value of type '{received_type}' to a SHAPE at line {line}, column {column}.")
+                raise Exception(f"Type Error: Cannot add value of type '{received_type}' to a SHAPE at line {line}, column {column}. Only LAYER can be added to a SHAPE.")
         
         c = self.get_connection(op)
         shape_closed = any(layer.is_closed() for layer in value.layers)
 
         if shape_closed:
             if not received_value.is_closed():
-                raise Exception(f"Type Error: Cannot add an open layer to a closed shape at line {line}, column {column}.")
+                raise Exception(f"Type Error: Cannot add an open layer to a closed shape at line {line}, column {column}. Close the layer first using CLOSED keyword.")
 
             if len(received_value) != len(value.layers[0]):
                 raise Exception(f"Type Error: New layer must have {len(value.layers[0])} units (same as existing layers) because the shape is closed at line {line}, column {column}.")
@@ -382,18 +382,18 @@ class CustomVisitor(ConnectITVisitor):
         line = op.start.line
         column = op.start.column
         if op.getText() not in ['+=', '-=', '*=', '/=']:
-            raise Exception(f"Operator '{op.getText()}' cannot be used to extend a NUMBER at line {line}, column {column}.")
+            raise Exception(f"Operator '{op.getText()}' cannot be used to extend a NUMBER at line {line}, column {column}. Use arithmetic operators instead.")
             
         received_value, received_type = self.visit(e)
         if received_type != "NUMBER": 
             if op.getText() == '+=':
-                raise Exception(f"Cannot add value of type '{received_type}' to a NUMBER at line {line}, column {column}.")
+                raise Exception(f"Cannot add value of type '{received_type}' to a NUMBER at line {line}, column {column}. Only NUMBER can be added to a NUMBER.")
             elif op.getText() == '-=':
-                raise Exception(f"Cannot subtract value of type '{received_type}' from a NUMBER at line {line}, column {column}.")
+                raise Exception(f"Cannot subtract value of type '{received_type}' from a NUMBER at line {line}, column {column}. Only NUMBER can be subtracted from a NUMBER.")
             elif op.getText() == '*=':
-                raise Exception(f"Cannot multiply value of type '{received_type}' to a NUMBER at line {line}, column {column}.")
+                raise Exception(f"Cannot multiply value of type '{received_type}' to a NUMBER at line {line}, column {column}. Only NUMBER can be multiplied to a NUMBER.")
             elif op.getText() == '/=':
-                raise Exception(f"Cannot divide value of type '{received_type}' from a NUMBER at line {line}, column {column}.")
+                raise Exception(f"Cannot divide value of type '{received_type}' from a NUMBER at line {line}, column {column}. Only NUMBER can be divided from a NUMBER.")
             
         if op.getText() == '+=':
             value += received_value
@@ -450,6 +450,8 @@ class CustomVisitor(ConnectITVisitor):
                     value = self.createModel(ctx)
                     type = "MODEL"
                 case _:
+                    if type == 'UNIT':
+                        raise Exception(f"Cannot use connectors with type '{type}' at line {line}, column {column}. Cast UNIT using [variable] syntax.")
                     raise Exception(f"Cannot use connectors with type '{type}' at line {line}, column {column}.")
                     
         return value, type
@@ -470,10 +472,10 @@ class CustomVisitor(ConnectITVisitor):
                 if type_map[next_type].get("MULTI_UNIT") is not None:
                     next_value = type_map[next_type]["MULTI_UNIT"](next_value)
                 else:
-                    raise Exception(f"Type Error: Can only apply '<->' connector to multiples of UNITs, not {next_type} at line {line}, column {column}.")
+                    raise Exception(f"Type Error: Can only apply '<->' connector to multiples of UNITs, not {next_type} at line {line}, column {column}. Change the type of variable to MULTI_UNIT or use a different connector.")
                 
             if op.getText() != "<->":
-                raise Exception(f"Type Error: Cannot use '{op.getText()}' connector when creating a LAYER at line {line}, column {column}.")
+                raise Exception(f"Type Error: Cannot use '{op.getText()}' connector when creating a LAYER at line {line}, column {column}. Change connector to <->.")
                 
             next_units = next_value.extract_units()
             for u in next_units:
