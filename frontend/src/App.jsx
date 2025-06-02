@@ -278,11 +278,37 @@ export default function App() {
             <h3>Diagnostic Logs</h3>
             <div className="diagnostic-logs">
               {diagnosticLogs.length > 0 ? (
-                diagnosticLogs.map((log, index) => (
-                  <div key={index} className="diagnostic-log">
-                    {log}
-                  </div>
-                ))
+                diagnosticLogs.map((log, index) => {
+                  if (log.startsWith("=== Variable Information ===")) {
+                    const lines = log.split("\n");
+                    return (
+                      <div key={index} className="diagnostic-log variable-info">
+                        {lines.map((line, lineIndex) => {
+                          if (line.startsWith("=== Variable Information ===")) {
+                            return <div key={lineIndex} className="scope-header">{line}</div>;
+                          } else if (line.startsWith("Scope:")) {
+                            return <div key={lineIndex} className="scope-header">{line}</div>;
+                          } else if (line.startsWith("  Path:")) {
+                            return <div key={lineIndex} className="scope-path">{line}</div>;
+                          } else if (line.startsWith("    ")) {
+                            const [varName, value] = line.trim().split(" = ");
+                            return (
+                              <div key={lineIndex} className="variable">
+                                {varName} = <span className="value">{value}</span>
+                              </div>
+                            );
+                          }
+                          return <div key={lineIndex}>{line}</div>;
+                        })}
+                      </div>
+                    );
+                  }
+                  return (
+                    <div key={index} className="diagnostic-log">
+                      {log}
+                    </div>
+                  );
+                })
               ) : (
                 <div className="diagnostic-log">No diagnostic logs available.</div>
               )}

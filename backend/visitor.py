@@ -43,12 +43,43 @@ class CustomVisitor(ConnectITVisitor):
             scope = scope.parent
         raise Exception("Error: No activation record matching scope")
 
+    def format_variable_info(self):
+        """Format variable information including scope and value for all variables"""
+        output = []
+        output.append("=== Variable Information ===")
+        
+        # Go through each activation record in the call stack
+        for ar in self.call_stack.records:
+            scope_name = ar.name
+            output.append(f"\nScope: {scope_name}")
+            
+            # Group variables by their path to show scope hierarchy
+            variables_by_path = {}
+            for var_path, value in ar.members.items():
+                if ":" in var_path:  # Only process variables, not function definitions
+                    var_name, *scope_path = var_path.split(":")
+                    scope_str = ":".join(scope_path)
+                    if scope_str not in variables_by_path:
+                        variables_by_path[scope_str] = []
+                    variables_by_path[scope_str].append((var_name, value))
+            
+            # Print variables grouped by their scope path
+            for scope_path, vars in variables_by_path.items():
+                if scope_path:
+                    output.append(f"  Path: {scope_path}")
+                for var_name, value in vars:
+                    output.append(f"    {var_name} = {value}")
+        
+        return "\n".join(output)
+
     def visitProgram(self, ctx):
         self.current_scope = self.get_scope_for_ctx(ctx)
         self.call_stack.push(ActivationRecord("global", "program", 1, self.current_scope))
         self.add_diagnostic_log(f"Starting program execution in global scope")
         for i in range(ctx.getChildCount()):
             self.visit(ctx.getChild(i))
+            # Add variable information after each statement
+            self.add_diagnostic_log(self.format_variable_info())
         return self.text, self.render, self.diagnostic_logs
     
     def visitStatement(self, ctx):
@@ -96,6 +127,7 @@ class CustomVisitor(ConnectITVisitor):
             }
         
     def visitDeclarationList(self, ctx):
+        type = ctx.dataType().getText()
         line = ctx.start.line
         column = ctx.start.column
         for dec in ctx.declaration():
@@ -115,6 +147,7 @@ class CustomVisitor(ConnectITVisitor):
                 name = dec.assignment().identifier().ID().getText()
                 name += ":" + path
                 ar.set(name, None)
+                self.add_diagnostic_log(f"Line {line}: Declaring variable '{name.split(':')[0]}' in scope '{path}'")
                 self.visit(dec.assignment())
             else:
                 name = dec.ID().getText()
@@ -135,6 +168,7 @@ class CustomVisitor(ConnectITVisitor):
                     case "BOOLEAN":
                         default = "FALSE"
                 ar.set(name, default)
+                self.add_diagnostic_log(f"Line {line}: Declared variable '{name.split(':')[0]}' with default value '{default}' in scope '{path}'")
         return None
 
     def visitAssignment(self, ctx):
@@ -142,7 +176,6 @@ class CustomVisitor(ConnectITVisitor):
         column = ctx.start.column
 
         name = ctx.identifier().ID().getText()
-        self.add_diagnostic_log(f"Line {line}: Processing assignment to variable '{name}'")
         scope = self.current_scope
         if ctx.identifier().getChild(0).getText() == "GLOBAL":
             while scope.parent:
@@ -160,7 +193,6 @@ class CustomVisitor(ConnectITVisitor):
         while name not in scope.variables and scope.parent:
             scope = scope.parent
 
-        # print(name, scope.variables)
         expected_type = scope.get_type(name)
         ar = self.get_ar_for_scope(scope)
 
@@ -183,6 +215,7 @@ class CustomVisitor(ConnectITVisitor):
 
         if name+":"+path in ar.members:
             ar.set(name+":"+path, value)
+            self.add_diagnostic_log(f"Line {line}: Assigned value '{value}' to variable '{name}' in scope '{path}'")
             return None
 
     def visitIdentifier(self, ctx):

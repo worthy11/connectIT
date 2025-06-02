@@ -390,6 +390,30 @@
   word-wrap: break-word;
 }
 
+.diagnostic-log.variable-info {
+  background-color: #2d2d2d;
+  border-left: 3px solid #569cd6;
+}
+
+.diagnostic-log.variable-info .scope-header {
+  color: #569cd6;
+  font-weight: bold;
+}
+
+.diagnostic-log.variable-info .scope-path {
+  color: #9cdcfe;
+  margin-left: 8px;
+}
+
+.diagnostic-log.variable-info .variable {
+  color: #4ec9b0;
+  margin-left: 16px;
+}
+
+.diagnostic-log.variable-info .value {
+  color: #ce9178;
+}
+
 .diagnostic-log:hover {
   background-color: #2a2a2a;
 }
