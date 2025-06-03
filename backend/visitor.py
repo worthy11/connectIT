@@ -749,10 +749,7 @@ class CustomVisitor(ConnectITVisitor):
             self.render = show_figure(go.Figure(), structure)
             self.show = True
         else:
-            return {
-                "type": "error",
-                "message": f"SHOW only supports STRUCTUREs, not {type} at line {line}, column {column}."
-            }
+            raise Exception(f"Type Error: SHOW statement only supports UNIT, MULTI_UNIT, LAYER, SHAPE, and MODEL, not {type} at line {line}, column {column}.")
         
     def visitOutStmt(self, ctx):
         value, type = self.visit(ctx.expression())
