@@ -44,31 +44,26 @@ class CustomVisitor(ConnectITVisitor):
         raise Exception("Error: No activation record matching scope")
 
     def format_variable_info(self):
-        """Format variable information including scope and value for all variables"""
         output = []
-        output.append("=== Variable Information ===")
         
-        # Go through each activation record in the call stack
+        scope_variables = {}
+        
         for ar in self.call_stack.records:
-            scope_name = ar.name
-            output.append(f"\nScope: {scope_name}")
-            
-            # Group variables by their path to show scope hierarchy
-            variables_by_path = {}
             for var_path, value in ar.members.items():
-                if ":" in var_path:  # Only process variables, not function definitions
-                    var_name, *scope_path = var_path.split(":")
-                    scope_str = ":".join(scope_path)
-                    if scope_str not in variables_by_path:
-                        variables_by_path[scope_str] = []
-                    variables_by_path[scope_str].append((var_name, value))
-            
-            # Print variables grouped by their scope path
-            for scope_path, vars in variables_by_path.items():
-                if scope_path:
-                    output.append(f"  Path: {scope_path}")
-                for var_name, value in vars:
-                    output.append(f"    {var_name} = {value}")
+                if ":" in var_path:
+                    var_name, *scope_parts = var_path.split(":")
+                    scope_str = ":".join(scope_parts)
+                    
+                    if scope_str not in scope_variables:
+                        scope_variables[scope_str] = []
+                    
+                    scope_variables[scope_str].append((var_name, value))
+        
+        for scope_str, variables in scope_variables.items():
+            if scope_str:
+                output.append(f"  Scope: {scope_str}")
+                for var_name, value in variables:
+                    output.append(f"{var_name} = {value}")
         
         return "\n".join(output)
 
@@ -78,8 +73,6 @@ class CustomVisitor(ConnectITVisitor):
         self.add_diagnostic_log(f"Starting program execution in global scope")
         for i in range(ctx.getChildCount()):
             self.visit(ctx.getChild(i))
-            # Add variable information after each statement
-            self.add_diagnostic_log(self.format_variable_info())
         return self.text, self.render, self.diagnostic_logs
     
     def visitStatement(self, ctx):
@@ -88,11 +81,26 @@ class CustomVisitor(ConnectITVisitor):
         if ctx.getChildCount() > 1 and ctx.getChild(0).getText() == "?":
             return None
         if ctx.declarationList():
-            self.add_diagnostic_log(f"Line {line}: Processing declaration list")
-            return self.visit(ctx.declarationList())
+            declarations = []
+            for dec in ctx.declarationList().declaration():
+                if dec.assignment():
+                    name = dec.assignment().identifier().ID().getText()
+                    expr = dec.assignment().expression().getText()
+                    declarations.append(f"{name} = {expr}")
+                else:
+                    name = dec.ID().getText()
+                    declarations.append(name)
+            self.add_diagnostic_log(f"Line {line}: Processing declaration {', '.join(declarations)}")
+            self.visit(ctx.declarationList())
+            self.add_diagnostic_log(self.format_variable_info())
+            return None
         if ctx.assignment():
-            self.add_diagnostic_log(f"Line {line}: Processing assignment")
-            return self.visit(ctx.assignment())
+            name = ctx.assignment().identifier().ID().getText()
+            expr = ctx.assignment().expression().getText()
+            self.add_diagnostic_log(f"Line {line}: Processing assignment {name} = {expr}")
+            self.visit(ctx.assignment())
+            self.add_diagnostic_log(self.format_variable_info())
+            return None
         if ctx.expression():
             self.add_diagnostic_log(f"Line {line}: Processing expression")
             return self.visit(ctx.expression())
@@ -147,7 +155,6 @@ class CustomVisitor(ConnectITVisitor):
                 name = dec.assignment().identifier().ID().getText()
                 name += ":" + path
                 ar.set(name, None)
-                self.add_diagnostic_log(f"Line {line}: Declaring variable '{name.split(':')[0]}' in scope '{path}'")
                 self.visit(dec.assignment())
             else:
                 name = dec.ID().getText()
@@ -168,7 +175,6 @@ class CustomVisitor(ConnectITVisitor):
                     case "BOOLEAN":
                         default = "FALSE"
                 ar.set(name, default)
-                self.add_diagnostic_log(f"Line {line}: Declared variable '{name.split(':')[0]}' with default value '{default}' in scope '{path}'")
         return None
 
     def visitAssignment(self, ctx):
@@ -180,7 +186,6 @@ class CustomVisitor(ConnectITVisitor):
         if ctx.identifier().getChild(0).getText() == "GLOBAL":
             while scope.parent:
                 scope = scope.parent
-            self.add_diagnostic_log(f"Line {line}: Using global scope for variable '{name}'")
         elif ctx.identifier().getChild(0).getText() == "UP":
             up_scopes = sum(1 for token in ctx.identifier().getChildren() if token.getText() == "UP")
             for _ in range(up_scopes):
@@ -215,7 +220,6 @@ class CustomVisitor(ConnectITVisitor):
 
         if name+":"+path in ar.members:
             ar.set(name+":"+path, value)
-            self.add_diagnostic_log(f"Line {line}: Assigned value '{value}' to variable '{name}' in scope '{path}'")
             return None
 
     def visitIdentifier(self, ctx):
