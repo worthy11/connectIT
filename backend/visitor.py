@@ -294,13 +294,6 @@ class CustomVisitor(ConnectITVisitor):
 
         value = ar.get(name+":"+path)
 
-        new_value, received_type = self.visit(ctx.expression())
-        if received_type != expected_type:
-            if type_map[received_type].get(expected_type) is not None:
-                value = type_map[received_type][expected_type](value)
-            else:
-                raise Exception(f"Type Error: Cannot assign {received_type} to {expected_type} at line {line}, column {column}. Did you mean to type {expected_type} {name}?")
-
         if name+":"+path in ar.members:
             match expected_type:
                 case "LAYER":

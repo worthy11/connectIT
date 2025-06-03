@@ -1,9 +1,8 @@
-LAYER l = 10**red*
-SHAPE s
-NUMBER x
+SHAPE s = 10**red*
+LAYER l = 5**green*
 
 REPEAT 5 TIMES WITH COUNTER i [
-    x += 1 
+    s <+- l
 ]
 
-OUTPUT x
+SHOW s
