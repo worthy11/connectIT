@@ -81,7 +81,7 @@ funcDec:
 	'METHOD' ID '(' paramList? ')' 'RETURNS' dataType stmtBlock;
 
 paramList: dataType ID (',' dataType ID)*;
-funcCall: 'PERFORM' identifier '(' argList? ')';
+funcCall: 'PERFORM' ID '(' argList? ')';
 argList: expression (',' expression)*;
 returnStmt: 'RETURN' expression;
 

@@ -154,8 +154,8 @@ def serializedATN():
         383,384,3,42,21,0,384,55,1,0,0,0,385,386,3,64,32,0,386,393,5,67,
         0,0,387,388,5,2,0,0,388,389,3,64,32,0,389,390,5,67,0,0,390,392,1,
         0,0,0,391,387,1,0,0,0,392,395,1,0,0,0,393,391,1,0,0,0,393,394,1,
-        0,0,0,394,57,1,0,0,0,395,393,1,0,0,0,396,397,5,39,0,0,397,398,3,
-        32,16,0,398,400,5,17,0,0,399,401,3,60,30,0,400,399,1,0,0,0,400,401,
+        0,0,0,394,57,1,0,0,0,395,393,1,0,0,0,396,397,5,39,0,0,397,398,5,
+        67,0,0,398,400,5,17,0,0,399,401,3,60,30,0,400,399,1,0,0,0,400,401,
         1,0,0,0,401,402,1,0,0,0,402,403,5,18,0,0,403,59,1,0,0,0,404,409,
         3,14,7,0,405,406,5,2,0,0,406,408,3,14,7,0,407,405,1,0,0,0,408,411,
         1,0,0,0,409,407,1,0,0,0,409,410,1,0,0,0,410,61,1,0,0,0,411,409,1,
@@ -2721,9 +2721,8 @@ class ConnectITParser ( Parser ):
             super().__init__(parent, invokingState)
             self.parser = parser
 
-        def identifier(self):
-            return self.getTypedRuleContext(ConnectITParser.IdentifierContext,0)
-
+        def ID(self):
+            return self.getToken(ConnectITParser.ID, 0)
 
         def argList(self):
             return self.getTypedRuleContext(ConnectITParser.ArgListContext,0)
@@ -2759,7 +2758,7 @@ class ConnectITParser ( Parser ):
             self.state = 396
             self.match(ConnectITParser.T__38)
             self.state = 397
-            self.identifier()
+            self.match(ConnectITParser.ID)
             self.state = 398
             self.match(ConnectITParser.T__16)
             self.state = 400
