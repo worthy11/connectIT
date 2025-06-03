@@ -1,0 +1,9 @@
+LAYER l = 10**red*
+SHAPE s
+NUMBER x
+
+REPEAT 5 TIMES WITH COUNTER i [
+    x += 1 
+]
+
+OUTPUT x

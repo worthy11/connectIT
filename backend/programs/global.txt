@@ -1,3 +1,4 @@
+UNITT t = *red*
 NUMBER x = 1
 [
     NUMBER x = 3
@@ -7,3 +8,5 @@ NUMBER x = 1
     GLOBAL x = 2
 ]
 OUTPUT x
+
+x = y

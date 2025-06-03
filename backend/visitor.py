@@ -258,13 +258,14 @@ class CustomVisitor(ConnectITVisitor):
         line = ctx.start.line
         column = ctx.start.column
 
-        name = ctx.identifier().ID()
+        name = ctx.identifier().ID().getText()
+        self.add_diagnostic_log(f"Line {line}: Accessing identifier '{name}'")
         scope = self.current_scope
-        if ctx.identifier().GLOBAL():
+        if ctx.getChild(0).getText() == "GLOBAL":
             while scope.parent:
                 scope = scope.parent
-        elif ctx.identifier.UP():
-            up_scopes = sum(1 for token in ctx.identifier().getChildren() if token.getText() == "UP")
+        elif ctx.getChild(0).getText() == "UP":
+            up_scopes = sum(1 for token in ctx.getChildren() if token.getText() == "UP")
             for _ in range(up_scopes):
                 if scope.parent:
                     if scope.parent.name not in ["block", "global"]:
@@ -275,8 +276,9 @@ class CustomVisitor(ConnectITVisitor):
         while name not in scope.variables and scope.parent:
             scope = scope.parent
         expected_type = scope.get_type(name)
+        ar = self.get_ar_for_scope(scope)
 
-        e, op = ctx.expression(1), ctx.extensionOperator()
+        e, op = ctx.expression(), ctx.extensionOperator()
         if expected_type not in ["LAYER", "SHAPE", "MODEL", "NUMBER"]:            
             raise Exception(f"Type Error: Cannot add new values to type {expected_type} at line {line}, column {column}. Only LAYER, SHAPE, MODEL, and NUMBER can be extended.")
 
@@ -285,10 +287,8 @@ class CustomVisitor(ConnectITVisitor):
             path.append(scope.name)
             scope = scope.parent
         path = ":".join(path)
-        print(f"Assignment path: {path}")
 
-        ar = self.get_ar_for_scope(scope)
-        value = ar.get(name)
+        value = ar.get(name+":"+path)
 
         new_value, received_type = self.visit(ctx.expression())
         if received_type != expected_type:
@@ -308,6 +308,7 @@ class CustomVisitor(ConnectITVisitor):
                 case "NUMBER":
                     new_value = self.extendNumber(value, e, op)
             ar.set(name+":"+path, new_value)
+            return
         raise Exception(f"Error: Cannot apply {op.getText()} operator to undeclared variable {name} at line {line}, column {column}")
 
     def extendLayer(self, value, e, op):

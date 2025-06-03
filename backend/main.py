@@ -58,7 +58,7 @@ def evaluate_expression(expression):
     tree = parser.program()
     # print(tree.toStringTree(recog=parser))
 
-    diagnostic_logs = []  # Create diagnostic logs list at the start
+    diagnostic_logs = []
 
     if lexer_error_listener.has_error:
         print(lexer_error_listener.errors)
@@ -96,7 +96,7 @@ def evaluate_expression(expression):
     try:
         visitor = CustomVisitor(listener.scopes)
         text, render, visitor_logs = visitor.visit(tree)
-        diagnostic_logs.extend(visitor_logs)  # Add visitor logs to our diagnostic logs
+        diagnostic_logs.extend(visitor_logs)
 
     except Exception as e:
         diagnostic_logs.append("ERROR: " + str(e))

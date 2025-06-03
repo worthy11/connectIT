@@ -294,8 +294,8 @@ class Shape(Structure):
     def bend(self, start, end, angle):
         x = self.radius * np.cos(np.deg2rad(angle))
     
-    def render(self, fig, stack=0):
-        shifts = [self.connections[0]["shift"]*2 + self.connections[0]["type"]]
+    def render(self, fig, stack=0, shift=0):
+        shifts = [shift + self.connections[0]["shift"]*2 + self.connections[0]["type"]]
         for idx, c in enumerate(self.connections[1:]):
             shifts.append(shifts[idx] + c["shift"]*2 + c["type"])
 
@@ -304,29 +304,51 @@ class Shape(Structure):
     
 class Model(Structure):
     def __init__(self, shapes: list[Shape]=[], connections: list[dict]=[]):
-        self.shapes = [s.__copy__() for s in shapes]
-        self.connections = [c for c in connections]
-        self.free = []
-
-    def update_free(self):
-        base_length = len(self.shapes[0].layers[0])
-        for s in self.shapes:
-            for l in s.layers:
-                self.free.append([False for _ in range(base_length*2)])
-
-        for l_i, l in enumerate([l for s in self.shapes for l in s.layers][1:]):
-            shift = l.shift
-            length = len(l.units)
-            for _ in range(shift, shift+length):
-                self.free[l_i-1][_] = False
+        self.shapes = []
+        self.connections = []
+        for s, c in zip(shapes, [{"from": 0, "to": 0, "type": 0, "shift": 0}] + connections):
+            self.add_shape(s, c)
+        self.closed = False
+        self.top = []
+        self.base_length = 0
 
     def add_shape(self, s: Shape, c: dict):
+        if c.get("from") is not None:
+            self.base_length = len(s.layers[0])
+            self.top = [0 for _ in range(self.base_length*2)]
+            self.shapes.append(s.__copy__())
+            self.connections.append(c)
+            return
+            
+        if s.layers[0]._closed and len(s.layers[0]) != self.base_length:
+            raise Exception("Boom1")
+        for l in s.layers:
+            if len(l) > self.base_length:
+                raise Exception("Boom2")
+        
+        type = c["type"]
+        shift = c["shift"]
+        _from = self.top[shift+type]
+        to = len(self.shapes)
+        for index in range(len(s.layers[0])):
+            if self.top[index] != _from:
+                raise Exception("Boom3")
+            self.top[index] = to
+            
+        c["from"] = _from
+        c["to"] = to
         self.shapes.append(s.__copy__())
         self.connections.append(c)
-        self.update_free()
 
     def add_model(self, m, c: dict):
         shapes = m.shapes
         connections = [c] + m.connections
         for s, c in zip(shapes, connections):
             self.add_shape(s, c)
+
+    def render(self, fig):
+        stack = 0
+        shifts = [self.connections[0]["shift"]*2 + self.connections[0]["type"]]
+        for idx, s in enumerate(self.shapes):
+            s.render(fig, stack=stack, shift=shifts[idx])
+            stack += len(s.layers)
