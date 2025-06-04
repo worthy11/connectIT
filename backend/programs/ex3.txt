@@ -1,5 +1,5 @@
 METHOD createRing(UNIT u, NUMBER n) RETURNS LAYER [
-    LAYER l = u <-> u
+    LAYER l = u*n CLOSED
     RETURN l
 ]
 
