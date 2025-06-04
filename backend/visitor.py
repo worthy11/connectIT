@@ -259,7 +259,7 @@ class CustomVisitor(ConnectITVisitor):
             
             error_msg = f"Error: Use of undeclared variable {name} at line {line}, column {column}."
             if similar_vars:
-                similar_vars = list(set(similar_vars))[:3]  # Limit to 3 suggestions
+                similar_vars = list(set(similar_vars))[:3]
                 error_msg += f" Did you mean: {', '.join(similar_vars)}?"
             raise Exception(error_msg)
 
