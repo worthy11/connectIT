@@ -247,7 +247,21 @@ class CustomVisitor(ConnectITVisitor):
 
         type = scope.get_type(name)
         if type is None:
-            raise Exception(f"Error: Use of undeclared variable {name} at line {line}, column {column}. Please ensure the variable is declared before use.")
+            similar_vars = []
+            current_scope = self.current_scope
+            while current_scope is not None:
+                for var_name in current_scope.variables:
+                    if (var_name.startswith(name[:3]) or 
+                        (abs(len(var_name) - len(name)) <= 2 and 
+                         sum(a == b for a, b in zip(var_name, name)) >= min(len(var_name), len(name)) - 2)):
+                        similar_vars.append(var_name)
+                current_scope = current_scope.parent
+            
+            error_msg = f"Error: Use of undeclared variable {name} at line {line}, column {column}."
+            if similar_vars:
+                similar_vars = list(set(similar_vars))[:3]  # Limit to 3 suggestions
+                error_msg += f" Did you mean: {', '.join(similar_vars)}?"
+            raise Exception(error_msg)
 
         path = []
         curr_scope = scope
