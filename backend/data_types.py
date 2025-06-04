@@ -33,7 +33,7 @@ def shape_to_model(s):
     return Model([s], [])
 
 def unit_to_number(u):
-    return 0
+    return 1
 
 def unit_to_boolean(u):
     return True

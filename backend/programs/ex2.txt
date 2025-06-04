@@ -1,0 +1,10 @@
+NUMBER x = 5
+NUMBER y = 6
+
+IF x > y [
+    OUTPUT 999
+] ELSE IF x == y [
+    OUTPUT 888
+] ELSE [
+    OUTPUT 777
+]

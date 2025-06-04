@@ -1,0 +1,7 @@
+METHOD createRing(UNIT u, NUMBER n) RETURNS LAYER [
+    LAYER l = u * n CLOSED
+    RETURN l
+]
+
+LAYER l = PERFORM createRing(*red*, 10)
+SHOW l

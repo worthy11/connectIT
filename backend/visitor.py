@@ -762,13 +762,15 @@ class CustomVisitor(ConnectITVisitor):
 
         if condition_value:
             self.visit(ctx.stmtBlock())
-        elif ctx.elifStmt():
-            for elseif in ctx.elifStmt():
-                self.visit(elseif)
-        elif ctx.elseStmt():
-            self.visit(ctx.elseStmt())
         else:
-            return
+            if ctx.elifStmt():
+                for elseif in ctx.elifStmt():
+                    if self.visit(elseif):
+                        return
+            if ctx.elseStmt():
+                self.visit(ctx.elseStmt())
+            else:
+                return
         
     def visitElifStmt(self, ctx):
         line = ctx.start.line
@@ -779,8 +781,9 @@ class CustomVisitor(ConnectITVisitor):
 
         if condition_value:
             self.visit(ctx.stmtBlock())
+            return True
         else:
-            return
+            return False
 
     def visitElseStmt(self, ctx):
         self.visit(ctx.stmtBlock())
