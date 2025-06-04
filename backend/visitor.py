@@ -414,7 +414,7 @@ class CustomVisitor(ConnectITVisitor):
             line = operator.start.line
             column = operator.start.column
             shift_val, shift_type = self.visit(operator.expression())
-            if shift_type != 5: 
+            if shift_type != "NUMBER": 
                 raise Exception(f"Shift value must be of type NUMBER, not '{shift_type}' at line {line}, column {column}.")
                 
             shift = shift_val
