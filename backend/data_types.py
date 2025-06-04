@@ -244,7 +244,7 @@ class Layer(Structure):
 
     def __str__(self):
         if self._closed:
-            return f"{self._units}, CLOSED"
+            return f"[{', '.join([str(unit) for unit in self._units])}], CLOSED"
         return f"[{', '.join([str(unit) for unit in self._units])}]"
 
     def add_unit(self, u: Unit):
