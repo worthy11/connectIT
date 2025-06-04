@@ -51,7 +51,6 @@ baseExpr:
 	| BOOLEAN
 	| funcCall
 	| '(' expression ')'
-	| '[' expression ']'
 	| dataType '[' expression ']';
 identifier: (('UP')* | 'GLOBAL') ID;
 unitExpr: COLOR (PATTERN)?;

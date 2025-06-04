@@ -32,6 +32,30 @@ def layer_to_model(l):
 def shape_to_model(s):
     return Model([s], [])
 
+def unit_to_number(u):
+    return 0
+
+def unit_to_boolean(u):
+    return True
+
+def multiunit_to_number(mu):
+    return mu.number
+
+def layer_to_number(l):
+    return len(l)
+
+def shape_to_number(s):
+    return len(s.layers)
+
+def model_to_number(m):
+    return len(m.shapes)
+
+def any_to_boolean(x):
+    return True
+
+def number_to_boolean(x):
+    return x > 0
+
 type_map = {
     "UNIT": {
         "MULTI_UNIT": unit_to_multiunit,
@@ -46,6 +70,16 @@ type_map = {
     "NUMBER": {},
     "BOOLEAN": {},
     "FUNCTION": {}
+}
+
+cast_map = {
+    "UNIT": {"NUMBER": unit_to_number, "BOOLEAN": any_to_boolean},
+    "MULTI_UNIT": {"NUMBER": multiunit_to_number, "BOOLEAN": any_to_boolean},
+    "LAYER": {"NUMBER": layer_to_number, "BOOLEAN": any_to_boolean},
+    "SHAPE": {"NUMBER": shape_to_number, "BOOLEAN": any_to_boolean},
+    "MODEL": {"NUMBER": model_to_number, "BOOLEAN": any_to_boolean},
+    "NUMBER": {"BOOLEAN": number_to_boolean},
+    "BOOLEAN": {"NUMBER": lambda x: 1 if x else 0},
 }
 
 class Structure:

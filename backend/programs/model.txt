@@ -5,4 +5,4 @@ REPEAT 5 TIMES WITH COUNTER i [
     s <+- l
 ]
 
-SHOW s
+OUTPUT BOOLEAN[2**red*<->*green*]

@@ -709,24 +709,12 @@ class CustomVisitor(ConnectITVisitor):
 
         elif ctx.expression():
             value, type = self.visit(ctx.expression())
-            if ctx.getChild(0).getText() == '[':
-                if self.assigning:
-                    raise Exception(f"Error: Cannot cast in a non-evaluating context at line {line}, column {column}.")
-                if type not in ["UNIT", "MULTI_UNIT", "LAYER", "SHAPE"]:
-                    raise Exception(f"Type Error: Cannot cast type {type} to another type at line {line}, column {column}.")
-                match type:
-                    case "UNIT":
-                        value = MultiUnit(u=value)
-                        type = "MULTI_UNIT"
-                    case "MULTI_UNIT":
-                        value = Layer(units=value.extract_units())
-                        type = "LAYER"
-                    case "LAYER":
-                        value = Shape(layers=[value])
-                        type = "SHAPE"
-                    case "SHAPE":
-                        value = Model(shapes=[value])
-                        type = "MODEL"
+            if ctx.dataType():
+                if cast_map[type].get(ctx.dataType().getText()) is not None:
+                    value = cast_map[type][ctx.dataType().getText()](value)
+                    type = ctx.dataType().getText()
+                else:
+                    raise Exception(f"Type Error: Cannot cast type {type} to {ctx.dataType().getText()} at line {line}, column {column}.")
         return value, type
     
     def visitUnitExpr(self, ctx):
