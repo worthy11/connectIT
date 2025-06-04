@@ -1,5 +1,6 @@
 NUMBER x = 2
 [
+    OUTPUT x
     NUMBER x = 3
     OUTPUT x
     OUTPUT UP x

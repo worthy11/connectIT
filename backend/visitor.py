@@ -249,14 +249,22 @@ class CustomVisitor(ConnectITVisitor):
         if type is None:
             raise Exception(f"Error: Use of undeclared variable {name} at line {line}, column {column}. Please ensure the variable is declared before use.")
 
-        ar = self.get_ar_for_scope(scope)
-
         path = []
-        while scope is not None:
-            path.append(scope.name)
+        curr_scope = scope
+        while curr_scope is not None:
+            path.append(curr_scope.name)
+            curr_scope = curr_scope.parent
+
+        ar = self.get_ar_for_scope(scope)
+        lookup_path = ":".join(path)
+        value = ar.get(name+":"+lookup_path)
+        while value is None:
             scope = scope.parent
-        path = ":".join(path)
-        value = ar.get(name+":"+path)
+            path.pop(0)
+            lookup_path = ":".join(path)
+            ar = self.get_ar_for_scope(scope)
+            value = ar.get(name+":"+lookup_path)
+
         return value, type
     
     def visitExtension(self, ctx):
@@ -454,7 +462,7 @@ class CustomVisitor(ConnectITVisitor):
                     type = "LAYER"
                 else:
                     raise Exception(f"Type Error: Cannot use CLOSED keyword with type {type} at line {line}, column {column}.")
-                    
+
         return value, type
 
     def createLayer(self, ctx):
