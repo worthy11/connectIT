@@ -143,6 +143,11 @@ class Unit(Structure):
                 self.j_faces.append(face[2])
                 self.k_faces.append(face[3])
 
+    def __str__(self) -> str:
+        if str(self.pattern) == "None":
+            return f"*{self.color}*"
+        print(self.pattern)
+        return f"*{self.color}* *{self.pattern}*"
 
     def __copy__(self):
         return Unit(self.color, self.pattern)
@@ -237,6 +242,11 @@ class Layer(Structure):
     def __len__(self):
         return len(self._units)
 
+    def __str__(self):
+        if self._closed:
+            return f"{self._units}, CLOSED"
+        return f"[{', '.join([str(unit) for unit in self._units])}]"
+
     def add_unit(self, u: Unit):
         self._units.append(u.__copy__())
         if self._closed:
@@ -309,6 +319,9 @@ class Shape(Structure):
 
     def __copy__(self):
         return Shape(self.layers, self.connections)
+
+    def __str__(self):
+        return f"[{', '.join([str(layer) for layer in self.layers])}]"
 
     def add_layer(self, l: Layer, c: dict):
         self.layers.append(l.__copy__())
