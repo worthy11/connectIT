@@ -209,6 +209,7 @@ class CustomVisitor(ConnectITVisitor):
 
         value, received_type = self.visit(ctx.expression())
         if received_type != expected_type:
+            print(received_type, expected_type)
             if type_map[received_type].get(expected_type) is not None:
                 value = type_map[received_type][expected_type](value)
             else:
@@ -421,23 +422,16 @@ class CustomVisitor(ConnectITVisitor):
         return {"type": type, "shift": shift}
 
     def visitExpression(self, ctx):
+        line = ctx.start.line
+        column = ctx.start.column
         value, type = self.visit(ctx.logicExpr(0))
-        if ctx.getChildCount() % 2 == 0:
-            # TODO: Do zmiany
-            if type == "LAYER":
-                if self.assigning:
-                    raise Exception(f"Error: Cannot set a layer to CLOSED in a non-evaluating context at line {line}, column {column}.")
-                value.set_closed(True)
-            else:
-                line = ctx.start.line
-                column = ctx.start.column
-                raise Exception(f"Cannot use CLOSED keyword with type {type} at line {line}, column {column}.")
         if ctx.arrowOperator():
-            if self.assigning:
-                raise Exception(f"Error: Cannot connect elements in a non-evaluating context at line {line}, column {column}.")
             line = ctx.start.line
             column = ctx.start.column
             match type:
+                case "UNIT":
+                    value = self.createLayer(ctx)
+                    type = "LAYER"
                 case "MULTI_UNIT":
                     value = self.createLayer(ctx)
                     type = "LAYER"
@@ -448,14 +442,31 @@ class CustomVisitor(ConnectITVisitor):
                     value = self.createModel(ctx)
                     type = "MODEL"
                 case _:
-                    if type == 'UNIT':
-                        raise Exception(f"Cannot use connectors with type '{type}' at line {line}, column {column}. Cast UNIT using [variable] syntax.")
                     raise Exception(f"Cannot use connectors with type '{type}' at line {line}, column {column}.")
+                    
+        if ctx.getChildCount() % 2 == 0:
+            if type == "LAYER":
+                value.set_closed(True)
+            else:
+                if type_map[type].get("LAYER") is not None:
+                    value = type_map[type]["LAYER"](value)
+                    value.set_closed(True)
+                    type = "LAYER"
+                else:
+                    raise Exception(f"Type Error: Cannot use CLOSED keyword with type {type} at line {line}, column {column}.")
                     
         return value, type
 
     def createLayer(self, ctx):
-        value, _ = self.visit(ctx.logicExpr(0))
+        line = ctx.start.line
+        column = ctx.start.column
+        value, type = self.visit(ctx.logicExpr(0))
+        if type != "MULTI_UNIT":
+            if type_map[type].get("MULTI_UNIT") is not None:
+                value = type_map[type]["MULTI_UNIT"](value)
+                type = "MULTI_UNIT"
+            else:
+                raise Exception(f"Type Error: Cannot use '<->' connector to create a LAYER at line {line}, column {column}. Change connector to <->.")
         first = value.extract_units()
         closed = ctx.getChildCount() % 2 == 0
         result = Layer(units=first, closed=closed)

@@ -93,18 +93,18 @@ def evaluate_expression(expression):
             "diagnostic_logs": diagnostic_logs
         }
 
-    try:
-        visitor = CustomVisitor(listener.scopes)
-        text, render, visitor_logs = visitor.visit(tree)
-        diagnostic_logs.extend(visitor_logs)
+    # try:
+    visitor = CustomVisitor(listener.scopes)
+    text, render, visitor_logs = visitor.visit(tree)
+    diagnostic_logs.extend(visitor_logs)
 
-    except Exception as e:
-        diagnostic_logs.append("ERROR: " + str(e))
-        return {
-            "type": "error",
-            "message": f"{str(e)}",
-            "diagnostic_logs": diagnostic_logs
-        }
+    # except Exception as e:
+    #     diagnostic_logs.append("ERROR: " + str(e))
+    #     return {
+    #         "type": "error",
+    #         "message": f"{str(e)}",
+    #         "diagnostic_logs": diagnostic_logs
+    #     }
     
     return text, render, diagnostic_logs
 
