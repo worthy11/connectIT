@@ -1,0 +1,8 @@
+UNIT u = *lilac*
+
+LAYER l = 2*u <-> *red*
+SHAPE s = l <<- l <<-(1)- l
+
+NUMBER x = NUMBER[s]
+SHOW s
+OUTPUT x

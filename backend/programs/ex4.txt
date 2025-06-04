@@ -1,0 +1,9 @@
+LAYER l = 5**lilac*
+NUMBER x
+x = NUMBER[l]
+OUTPUT x
+
+
+BOOLEAN t = FALSE
+NUMBER x = NUMBER[t]
+OUTPUT x
