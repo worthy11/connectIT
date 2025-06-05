@@ -217,7 +217,7 @@ class CustomVisitor(ConnectITVisitor):
                     raise Exception(f"Error: Cannot assign undeclared variable value to {name} at line {line}, column {column}. Please ensure the variable is declared before assignment.")
                 if expected_type is None:
                     raise Exception(f"Error: Cannot assign to undeclared variable {name} at line {line}, column {column}. Please ensure the variable is declared before assignment.")
-                raise Exception(f"Type Error: Cannot assign {received_type} to {expected_type} at line {line}, column {column}. Did you mean to type {expected_type} {name}?")
+                raise Exception(f"Type Error: Cannot assign {received_type} to {expected_type} at line {line}, column {column}. Did you mean to type {received_type} {name}?")
 
         if name+":"+path in ar.members:
             ar.set(name+":"+path, value)
