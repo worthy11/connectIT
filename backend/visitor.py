@@ -879,9 +879,9 @@ class CustomVisitor(ConnectITVisitor):
 
         try:
             for i in range(count):
-                value = self.call_stack.peek().get(path)
-                self.call_stack.peek().set(path, value + start + i * step)
                 self.visit(ctx.stmtBlock())
+                value = self.call_stack.peek().get(path)
+                self.call_stack.peek().set(path, value + step)
         finally:
             self.current_scope = self.current_scope.parent
     
