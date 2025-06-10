@@ -1,0 +1,5 @@
+SHAPE tree = *black* CLOSED
+REPEAT 9 TIMES WITH COUNTER i START 10 STEP -1[
+    tree <+- i * *green* CLOSED
+]
+SHOW tree

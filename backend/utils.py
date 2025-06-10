@@ -14,7 +14,7 @@ color_map = {
 class Scope:
     def __init__(self, name, parent=None):
         self.name = name
-        self.variables = {}
+        self.variables = {} # tablica symboli
         self.parent = parent
         self.children = []
 

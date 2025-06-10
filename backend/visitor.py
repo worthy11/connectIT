@@ -272,7 +272,7 @@ class CustomVisitor(ConnectITVisitor):
         ar = self.get_ar_for_scope(scope)
         lookup_path = ":".join(path)
         value = ar.get(name+":"+lookup_path)
-        while value is None:
+        while value is None and scope.parent:
             scope = scope.parent
             path.pop(0)
             lookup_path = ":".join(path)
@@ -369,8 +369,8 @@ class CustomVisitor(ConnectITVisitor):
             if not received_value.is_closed():
                 raise Exception(f"Type Error: Cannot add an open layer to a closed shape at line {line}, column {column}. Close the layer first using CLOSED keyword.")
 
-            if len(received_value) != len(value.layers[0]):
-                raise Exception(f"Type Error: New layer must have {len(value.layers[0])} units (same as existing layers) because the shape is closed at line {line}, column {column}.")
+            # if len(received_value) != len(value.layers[0]):
+            #     raise Exception(f"Type Error: New layer must have {len(value.layers[0])} units (same as existing layers) because the shape is closed at line {line}, column {column}.")
 
         if not shape_closed:
             if received_value.is_closed():
